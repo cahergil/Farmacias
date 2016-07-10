@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Farmacias</string>
+    <string name="action_settings">Settings</string>
+    <string name="places_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="maps_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_server_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_browser_api_key">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
+
+    <string name="content_authority">com.chernandezgil.farmacias</string>
+</resources>
