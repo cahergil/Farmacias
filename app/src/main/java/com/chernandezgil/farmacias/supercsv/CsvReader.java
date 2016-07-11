@@ -1,6 +1,6 @@
 package com.chernandezgil.farmacias.supercsv;
 
-import com.chernandezgil.farmacias.Utils.Util;
+import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.FarmaciasCsvBean;
 
 import org.supercsv.cellprocessor.Optional;

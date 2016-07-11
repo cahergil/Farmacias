@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias.Utils;
+package com.chernandezgil.farmacias.Utilities;
 
 import android.util.Log;
 
@@ -13,5 +13,9 @@ public class Util {
         if(BuildConfig.DEBUG) {
             Log.d(tag,message);
         }
+    }
+   // http://stackoverflow.com/questions/8710719/generating-an-alphabetic-sequence-in-java
+    public static String characterFromInteger(int i) {
+        return i < 0 ? "" : characterFromInteger((i / 26) - 1) + (char)(65 + i % 26);
     }
 }

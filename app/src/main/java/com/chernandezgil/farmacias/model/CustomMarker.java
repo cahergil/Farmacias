@@ -8,12 +8,16 @@ public class CustomMarker {
     private String id;
     private Double latitude;
     private Double longitude;
+    private String label;
 
-    public CustomMarker(String id, Double latitude, Double longitude) {
+
+
+    public CustomMarker(String id, Double latitude, Double longitude, String label) {
 
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.label=label;
     }
 
     public CustomMarker() {
@@ -44,5 +48,12 @@ public class CustomMarker {
 
     public void setCustomMarkerLongitude(Double mLongitude) {
         this.longitude = mLongitude;
+    }
+
+    public void setCustomMarkerLabel(String label) {
+        this.label=label;
+    }
+    public String getCustomMarkerLabel(){
+        return label;
     }
 }

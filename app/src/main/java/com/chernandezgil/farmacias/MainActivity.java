@@ -2,26 +2,26 @@ package com.chernandezgil.farmacias;
 
 import android.Manifest;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
 import com.aitorvs.android.allowme.AllowMeCallback;
 import com.aitorvs.android.allowme.PermissionResultSet;
-import com.chernandezgil.farmacias.Utils.Util;
-import com.chernandezgil.farmacias.database.DbContract;
-import com.chernandezgil.farmacias.model.CustomMarker;
+import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.services.DownloadFarmacias;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,48 +31,48 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
     GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    LocationListener, OnMapReadyCallback,LoaderManager.LoaderCallbacks<Cursor> {
+    LocationListener {
 
-    @BindView(R.id.coordinates)
-    TextView mTvCoordinates;
+    @BindView(R.id.navigation_drawer_layout)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.navigation_view)
+    NavigationView navigationView;
+    @BindDrawable(R.drawable.ic_menu_white_24dp)
+    Drawable menuDrawable;
+
+    ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private List<Place> mPlacesList = new ArrayList<>();
-    private GoogleMap mMap;
-    private static final int FARMACIAS_LOADER=1;
-    private HashMap mMarkersHashMap;
+    private Location mLocation;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        actionBar=getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(menuDrawable);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
+        if(navigationView!=null) {
+            setupNavigationDrawerContent(navigationView);
+        }
         Stetho.initializeWithDefaults(this);
 
 
@@ -85,23 +85,91 @@ public class MainActivity extends AllowMeActivity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        ButterKnife.bind(this);
+
+
+        if(savedInstanceState==null) {
+
+            Intent intent = new Intent(this, DownloadFarmacias.class);
+            startService(intent);
+        } else {
+            mLocation=savedInstanceState.getParcelable("location_key");
+        }
+        setupNavigationDrawerContent(navigationView);
 
 
 
-        Intent intent=new Intent(this, DownloadFarmacias.class);
-        startService(intent);
 
-        MapFragment map = ((MapFragment) getFragmentManager().findFragmentById(R.id.mapa));
-        map.getMapAsync(this);
+    }
 
+    private void setupNavigationDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+
+                    case R.id.item_navigation_localizador:
+                        item.setChecked(true);
+                        setFragment(0);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+
+                    case R.id.item_navigation_buscar:
+                        item.setChecked(true);
+                        setFragment(1);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.item_navigation_favoritas:
+                        item.setChecked(true);
+                        setFragment(2);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.item_navigation_opcion2:
+                        item.setChecked(true);
+                        setFragment(3);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+
+                }
+                return true;
+            }
+        });
+    }
+
+    private void setFragment(int position) {
+        FragmentManager fragmentManager;
+        FragmentTransaction fragmentTransaction;
+        switch (position) {
+            case 0:
+                fragmentManager = getSupportFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                FragmentMain fragmentMain = new FragmentMain();
+                Bundle bundle=new Bundle();
+                bundle.putParcelable("location_key",mLocation);
+                fragmentMain.setArguments(bundle);
+                fragmentTransaction.replace(R.id.fragment, fragmentMain);
+                fragmentTransaction.commit();
+                break;
+            case 1:
+                fragmentManager = getSupportFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                FragmentFind starredFragment = new FragmentFind();
+                fragmentTransaction.replace(R.id.fragment, starredFragment);
+                fragmentTransaction.commit();
+                break;
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("location_key",mLocation);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
-        getSupportLoaderManager().initLoader(FARMACIAS_LOADER,null,this);
+
     }
 
     @Override
@@ -127,6 +195,9 @@ public class MainActivity extends AllowMeActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id==android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -138,7 +209,8 @@ public class MainActivity extends AllowMeActivity implements
         Util.LOGD(LOG_TAG, "onConnected");
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(100000);
+                //min x secs x millisec
+                .setInterval(10*60*1000);
 
         if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             new AllowMe.Builder()
@@ -172,99 +244,16 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     public void onLocationChanged(Location location) {
         Util.LOGD(LOG_TAG, "onLocationChanged");
-        mTvCoordinates.setText(location.toString());
-      //  gotoToLatLong(location);
-
-    }
-    private void gotoToLatLong(Location location) {
-        LatLng newLatLng=new LatLng(location.getLatitude(),location.getLongitude());
-        CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(newLatLng,25);
-        mMap.moveCamera(cameraUpdate);
+        mLocation=location;
+        //First fragment
+        setFragment(0);
 
 
     }
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMap=map;
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-       // map.setMyLocationEnabled(true);
-        mMap.setTrafficEnabled(true);
-        mMap.setIndoorEnabled(true);
-        mMap.setBuildingsEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-    }
 
-    private void drawMarkerOnMap(Cursor data) {
-        while(data.moveToNext()) {
-            CustomMarker customMarker=new CustomMarker();
-            customMarker.setCustomMarkerId(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
-            customMarker.setCustomMarkerLatitude(data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT)));
-            customMarker.setCustomMarkerLongitude(data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON)));
-            addMarker(customMarker);
 
-        }
-        zoomAnimateLevelToFitMarkers(120);
-    }
 
-    public void setUpMarkersHashMap() {
-        if (mMarkersHashMap == null) {
-            mMarkersHashMap = new HashMap();
-        }
-    }
-    //this is method to help us add a Marker into the hashmap that stores the Markers
-    private void addMarkerToHashMap(CustomMarker customMarker, Marker marker) {
-        setUpMarkersHashMap();
-        mMarkersHashMap.put(customMarker, marker);
-    }
-    //this is method to help us add a Marker to the map
-    private void addMarker(CustomMarker customMarker) {
-        MarkerOptions markerOption = new MarkerOptions().position(
-                new LatLng(customMarker.getCustomMarkerLatitude(), customMarker.getCustomMarkerLongitude())).icon(
-                BitmapDescriptorFactory.defaultMarker());
 
-        Marker newMark = mMap.addMarker(markerOption);
-        addMarkerToHashMap(customMarker, newMark);
-    }
 
-    public void zoomAnimateLevelToFitMarkers(int padding) {
-        LatLngBounds.Builder b = new LatLngBounds.Builder();
-        Iterator<Map.Entry> iter = mMarkersHashMap.entrySet().iterator();
 
-        while (iter.hasNext()) {
-            Map.Entry mEntry = (Map.Entry) iter.next();
-            CustomMarker key = (CustomMarker) mEntry.getKey();
-            LatLng ll = new LatLng(key.getCustomMarkerLatitude(), key.getCustomMarkerLongitude());
-            b.include(ll);
-        }
-        LatLngBounds bounds = b.build();
-
-        // Change the padding as per needed
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.animateCamera(cu);
-    }
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(id==FARMACIAS_LOADER){
-            return new CursorLoader(this,
-                    DbContract.FarmaciasEntity.CONTENT_URI,
-                    null,
-                    DbContract.FarmaciasEntity.LOCALITY + " LIKE '%"+ "Villanueva de la Serena" +"%'",
-                    null,
-                    null
-                    );
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(loader.getId()==FARMACIAS_LOADER) {
-            drawMarkerOnMap(data);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 }
