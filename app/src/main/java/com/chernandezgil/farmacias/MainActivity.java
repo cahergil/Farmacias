@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +58,9 @@ public class MainActivity extends AllowMeActivity implements
     private List<Place> mPlacesList = new ArrayList<>();
     private Location mLocation;
 
-
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,6 +248,7 @@ public class MainActivity extends AllowMeActivity implements
     public void onLocationChanged(Location location) {
         Util.LOGD(LOG_TAG, "onLocationChanged");
         mLocation=location;
+
         //First fragment
         setFragment(0);
 

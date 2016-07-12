@@ -1,59 +1,77 @@
 package com.chernandezgil.farmacias.model;
 
 /**
- * Created by Carlos on 09/07/2016.
+ * Created by Carlos on 10/07/2016.
  */
-public class CustomMarker {
-
-    private String id;
-    private Double latitude;
-    private Double longitude;
-    private String label;
+public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomMarker>{
 
 
+    Double distance;
+    String hours;
+    boolean isOpen;
+    String order;
 
-    public CustomMarker(String id, Double latitude, Double longitude, String label) {
-
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.label=label;
+    public String getOrder() {
+        return order;
     }
 
-    public CustomMarker() {
-        this.id = "";
-        this.latitude = 0.0;
-        this.longitude = 0.0;
+    public void setOrder(String order) {
+        this.order = order;
     }
 
-    public String getCustomMarkerId() {
-        return id;
+    public String getHours() {
+        return hours;
     }
 
-    public void setCustomMarkerId(String id) {
-        this.id = id;
+    public void setHours(String hours) {
+        this.hours = hours;
     }
 
-    public Double getCustomMarkerLatitude() {
-        return latitude;
+    public CustomMarker(){
+
     }
 
-    public void setCustomMarkerLatitude(Double mLatitude) {
-        this.latitude = mLatitude;
+    public Double getDistance() {
+        return distance;
     }
 
-    public Double getCustomMarkerLongitude() {
-        return longitude;
+    public void setDistance(Double distance) {
+        this.distance = distance;
     }
 
-    public void setCustomMarkerLongitude(Double mLongitude) {
-        this.longitude = mLongitude;
+    public boolean isOpen() {
+        return isOpen;
     }
 
-    public void setCustomMarkerLabel(String label) {
-        this.label=label;
+    public void setOpen(boolean open) {
+        this.isOpen = open;
     }
-    public String getCustomMarkerLabel(){
-        return label;
+
+
+
+    @Override
+    public int compareTo(CustomMarker other) {
+        return this.getDistance().compareTo(other.getDistance());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CustomMarker that = (CustomMarker) o;
+
+        if (!getDistance().equals(that.getDistance())) return false;
+        return getOrder().equals(that.getOrder());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + getDistance().hashCode();
+        result = 31 * result + getOrder().hashCode();
+        return result;
     }
 }

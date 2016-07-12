@@ -22,7 +22,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,7 +29,6 @@ import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.database.DbContract;
 import com.chernandezgil.farmacias.model.CustomMarker;
-import com.chernandezgil.farmacias.model.FarmaciaRow;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,23 +47,38 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import rx.Observable;
 
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class FragmentMain extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
+public class FragmentMain extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor>,
+        GoogleMap.OnMarkerClickListener{
     private static final String LOG_TAG = FragmentMain.class.getSimpleName();
     private GoogleMap mMap;
     private static final int FARMACIAS_LOADER = 1;
     private HashMap mMarkersHashMap;
     private Location mLocation;
     TimeMeasure mTm = new TimeMeasure(LOG_TAG);
-    private Cursor mData;
     private boolean mBottomsheetLoaded = false;
     private BottomSheetBehavior mBottomSheetBehavior;
-    private View mBottomSheet;
     private SupportMapFragment mMapFragment;
+    private boolean mRotation=false;
+    @BindView(R.id.adress)
+    TextView tvAdress;
+    @BindView(R.id.phone)
+    TextView tvPhone;
+    @BindView(R.id.hours)
+    TextView tvHours;
+    @BindView(R.id.bottom_sheet)
+    View bottomSheet;
+    @BindView(R.id.distance)
+    TextView tvDistance;
+    @BindView(R.id.name)
+    TextView tvName;
+
     public FragmentMain() {
     }
 
@@ -82,7 +95,7 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
+        ButterKnife.bind(this,view);
         //to avoid: error duplicate http://stackoverflow.com/questions/14083950/duplicate-id-tag-null-or-parent-id-with-another-fragment-for-com-google-androi
         FragmentManager fm = getChildFragmentManager();
         SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
@@ -96,19 +109,22 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
         }
         mapFragment.getMapAsync(this);
         mMapFragment=mapFragment;
-        View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        LinearLayout llFragmentContainer = (LinearLayout) view.findViewById(R.id.mapFragmentContainer);
+
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         mBottomSheetBehavior.setPeekHeight(300);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 //        MapFragment mapFragment= (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.mapa);
 //        mapFragment.getMapAsync(this);
+        if(savedInstanceState==null) {
+            Bundle bundle = getArguments();
+            if (bundle != null) {
+                mLocation = bundle.getParcelable("location_key");
 
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            mLocation = bundle.getParcelable("location_key");
+            }
+        }else {
+            mRotation=true;
+            mLocation = savedInstanceState.getParcelable("location_key");
         }
-
 
         return view;
     }
@@ -155,9 +171,15 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
                     getResources().getDisplayMetrics());
             params.setMargins(margin, margin, margin, margin);
         }
+        mMap.setOnMarkerClickListener(this);
     }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("location_key",mLocation);
+    }
 
     private void gotoToLatLong(Location location) {
         LatLng newLatLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -206,11 +228,11 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
     }
     private void bindView(Cursor data) {
 
-        List<FarmaciaRow> farmaciasList=new ArrayList<>();
+        List<CustomMarker> farmaciasList=new ArrayList<>();
 
         while (data.moveToNext()) {
 
-            FarmaciaRow farmacia=new FarmaciaRow();
+            CustomMarker farmacia=new CustomMarker();
 
             double latDest=data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
             double lonDest=data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
@@ -229,45 +251,24 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
             farmacia.setOpen(false);
 
             farmaciasList.add(farmacia);
-//            //map
-
 
         }
-        getLoaderManager().destroyLoader(FARMACIAS_LOADER);
+
         farmaciasList= toFilteredSortedOrderedList(farmaciasList);
         for (int i = 0;i < farmaciasList.size();i++) {
-            FarmaciaRow f=farmaciasList.get(i);
-
-            //Map Marker
-            CustomMarker customMarker = new CustomMarker();
-            customMarker.setCustomMarkerId(f.getName());
-            customMarker.setCustomMarkerLatitude(f.getLat());
-            customMarker.setCustomMarkerLongitude(f.getLon());
-            customMarker.setCustomMarkerLabel(f.getOrder());
-            addMarker(customMarker);
-            //botoomsheet
-            LinearLayout llBottomSheetContainer = (LinearLayout) getView().findViewById(R.id.rowsContainer);
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.bottom_sheet_row, llBottomSheetContainer, false);
-            TextView order= (TextView) view.findViewById(R.id.order);
-            TextView name = (TextView) view.findViewById(R.id.name);
-            TextView distance = (TextView) view.findViewById(R.id.distance);
-            TextView street = (TextView) view.findViewById(R.id.street);
-            TextView open = (TextView) view.findViewById(R.id.open);
-            name.setText(f.getName());
-            distance.setText(""+String.format("%1$,.2f m",f.getDistance()));
-            street.setText(f.getAddress());
-            open.setText("OPEN");
-            order.setText(f.getOrder());
-            llBottomSheetContainer.addView(view);
-
+                addMarker(farmaciasList.get(i));
         }
 
         CustomMarker userLocation=new CustomMarker();
-        userLocation.setCustomMarkerId("userLocation");
-        userLocation.setCustomMarkerLatitude(mLocation.getLatitude());
-        userLocation.setCustomMarkerLongitude(mLocation.getLongitude());
+        userLocation.setName("userLocation");
+        userLocation.setLat(mLocation.getLatitude());
+        userLocation.setLon(mLocation.getLongitude());
+        //for hascode and equals
+        userLocation.setOrder("A");
+        userLocation.setDistance(0d);
         addMarker(userLocation);
-
+        //user location by defaul in bottom sheet
+        //tvName.setText();
 
         zoomAnimateLevelToFitMarkers(120);
     }
@@ -279,12 +280,12 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
      * @return
      */
 
-    public List<FarmaciaRow> toFilteredSortedOrderedList(List<FarmaciaRow> list){
+    public List<CustomMarker> toFilteredSortedOrderedList(List<CustomMarker> list){
         String str;
 
        return Observable.from(list)
                 .filter(f->{
-                    if(f.getDistance()<400) {
+                    if(f.getDistance()<4000) {
                         return true;
                     }
                     return false;
@@ -307,7 +308,7 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
     //this is method to help us add a Marker into the hashmap that stores the Markers
     private void addMarkerToHashMap(CustomMarker customMarker, Marker marker) {
         setUpMarkersHashMap();
-        mMarkersHashMap.put(customMarker, marker);
+        mMarkersHashMap.put(marker,customMarker);
     }
 
 
@@ -333,18 +334,23 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     private void addMarker(CustomMarker customMarker) {
         MarkerOptions markerOption = new MarkerOptions().position(
-                new LatLng(customMarker.getCustomMarkerLatitude(), customMarker.getCustomMarkerLongitude())
+                new LatLng(customMarker.getLat(), customMarker.getLon())
         );
-        if(customMarker.getCustomMarkerId().equals("userLocation")) {
-          //  markerOption.icon()
+        if(customMarker.getName().equals("userLocation")) {
+            markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    .title("Tu ubicación");
+
+         //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
-            markerOption.icon(BitmapDescriptorFactory.fromBitmap(getCustomBitmap(customMarker.getCustomMarkerLabel())))
-                    .title(customMarker.getCustomMarkerLabel())
-                    .snippet(customMarker.getCustomMarkerLabel());
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(getCustomBitmap(customMarker.getOrder())))
+                    .title(customMarker.getName())
+                    .snippet(getString(R.string.format_distance,customMarker.getDistance()/1000));
         }
 
 
         Marker newMark = mMap.addMarker(markerOption);
+
+        newMark.showInfoWindow();//only last infowindow shows up
         addMarkerToHashMap(customMarker, newMark);
     }
 
@@ -354,17 +360,38 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
 
         while (iter.hasNext()) {
             Map.Entry mEntry = (Map.Entry) iter.next();
-            CustomMarker key = (CustomMarker) mEntry.getKey();
-            LatLng ll = new LatLng(key.getCustomMarkerLatitude(), key.getCustomMarkerLongitude());
+            Marker key = (Marker) mEntry.getKey();
+            CustomMarker c= (CustomMarker) mMarkersHashMap.get(key);
+            LatLng ll = new LatLng(c.getLat(), c.getLon());
             b.include(ll);
         }
         LatLngBounds bounds = b.build();
 
         // Change the padding as per needed
+
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.animateCamera(cu);
+        if(mRotation) {
+            mMap.moveCamera(cu);
+            mRotation = false;
+        } else {
+            mMap.animateCamera(cu);
+        }
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+            CustomMarker customMarker= (CustomMarker) mMarkersHashMap.get(marker);
+            tvName.setText(customMarker.getName());
+            tvDistance.setText(getString(R.string.format_distance,customMarker.getDistance()));
+            tvAdress.setText(customMarker.getAddress());
+            tvHours.setText(customMarker.getHours());
+            tvPhone.setText(customMarker.getPhone());
+
+            if( mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+            return false;
+    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -397,4 +424,6 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
         Util.LOGD(LOG_TAG, "onDestroy");
         super.onDestroy();
     }
+
+
 }
