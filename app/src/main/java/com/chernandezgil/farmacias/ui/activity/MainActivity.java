@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias;
+package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -22,8 +22,14 @@ import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
 import com.aitorvs.android.allowme.AllowMeCallback;
 import com.aitorvs.android.allowme.PermissionResultSet;
+import com.chernandezgil.farmacias.MyApplication;
+import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
+import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
+import com.chernandezgil.farmacias.ui.fragment.FragmentMain;
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.services.DownloadFarmacias;
+import com.chernandezgil.farmacias.view.MainMvpView;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,13 +42,15 @@ import com.google.android.gms.location.places.Places;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
     GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    LocationListener {
+    LocationListener,MainMvpView{
 
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
@@ -50,13 +58,18 @@ public class MainActivity extends AllowMeActivity implements
     NavigationView navigationView;
     @BindDrawable(R.drawable.ic_menu_white_24dp)
     Drawable menuDrawable;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private GoogleApiClient mGoogleApiClient;
+
+    @Inject GoogleApiClient mGoogleApiClient;
+
     private LocationRequest mLocationRequest;
     private List<Place> mPlacesList = new ArrayList<>();
     private Location mLocation;
+    private MainActivityPresenter mMainActivityPresenter;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -66,32 +79,19 @@ public class MainActivity extends AllowMeActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        actionBar=getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(menuDrawable);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        if(navigationView!=null) {
-            setupNavigationDrawerContent(navigationView);
-        }
+        mMainActivityPresenter=new MainActivityPresenter();
+        mMainActivityPresenter.setView(this);
+        setUpToolBar();
         Stetho.initializeWithDefaults(this);
-
-
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-
+       // initializeLocationServices();
+        ((MyApplication)getApplication()).getMainActivityComponent().inject(this);
+//        if(navigationView!=null) {
+//            setupNavigationDrawerContent(navigationView);
+//        }
+        mGoogleApiClient.registerConnectionCallbacks(this);
+        mGoogleApiClient.registerConnectionFailedListener(this);
 
         if(savedInstanceState==null) {
-
             Intent intent = new Intent(this, DownloadFarmacias.class);
             startService(intent);
         } else {
@@ -103,7 +103,66 @@ public class MainActivity extends AllowMeActivity implements
 
 
     }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("location_key",mLocation);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mMainActivityPresenter.start();
+        mGoogleApiClient.connect();
+
+    }
+
+    @Override
+    protected void onStop() {
+        mMainActivityPresenter.stop();
+        mGoogleApiClient.disconnect();
+
+        super.onStop();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        } else if (id==android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMainActivityPresenter.detachView();
+        super.onDestroy();
+    }
+
+    private void setUpToolBar(){
+
+        setSupportActionBar(toolbar);
+        actionBar=getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(menuDrawable);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
     private void setupNavigationDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -162,49 +221,7 @@ public class MainActivity extends AllowMeActivity implements
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key",mLocation);
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-
-    }
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id==android.R.id.home) {
-            drawerLayout.openDrawer(GravityCompat.START);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings({"MissingPermission"})
     @Override

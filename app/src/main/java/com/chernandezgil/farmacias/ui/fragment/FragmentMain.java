@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias;
+package com.chernandezgil.farmacias.ui.fragment;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.database.DbContract;

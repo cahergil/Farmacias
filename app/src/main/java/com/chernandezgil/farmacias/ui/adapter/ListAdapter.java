@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias;
+package com.chernandezgil.farmacias.ui.adapter;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.chernandezgil.farmacias.R;
 import com.google.android.gms.location.places.Place;
 
 import java.util.List;

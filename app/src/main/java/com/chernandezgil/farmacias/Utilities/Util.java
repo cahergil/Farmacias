@@ -18,4 +18,8 @@ public class Util {
     public static String characterFromInteger(int i) {
         return i < 0 ? "" : characterFromInteger((i / 26) - 1) + (char)(65 + i % 26);
     }
+
+    public void navigateTo(){
+
+    }
 }
