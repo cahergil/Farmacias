@@ -1,9 +1,11 @@
-package com.chernandezgil.farmacias.database;
+package com.chernandezgil.farmacias.data.source.local;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.chernandezgil.farmacias.data.source.local.DbContract;
 
 /**
  * Created by Carlos on 09/07/2016.
@@ -21,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQL_CREATE_FARMACIAS_TABLE="CREATE TABLE "+DbContract.FarmaciasEntity.TABLE_NAME + " ("+
+        final String SQL_CREATE_FARMACIAS_TABLE="CREATE TABLE "+ DbContract.FarmaciasEntity.TABLE_NAME + " ("+
                 DbContract.FarmaciasEntity._ID + " INTEGER PRIMARY_KEY," +
                 DbContract.FarmaciasEntity.NAME + " TEXT NOT NULL," +
                 DbContract.FarmaciasEntity.HOURS + " TEXT," +

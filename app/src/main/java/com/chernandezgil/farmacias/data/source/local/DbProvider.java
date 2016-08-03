@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias.database;
+package com.chernandezgil.farmacias.data.source.local;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.chernandezgil.farmacias.data.source.local.DbContract;
+import com.chernandezgil.farmacias.data.source.local.DbHelper;
+
 /**
  * Created by Carlos on 09/07/2016.
  */
@@ -16,7 +19,7 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("ConstantConditions") //to delete lint warning getContext().getContentResolver() may produce npe...
 public class DbProvider extends ContentProvider {
 
-    private  DbHelper mDbHelper;
+    private DbHelper mDbHelper;
 
     private static UriMatcher mUriMatcher=buildUriMatcher();
 
@@ -26,7 +29,7 @@ public class DbProvider extends ContentProvider {
     static UriMatcher buildUriMatcher(){
 
         final UriMatcher matcher=new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority=DbContract.CONTENT_AUTHORITY;
+        final String authority= DbContract.CONTENT_AUTHORITY;
         matcher.addURI(authority,DbContract.PATH_FARMACIAS + "/*", FARMACIAS_ID);
 
 

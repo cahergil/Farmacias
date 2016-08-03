@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.fragment.MapFragment">
 
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,18 +20,18 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabMain"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:layout_marginBottom="60dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        app:backgroundTint="@color/green_500"
         app:layout_anchor="@+id/bottom_sheet"
         app:layout_anchorGravity="top|end"
         app:pressedTranslationZ="12dp"
         app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/plus"
+        app:srcCompat="@drawable/directions"
         />
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"

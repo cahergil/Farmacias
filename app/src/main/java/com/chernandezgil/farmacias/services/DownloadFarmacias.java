@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.database.DbContract;
+import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.FarmaciasCsvBean;
 import com.chernandezgil.farmacias.supercsv.CsvReader;
 

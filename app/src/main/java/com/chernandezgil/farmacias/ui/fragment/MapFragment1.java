@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.database.DbContract;
+import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.CameraUpdate;
@@ -55,9 +55,9 @@ import rx.Observable;
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class FragmentMain extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor>,
+public class MapFragment1 extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor>,
         GoogleMap.OnMarkerClickListener{
-    private static final String LOG_TAG = FragmentMain.class.getSimpleName();
+    private static final String LOG_TAG = MapFragment1.class.getSimpleName();
     private GoogleMap mMap;
     private static final int FARMACIAS_LOADER = 1;
     private HashMap mMarkersHashMap;
@@ -80,7 +80,7 @@ public class FragmentMain extends Fragment implements OnMapReadyCallback, Loader
     @BindView(R.id.name)
     TextView tvName;
 
-    public FragmentMain() {
+    public MapFragment1() {
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.chernandezgil.farmacias.presenter;
 
 import android.content.Context;
 
-import com.chernandezgil.farmacias.view.MainMvpView;
+import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -17,7 +17,7 @@ import dagger.Provides;
  */
 @Module
 public class MainActivityModule {
-    private  MainMvpView mainMvpView;
+    private MainActivityContract mainActivityContract;
 
     public MainActivityModule(){
 

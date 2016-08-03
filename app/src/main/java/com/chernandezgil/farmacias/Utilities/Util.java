@@ -1,8 +1,13 @@
 package com.chernandezgil.farmacias.Utilities;
 
+
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.chernandezgil.farmacias.BuildConfig;
+import com.chernandezgil.farmacias.R;
+import com.google.android.gms.maps.SupportMapFragment;
 
 /**
  * Created by Carlos on 06/07/2016.
@@ -21,5 +26,18 @@ public class Util {
 
     public void navigateTo(){
 
+    }
+    public static SupportMapFragment handleMapFragmentRecreation(FragmentManager fragmentManager, int fragmentId,
+                                                                 String fragmentTag){
+        SupportMapFragment mapFragment=(SupportMapFragment) fragmentManager.findFragmentByTag("mapFragment");
+        if (mapFragment == null) {
+            mapFragment = new SupportMapFragment();
+            fragmentManager.beginTransaction()
+                .add(R.id.mapFragmentContainer,mapFragment,fragmentTag)
+                .commit();
+            fragmentManager.executePendingTransactions();
+
+        }
+        return mapFragment;
     }
 }

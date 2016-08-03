@@ -40,7 +40,7 @@
         <service android:name=".services.DownloadFarmacias" android:exported="false" />
         <!-- Content provider -->
         <provider
-            android:name=".database.DbProvider"
+            android:name=".data.source.local.DbProvider"
             android:authorities="@string/content_authority"
             android:exported="false"
             android:syncable="true" />

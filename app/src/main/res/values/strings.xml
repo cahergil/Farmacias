@@ -7,6 +7,6 @@
     <string name="places_browser_api_key">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
 
     <string name="content_authority">com.chernandezgil.farmacias</string>
-    <!-- FragmentMain-->
+    <!-- MapFragment-->
     <string name="format_distance"><xliff:g id="change_percent">%1$1.2f</xliff:g> Km</string>
 </resources>

@@ -8,7 +8,7 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
 
     Double distance;
     String hours;
-    boolean isOpen;
+    Boolean isOpen;
     String order;
 
     public String getOrder() {
@@ -39,11 +39,11 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         this.distance = distance;
     }
 
-    public boolean isOpen() {
+    public Boolean isOpen() {
         return isOpen;
     }
 
-    public void setOpen(boolean open) {
+    public void setOpen(Boolean open) {
         this.isOpen = open;
     }
 
@@ -51,7 +51,12 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
 
     @Override
     public int compareTo(CustomMarker other) {
-        return this.getDistance().compareTo(other.getDistance());
+        int res=other.isOpen().compareTo(this.isOpen());
+        if(res==0) {
+            return this.getDistance().compareTo(other.getDistance());
+        }
+        return res;
+
     }
 
     @Override

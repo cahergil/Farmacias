@@ -2,11 +2,13 @@ package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +19,8 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
@@ -25,11 +29,11 @@ import com.aitorvs.android.allowme.PermissionResultSet;
 import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
-import com.chernandezgil.farmacias.ui.fragment.FragmentMain;
+import com.chernandezgil.farmacias.ui.fragment.MapFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.services.DownloadFarmacias;
-import com.chernandezgil.farmacias.view.MainMvpView;
+import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,7 +41,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +52,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
-    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-    LocationListener,MainMvpView{
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, MainActivityContract.View {
 
+    private static final String TAG_FRAGMENT = "FRAG_MAP";
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -64,7 +68,8 @@ public class MainActivity extends AllowMeActivity implements
     ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    @Inject GoogleApiClient mGoogleApiClient;
+    @Inject
+    GoogleApiClient mGoogleApiClient;
 
     private LocationRequest mLocationRequest;
     private List<Place> mPlacesList = new ArrayList<>();
@@ -74,46 +79,47 @@ public class MainActivity extends AllowMeActivity implements
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mMainActivityPresenter=new MainActivityPresenter();
+        mMainActivityPresenter = new MainActivityPresenter();
         mMainActivityPresenter.setView(this);
         setUpToolBar();
         Stetho.initializeWithDefaults(this);
-       // initializeLocationServices();
-        ((MyApplication)getApplication()).getMainActivityComponent().inject(this);
+
+        ((MyApplication) getApplication()).getMainActivityComponent().inject(this);
 //        if(navigationView!=null) {
 //            setupNavigationDrawerContent(navigationView);
 //        }
         mGoogleApiClient.registerConnectionCallbacks(this);
         mGoogleApiClient.registerConnectionFailedListener(this);
 
-        if(savedInstanceState==null) {
-            Intent intent = new Intent(this, DownloadFarmacias.class);
-            startService(intent);
+        if (savedInstanceState == null) {
+            launchDownloadService();
         } else {
-            mLocation=savedInstanceState.getParcelable("location_key");
+            mLocation = savedInstanceState.getParcelable("location_key");
         }
         setupNavigationDrawerContent(navigationView);
 
-
+        mGoogleApiClient.connect();
 
 
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key",mLocation);
+        outState.putParcelable("location_key", mLocation);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mMainActivityPresenter.start();
-        mGoogleApiClient.connect();
+
 
     }
 
@@ -142,7 +148,7 @@ public class MainActivity extends AllowMeActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        } else if (id==android.R.id.home) {
+        } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
@@ -150,19 +156,20 @@ public class MainActivity extends AllowMeActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        mMainActivityPresenter.detachView();
-        super.onDestroy();
+
+    private void launchDownloadService() {
+        Intent intent = new Intent(this, DownloadFarmacias.class);
+        startService(intent);
     }
 
-    private void setUpToolBar(){
+    private void setUpToolBar() {
 
         setSupportActionBar(toolbar);
-        actionBar=getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(menuDrawable);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
+
     private void setupNavigationDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -204,11 +211,11 @@ public class MainActivity extends AllowMeActivity implements
             case 0:
                 fragmentManager = getSupportFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
-                FragmentMain fragmentMain = new FragmentMain();
-                Bundle bundle=new Bundle();
-                bundle.putParcelable("location_key",mLocation);
-                fragmentMain.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment, fragmentMain);
+                MapFragment mapFragment = new MapFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("location_key", mLocation);
+                mapFragment.setArguments(bundle);
+                fragmentTransaction.replace(R.id.fragment, mapFragment, TAG_FRAGMENT);
                 fragmentTransaction.commit();
                 break;
             case 1:
@@ -222,7 +229,6 @@ public class MainActivity extends AllowMeActivity implements
     }
 
 
-
     @SuppressWarnings({"MissingPermission"})
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -230,7 +236,7 @@ public class MainActivity extends AllowMeActivity implements
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 //min x secs x millisec
-                .setInterval(10*60*1000);
+                .setInterval(10 * 60 * 1000);
 
         if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             new AllowMe.Builder()
@@ -264,7 +270,7 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     public void onLocationChanged(Location location) {
         Util.LOGD(LOG_TAG, "onLocationChanged");
-        mLocation=location;
+        mLocation = location;
 
         //First fragment
         setFragment(0);
@@ -272,9 +278,35 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
+            if (mapFragment != null) {
+                mapFragment.handleDispatchTouchEvent(ev);
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public void onBackPressed() {
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
+        if (mapFragment != null) {
+            if(!mapFragment.hideBottomSheet()) {
+                super.onBackPressed();
+            }
+        }
 
 
+    }
 
+    @Override
+    protected void onDestroy() {
+        mMainActivityPresenter.detachView();
+        super.onDestroy();
+    }
 
 
 }

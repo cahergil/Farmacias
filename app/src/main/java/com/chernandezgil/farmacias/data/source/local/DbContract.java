@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias.database;
+package com.chernandezgil.farmacias.data.source.local;
 
 import android.content.ContentUris;
 import android.net.Uri;
