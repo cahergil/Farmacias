@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">@color/blue_mobile_web</color>
+    <color name="colorPrimaryDark">@color/blue_900</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
 
@@ -12,6 +12,16 @@
     <color name="gray800">#424242</color>
     <color name="black">#000000</color>
     <color name="green_500">#4CAF50</color>
-    <color name="bottom_shett_icons">@color/gray400</color>
+    <color name="indigo_500">#3F51B5</color>
+    <color name="indigo_700">#303F9F</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="blue_700">#1976D2</color>
+    <color name="blue_800">#1565C0</color>
+    <color name="blue_900">#0D47A1</color>
+    <color name="blue_mobile_web">#ff4285f4</color>
+    <color name="pharmacy_close">#ff736161</color>
+    <color name="pharmacy_open">#ffff0000</color>
+    <color name="bottom_sheet_icons">@color/colorPrimary</color>
     <color name="bottom_sheet_text">@color/black</color>
+    <color name="fav_color">@color/blue_mobile_web</color>
 </resources>

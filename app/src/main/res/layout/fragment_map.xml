@@ -26,9 +26,9 @@
         android:layout_marginBottom="60dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        app:backgroundTint="@color/green_500"
-        app:layout_anchor="@+id/bottom_sheet"
-        app:layout_anchorGravity="top|end"
+        app:backgroundTint="@color/blue_mobile_web"
+        app:layout_anchor="@+id/name"
+        app:layout_anchorGravity="bottom|end"
         app:pressedTranslationZ="12dp"
         app:rippleColor="@android:color/transparent"
         app:srcCompat="@drawable/directions"
@@ -46,6 +46,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <include layout="@layout/bottom_sheet_upper_box"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                />
+            <include layout="@layout/bottom_sheet_middle_box"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_marginLeft="58dp"

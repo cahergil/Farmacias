@@ -95,7 +95,7 @@ public class MapFragment1 extends Fragment implements OnMapReadyCallback, Loader
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this,view);
         //to avoid: error duplicate http://stackoverflow.com/questions/14083950/duplicate-id-tag-null-or-parent-id-with-another-fragment-for-com-google-androi
         FragmentManager fm = getChildFragmentManager();

@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,8 +44,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -55,7 +59,7 @@ public class MainActivity extends AllowMeActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, MainActivityContract.View {
 
-    private static final String TAG_FRAGMENT = "FRAG_MAP";
+
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -65,41 +69,46 @@ public class MainActivity extends AllowMeActivity implements
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    ActionBar actionBar;
+    private static final String TAG_FRAGMENT = "FRAG_MAP";
+    private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private LocationRequest mLocationRequest;
+    private Location mLocation;
+    private String mAddress;
+    private MainActivityPresenter mMainActivityPresenter;
+    private Geocoder mGeocoder;
 
     @Inject
     GoogleApiClient mGoogleApiClient;
 
-    private LocationRequest mLocationRequest;
-    private List<Place> mPlacesList = new ArrayList<>();
-    private Location mLocation;
-    private MainActivityPresenter mMainActivityPresenter;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.LOGD(LOG_TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mMainActivityPresenter = new MainActivityPresenter();
+        mGeocoder = new Geocoder(this, Locale.getDefault());
+        mMainActivityPresenter = new MainActivityPresenter(mGeocoder);
         mMainActivityPresenter.setView(this);
         setUpToolBar();
         Stetho.initializeWithDefaults(this);
 
+
         ((MyApplication) getApplication()).getMainActivityComponent().inject(this);
-//        if(navigationView!=null) {
-//            setupNavigationDrawerContent(navigationView);
-//        }
+
         mGoogleApiClient.registerConnectionCallbacks(this);
         mGoogleApiClient.registerConnectionFailedListener(this);
 
         if (savedInstanceState == null) {
             launchDownloadService();
         } else {
+
             mLocation = savedInstanceState.getParcelable("location_key");
         }
         setupNavigationDrawerContent(navigationView);
@@ -111,21 +120,26 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Util.LOGD(LOG_TAG,"onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key", mLocation);
     }
 
     @Override
     protected void onStart() {
+        Util.LOGD(LOG_TAG,"onStart");
         super.onStart();
-        mMainActivityPresenter.start();
 
 
     }
-
+    @Override
+    protected void onPause() {
+        Util.LOGD(LOG_TAG,"onPause");
+        super.onPause();
+    }
     @Override
     protected void onStop() {
-        mMainActivityPresenter.stop();
+        Util.LOGD(LOG_TAG,"onStop");
         mGoogleApiClient.disconnect();
 
         super.onStop();
@@ -204,26 +218,35 @@ public class MainActivity extends AllowMeActivity implements
         });
     }
 
+
+
+
     private void setFragment(int position) {
+        Util.LOGD(LOG_TAG,"setFragment");
         FragmentManager fragmentManager;
         FragmentTransaction fragmentTransaction;
         switch (position) {
             case 0:
                 fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
                 MapFragment mapFragment = new MapFragment();
                 Bundle bundle = new Bundle();
+                bundle.putString("address_key",mAddress);
                 bundle.putParcelable("location_key", mLocation);
                 mapFragment.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment, mapFragment, TAG_FRAGMENT);
-                fragmentTransaction.commit();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment, mapFragment, TAG_FRAGMENT)
+                        .commit();
+
                 break;
             case 1:
                 fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
                 FragmentFind starredFragment = new FragmentFind();
-                fragmentTransaction.replace(R.id.fragment, starredFragment);
-                fragmentTransaction.commit();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment, starredFragment)
+                        .commit();
+
+
+
                 break;
         }
     }
@@ -236,12 +259,12 @@ public class MainActivity extends AllowMeActivity implements
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 //min x secs x millisec
-                .setInterval(10 * 60 * 1000);
+                .setFastestInterval(10 * 60 * 1000);
 
-        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
             new AllowMe.Builder()
                     .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
-                    .setRationale("This app needs this permission to work")
+                    .setRationale("Esta app necesita este permision para funcionar")
                     .setCallback(new AllowMeCallback() {
                         @Override
                         public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
@@ -271,7 +294,7 @@ public class MainActivity extends AllowMeActivity implements
     public void onLocationChanged(Location location) {
         Util.LOGD(LOG_TAG, "onLocationChanged");
         mLocation = location;
-
+        mAddress = mMainActivityPresenter.onGetAddressFromLocation(mLocation);
         //First fragment
         setFragment(0);
 
@@ -280,7 +303,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-
+        Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
             if (mapFragment != null) {
@@ -292,9 +315,10 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public void onBackPressed() {
+        Util.LOGD(LOG_TAG,"onBackPressed");
         MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
         if (mapFragment != null) {
-            if(!mapFragment.hideBottomSheet()) {
+            if (!mapFragment.hideBottomSheet()) {
                 super.onBackPressed();
             }
         }
@@ -304,6 +328,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onDestroy() {
+        Util.LOGD(LOG_TAG,"onDestroy");
         mMainActivityPresenter.detachView();
         super.onDestroy();
     }

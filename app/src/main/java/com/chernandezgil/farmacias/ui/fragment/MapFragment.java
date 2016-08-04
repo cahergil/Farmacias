@@ -1,7 +1,6 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,14 +14,12 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -36,11 +33,10 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
-import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.chernandezgil.farmacias.presenter.MapPresenter;
 import com.chernandezgil.farmacias.view.MapContract;
-import com.github.davidmoten.rx.Transformers;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,36 +44,36 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
+import javax.inject.Inject;
+
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
 
 /**
  * Created by Carlos on 10/07/2016.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,MapContract.View {
+
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private GoogleMap mMap;
-
-
     private Location mLocation;
     TimeMeasure mTm = new TimeMeasure(LOG_TAG);
     private boolean mBottomsheetLoaded = false;
     private BottomSheetBehavior mBottomSheetBehavior;
     private SupportMapFragment mMapFragment;
     private boolean mRotation=false;
+    private MapPresenter mMapPresenter;
+    private LoaderProvider mLoaderProvider;
+    private LoaderManager mLoaderManager;
+    private String mAddress;
     @BindView(R.id.adress)
     TextView tvAdress;
     @BindView(R.id.phone)
@@ -92,10 +88,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     TextView tvName;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+    @BindColor(R.color.pharmacy_close)
+    int color_pharmacy_close;
+    @BindColor(R.color.pharmacy_open)
+    int color_pharmacy_open;
 
-    private MapPresenter mMapPresenter;
-    private LoaderProvider mLoaderProvider;
-    private LoaderManager mLoaderManager;
+    @Inject
+    GoogleApiClient mGoogleApiClient;
 
     public MapFragment() {
     }
@@ -115,10 +114,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this,view);
         setUpBotomSheet();
         setUpFav();
+        setUpTvPhone();
+
         SupportMapFragment mapFragment=Util.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer,"mapFragment");
         mapFragment.getMapAsync(this);
@@ -128,6 +129,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             Bundle bundle = getArguments();
             if (bundle != null) {
                 mLocation = bundle.getParcelable("location_key");
+                mAddress = bundle.getString("address_key");
 
 
             }
@@ -212,11 +214,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+    public void setUpTvPhone(){
+
+        tvPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handlePhoneCall();
+            }
+        });
+    }
     @Override
     public void moveCamera(CameraUpdate cameraUpdate) {
         mMap.animateCamera(cameraUpdate);
     }
-
+    private void handlePhoneCall(){
+        String uri="tel:" + mMapPresenter.onGetDestinationPhoneNumber();
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        startActivity(intent);
+    }
     @Override
     public boolean hideBottomSheet() {
        if(mBottomSheetBehavior.STATE_EXPANDED==mBottomSheetBehavior.getState()) {
@@ -261,8 +277,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         paint.getTextBounds(order,0,order.length(),boundsText);
         int x=(bmp.getWidth()- boundsText.width())/2;
     //    int y=(bmp.getHeight()- boundsText.height())/2;
-        Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",boundsText.height()"+boundsText.height());
-        Log.d(LOG_TAG,"letra:"+order);
+    //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",boundsText.height()"+boundsText.height());
+    //    Log.d(LOG_TAG,"letra:"+order);
 
         canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),
                 R.drawable.ic_maps_position), 0,0, paint);
@@ -289,11 +305,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                LatLng destinationLatLng=mMapPresenter.onGetDestinationLocale();
+                String destinationAddress=mMapPresenter.onGetDestinationAddress();
                 //mMapPresenter.getLocales()
-             //   String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)", sourceLatitude, sourceLongitude, "Home Sweet Home", destinationLatitude, destinationLongitude, "Where the party is at");
-             //   Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-             //   intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-              //  startActivity(intent);
+                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
+                        mLocation.getLatitude(),mLocation.getLongitude() , mAddress,
+                        destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                startActivity(intent);
             }
         });
     }
@@ -317,9 +337,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public boolean onMarkerClick(Marker marker) {
             HashMap hashMap=mMapPresenter.onGetHashMap();
             CustomMarker customMarker= (CustomMarker)hashMap.get(marker);
+
+            tvName.setBackgroundColor(customMarker.isOpen()?color_pharmacy_open:color_pharmacy_close);
             tvName.setText(customMarker.getName());
             tvDistance.setText(getString(R.string.format_distance,customMarker.getDistance()/1000));
-            tvAdress.setText(customMarker.getAddress());
+            tvAdress.setText(customMarker.getAddressFormatted());
             tvHours.setText(customMarker.getHours());
             tvPhone.setText(customMarker.getPhone());
 
@@ -327,6 +349,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             mMapPresenter.onSetLastMarkerClick(customMarker);
+
             return false;
     }
 

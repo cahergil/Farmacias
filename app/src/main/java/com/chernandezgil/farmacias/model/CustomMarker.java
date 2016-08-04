@@ -10,6 +10,19 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
     String hours;
     Boolean isOpen;
     String order;
+    String addressFormatted;
+
+    public Boolean getOpen() {
+        return isOpen;
+    }
+
+    public String getAddressFormatted() {
+        return addressFormatted;
+    }
+
+    public void setAddressFormatted(String addressFormatted) {
+        this.addressFormatted = addressFormatted;
+    }
 
     public String getOrder() {
         return order;

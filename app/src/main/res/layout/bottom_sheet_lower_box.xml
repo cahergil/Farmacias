@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
         <FrameLayout
@@ -38,10 +38,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:ellipsize="end"
-            android:lines="1"
+            android:lines="2"
             android:text="740 Villanueva St, Badajoz, Extremadura"
             android:textColor="@color/bottom_sheet_text"
-            android:textSize="18sp"
+            android:textSize="@dimen/bslb_text_size"
             tools:text="740 Villanueva St, Badajoz, Extremadura" />
 
 
@@ -75,7 +75,7 @@
             android:layout_weight="4"
             android:text="(415) 349 -0942"
             android:textColor="@color/bottom_sheet_text"
-            android:textSize="18sp"
+            android:textSize="@dimen/bslb_text_size"
             tools:text="(415) 349 -0942" />
     </LinearLayout>
 
@@ -107,7 +107,8 @@
             android:layout_weight="4"
             android:text="LV09:00-14:00,16:30-20:30S09:00-14:00"
             android:textColor="@color/bottom_sheet_text"
-            android:textSize="18sp"
+            android:textSize="@dimen/bslb_text_size"
+
             tools:text="LV09:00-14:00,16:30-20:30S09:00-14:00" />
     </LinearLayout>
 </LinearLayout>

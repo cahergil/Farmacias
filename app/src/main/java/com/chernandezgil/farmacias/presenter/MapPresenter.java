@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.telephony.PhoneNumberUtils;
 
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import rx.Observable;
@@ -45,7 +47,8 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     private static final int FARMACIAS_LOADER = 1;
     private HashMap mMarkersHashMap;
     private Location mLocation;
-    private CustomMarker mLastMarkerClick;
+    private CustomMarker mLastClickMarker;
+    private CustomMarker mUserUbicationMarker;
 
     public MapPresenter(@NonNull LoaderProvider loaderProvider,@NonNull LoaderManager loaderManager){
         mLoaderProvider=checkNotNull(loaderProvider,"loader provider cannot be null");
@@ -85,7 +88,23 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
 
     @Override
     public void onSetLastMarkerClick(CustomMarker customMarker) {
-        mLastMarkerClick=customMarker;
+        mLastClickMarker =customMarker;
+    }
+
+    @Override
+    public LatLng onGetDestinationLocale() {
+        return new LatLng(mLastClickMarker.getLat(),mLastClickMarker.getLon());
+
+    }
+
+    @Override
+    public String onGetDestinationAddress() {
+        return mLastClickMarker.getAddressFormatted();
+    }
+
+    @Override
+    public String onGetDestinationPhoneNumber() {
+        return mLastClickMarker.getPhone();
     }
 
     private double meterDistanceBetweenPoints(double lat_a, double lng_a, double lat_b, double lng_b) {
@@ -147,6 +166,7 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     private void bindView(Cursor data){
 
         List<CustomMarker> farmaciasList=new ArrayList<>();
+        if(data.isClosed()) return;
 
         while (data.moveToNext()) {
 
@@ -161,14 +181,19 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
             farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
             farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
             farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
-            farmacia.setPhone(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE)));
+            String phone=data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
+            farmacia.setPhone(Util.formatPhoneNumber(phone));
             farmacia.setLat(latDest);
             farmacia.setLon(lonDest);
             farmacia.setDistance(distance);
             String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
             farmacia.setHours(hours);
             farmacia.setOpen(isPharmacyOpen(hours));
-
+            String addressFormatted=Util.formatAddress(farmacia.getAddress(),
+                                                       farmacia.getPostal_code(),
+                                                       farmacia.getLocality(),
+                                                       farmacia.getProvince());
+            farmacia.setAddressFormatted(addressFormatted);
             farmaciasList.add(farmacia);
 
         }
@@ -186,6 +211,8 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
         //for hascode and equals
         userLocation.setOrder("A");
         userLocation.setDistance(0d);
+        mUserUbicationMarker=userLocation;
+   //     mUserUbicationMarker.setAddress(mUserAddress);
         mMapView.addMarkerToMap(userLocation);
         //user location by defaul in bottom sheet
         //tvName.setText();

@@ -14,30 +14,50 @@ import com.google.android.gms.maps.SupportMapFragment;
  */
 public class Util {
 
-    public static void LOGD(final String tag,String message) {
-        if(BuildConfig.DEBUG) {
-            Log.d(tag,message);
+    public static void LOGD(final String tag, String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d(tag, message);
         }
     }
-   // http://stackoverflow.com/questions/8710719/generating-an-alphabetic-sequence-in-java
+
+    // http://stackoverflow.com/questions/8710719/generating-an-alphabetic-sequence-in-java
     public static String characterFromInteger(int i) {
-        return i < 0 ? "" : characterFromInteger((i / 26) - 1) + (char)(65 + i % 26);
+        return i < 0 ? "" : characterFromInteger((i / 26) - 1) + (char) (65 + i % 26);
     }
 
-    public void navigateTo(){
+    public void navigateTo() {
 
     }
+
     public static SupportMapFragment handleMapFragmentRecreation(FragmentManager fragmentManager, int fragmentId,
-                                                                 String fragmentTag){
-        SupportMapFragment mapFragment=(SupportMapFragment) fragmentManager.findFragmentByTag("mapFragment");
+                                                                 String fragmentTag) {
+        SupportMapFragment mapFragment = (SupportMapFragment) fragmentManager.findFragmentByTag("mapFragment");
         if (mapFragment == null) {
             mapFragment = new SupportMapFragment();
             fragmentManager.beginTransaction()
-                .add(R.id.mapFragmentContainer,mapFragment,fragmentTag)
-                .commit();
+                    .add(R.id.mapFragmentContainer, mapFragment, fragmentTag)
+                    .commit();
             fragmentManager.executePendingTransactions();
 
         }
         return mapFragment;
     }
+
+    //  address, postalCode City, Province
+    public static String formatAddress(String address, String postalCode, String city, String province) {
+
+        return  address
+                + Constants.COMMA + Constants.SPACE + postalCode + Constants.SPACE + city
+                + Constants.COMMA + Constants.SPACE + province;
+    }
+
+    public static String formatPhoneNumber(String phoneNumber) {
+
+        return phoneNumber.substring(0,3) + Constants.SPACE + phoneNumber.substring(3,5)
+                                               + Constants.SPACE + phoneNumber.substring(5,7)
+                                               + Constants.SPACE + phoneNumber.substring(7,9);
+
+
+    }
+
 }

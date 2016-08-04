@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ltgray" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:divider="?android:dividerHorizontal"
+        android:gravity="center_vertical"
+        android:showDividers="end"
+        android:textColor="@color/bottom_sheet_icons"
+        android:textSize="@dimen/bslb_text_size" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ltgray" />
+</LinearLayout>

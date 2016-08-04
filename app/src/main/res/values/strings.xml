@@ -9,4 +9,6 @@
     <string name="content_authority">com.chernandezgil.farmacias</string>
     <!-- MapFragment-->
     <string name="format_distance"><xliff:g id="change_percent">%1$1.2f</xliff:g> Km</string>
+    <!-- MainActivityPresenter-->
+    <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
 </resources>

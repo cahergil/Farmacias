@@ -5,9 +5,11 @@ import android.view.MotionEvent;
 
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Created by Carlos on 03/08/2016.
@@ -32,6 +34,9 @@ public interface MapContract {
         public HashMap onGetHashMap();
         public void setLocation(Location location);
         public void onSetLastMarkerClick(CustomMarker customMarker);
+        public LatLng onGetDestinationLocale();
+        public String onGetDestinationAddress();
+        public String onGetDestinationPhoneNumber();
 
     }
 }
