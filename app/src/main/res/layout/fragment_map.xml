@@ -19,20 +19,7 @@
 
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        app:backgroundTint="@color/blue_mobile_web"
-        app:layout_anchor="@+id/name"
-        app:layout_anchorGravity="bottom|end"
-        app:pressedTranslationZ="12dp"
-        app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/directions"
-        />
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
@@ -44,7 +31,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/llBottomSheet">
             <include layout="@layout/bottom_sheet_upper_box"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
@@ -52,7 +40,6 @@
             <include layout="@layout/bottom_sheet_middle_box"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_marginLeft="58dp"
                 android:layout_marginRight="16dp"/>
             <include layout="@layout/bottom_sheet_lower_box"
                 android:layout_height="wrap_content"

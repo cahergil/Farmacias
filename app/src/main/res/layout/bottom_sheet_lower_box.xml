@@ -4,10 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="18dp"
+            android:layout_weight="0.3">
+
+            <ImageView
+                android:id="@+id/ivDistance"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/distance"
+
+                />
+
+        </FrameLayout >
+
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:ellipsize="end"
+            android:lines="2"
+            android:text=""
+            android:textColor="@color/bottom_sheet_text"
+            android:textSize="@dimen/bslb_text_size"
+            tools:text="1,2 Km" />
+
+
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,12 +56,10 @@
             android:layout_weight="0.3">
 
         <ImageView
-            android:id="@+id/order"
+            android:id="@+id/ivMarker"
             android:layout_width="24dp"
             android:layout_height="24dp"
-
             app:srcCompat="@drawable/map_marker"
-
             />
 
         </FrameLayout >
@@ -61,7 +93,7 @@
             android:layout_weight="0.3">
 
             <ImageView
-                android:id="@+id/street"
+                android:id="@+id/ivPhone"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
 
@@ -93,7 +125,7 @@
             android:layout_weight="0.3">
 
             <ImageView
-                android:id="@+id/clock"
+                android:id="@+id/ivClock"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
 

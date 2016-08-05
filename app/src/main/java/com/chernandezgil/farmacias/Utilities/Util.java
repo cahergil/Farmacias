@@ -1,8 +1,11 @@
 package com.chernandezgil.farmacias.Utilities;
 
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.chernandezgil.farmacias.BuildConfig;
@@ -58,6 +61,13 @@ public class Util {
                                                + Constants.SPACE + phoneNumber.substring(7,9);
 
 
+    }
+
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return px;
     }
 
 }

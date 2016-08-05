@@ -23,8 +23,7 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
     private Geocoder mGeocoder;
 
 
-    public MainActivityPresenter(Geocoder geocoder){
-        mGeocoder=geocoder;
+    public MainActivityPresenter(){
     }
 
 
@@ -41,36 +40,5 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
 
     }
 
-    @Override
-    public String onGetAddressFromLocation(Location location) {
-        List<Address> addresses = null;
-        try {
-            addresses = mGeocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    1);
-        } catch (IOException ioe) {
 
-        }
-
-        if (addresses == null || addresses.size()  == 0) {
-            Util.LOGD(LOG_TAG,"no address found");
-            return null;
-        }else {
-            Address address = addresses.get(0);
-            StringBuilder stringBuilder=new StringBuilder();
-
-            // Fetch the address lines using getAddressLine,
-            // join them, and send them to the thread.
-            for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                stringBuilder.append(address.getAddressLine(i));
-                if(i!=address.getMaxAddressLineIndex()-1) {
-                    stringBuilder.append(Constants.COMMA);
-                }
-            }
-            Util.LOGD(LOG_TAG,"address found");
-            return stringBuilder.toString();
-        }
-
-    }
 }

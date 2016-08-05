@@ -1,34 +1,37 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.aitorvs.android.allowme.AllowMe;
+import com.aitorvs.android.allowme.AllowMeCallback;
+import com.aitorvs.android.allowme.PermissionResultSet;
+import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
@@ -36,7 +39,11 @@ import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.chernandezgil.farmacias.presenter.MapPresenter;
 import com.chernandezgil.farmacias.view.MapContract;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -52,6 +59,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import butterknife.BindBitmap;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,7 +68,8 @@ import butterknife.ButterKnife;
  * Created by Carlos on 10/07/2016.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener,MapContract.View {
+        GoogleMap.OnMarkerClickListener,MapContract.View, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private static final String LOG_TAG = MapFragment.class.getSimpleName();
     private GoogleMap mMap;
@@ -86,15 +95,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     TextView tvDistance;
     @BindView(R.id.name)
     TextView tvName;
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
+
+
+
+    @BindView(R.id.llUpper)
+    LinearLayout llUper;
+    @BindView(R.id.ivCall)
+    ImageView ivCall;
+    @BindView(R.id.txtCall)
+    TextView tvCall;
+    @BindView(R.id.ivGo)
+    ImageView ivGo;
+    @BindView(R.id.txtGo)
+    TextView tvGo;
+
+    @BindView(R.id.ivDistance)
+    ImageView ivDistance;
+    @BindView(R.id.ivMarker)
+    ImageView ivMarker;
+    @BindView(R.id.ivPhone)
+    ImageView ivPhone;
+    @BindView(R.id.ivClock)
+    ImageView ivClock;
+  //  @BindView(R.id.fab)
+  //  FloatingActionButton fab;
     @BindColor(R.color.pharmacy_close)
     int color_pharmacy_close;
     @BindColor(R.color.pharmacy_open)
     int color_pharmacy_open;
+    @BindBitmap(R.drawable.ic_maps_position)
+    Bitmap markerBitmap;
 
     @Inject
     GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private Geocoder mGeocoder;
 
     public MapFragment() {
     }
@@ -103,9 +138,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Util.LOGD(LOG_TAG, "onCreate");
+        mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         mLoaderProvider=new LoaderProvider(getActivity());
         mLoaderManager=getLoaderManager();
-        mMapPresenter=new MapPresenter(mLoaderProvider,mLoaderManager);
+        mMapPresenter=new MapPresenter(mLoaderProvider,mLoaderManager,mGeocoder);
+        ((MyApplication) getActivity().getApplication()).getMainActivityComponent().inject(this);
+
+        mGoogleApiClient.registerConnectionCallbacks(this);
+        mGoogleApiClient.registerConnectionFailedListener(this);
+        mGoogleApiClient.connect();
 
     }
 
@@ -117,8 +158,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this,view);
         setUpBotomSheet();
-        setUpFav();
         setUpTvPhone();
+        setUpIvCall();
+        setUpIvGo();
 
         SupportMapFragment mapFragment=Util.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer,"mapFragment");
@@ -126,20 +168,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mMapFragment=mapFragment;
 
         if(savedInstanceState==null) {
-            Bundle bundle = getArguments();
-            if (bundle != null) {
-                mLocation = bundle.getParcelable("location_key");
-                mAddress = bundle.getString("address_key");
 
-
-            }
         }else {
             mRotation=true;
             mLocation = savedInstanceState.getParcelable("location_key");
 
         }
         mMapPresenter.setView(this);
-        mMapPresenter.setLocation(mLocation);
+        mMapPresenter.onSetMarkerBitMap(markerBitmap);
         return view;
     }
 
@@ -149,7 +185,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         super.onStart();
         Util.LOGD(LOG_TAG, "onStart");
         mTm.log("onStart");
-        mMapPresenter.onStartLoader();
+
         // getActivity().getSupportLoaderManager().initLoader(FARMACIAS_LOADER,null,this);
 
     }
@@ -157,6 +193,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onResume() {
         super.onResume();
+
+    }
+
+    @Override
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+
 
     }
 
@@ -201,8 +245,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
-            markerOption.icon(BitmapDescriptorFactory.fromBitmap(getCustomBitmap(customMarker.getOrder(),
-                    customMarker.isOpen())))
+            Bitmap bitmap=mMapPresenter.onRequestCustomBitmap(customMarker.getOrder(),customMarker.isOpen());
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(customMarker.getName())
                     .snippet(getString(R.string.format_distance,customMarker.getDistance()/1000));
         }
@@ -227,6 +271,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public void moveCamera(CameraUpdate cameraUpdate) {
         mMap.animateCamera(cameraUpdate);
     }
+
     private void handlePhoneCall(){
         String uri="tel:" + mMapPresenter.onGetDestinationPhoneNumber();
         Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -253,41 +298,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-
-    public Bitmap getCustomBitmap(String order,boolean isOpen){
-        ColorMatrix matrix=new ColorMatrix();
-        float saturation=0.1f;
-        if(isOpen) {
-            saturation=10f;
-        }
-        matrix.setSaturation(saturation);
-        ColorFilter paintColorFilter = new ColorMatrixColorFilter(matrix);
-
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(144, 144, conf);
-        //Bitmap bmp = BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.ic_maps_position);
-        Canvas canvas = new Canvas(bmp);
-        Paint paint = new Paint();
-        paint.setTextSize(60);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setColor(Color.BLACK);
-        paint.setColorFilter(paintColorFilter);
-
-        Rect boundsText=new Rect();
-        paint.getTextBounds(order,0,order.length(),boundsText);
-        int x=(bmp.getWidth()- boundsText.width())/2;
-    //    int y=(bmp.getHeight()- boundsText.height())/2;
-    //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",boundsText.height()"+boundsText.height());
-    //    Log.d(LOG_TAG,"letra:"+order);
-
-        canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.ic_maps_position), 0,0, paint);
-        canvas.drawText(order, x-4,69, paint);
-
-        return bmp;
-
+    @Override
+    public void displayFirstNearestOpenPharmacyInBottomSheet(CustomMarker marker) {
+        showPharmacyInBottomSheet(marker);
+        //http://stackoverflow.com/questions/37822264/android-bottom-sheet-behavior-not-working-properly-views-not-show-on-first-run
+        bottomSheet.post(new Runnable() {
+            @Override
+            public void run() {
+                mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
 
     }
+
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -301,8 +326,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
 
     }
-    public void setUpFav(){
-        fab.setOnClickListener(new View.OnClickListener() {
+    public void setUpIvGo(){
+        ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LatLng destinationLatLng=mMapPresenter.onGetDestinationLocale();
@@ -317,51 +342,157 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             }
         });
     }
+
+    public void setUpIvCall(){
+        ivCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handlePhoneCall();
+            }
+        });
+
+    }
     public void setUpBotomSheet(){
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        mBottomSheetBehavior.setPeekHeight(300);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        //initially set hidden(in case there are no pharmacies around)
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if(newState==BottomSheetBehavior.STATE_COLLAPSED) {
+
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+              //  Util.LOGD(LOG_TAG,""+slideOffset);
+              //  fab.setAlpha(slideOffset);
+
+            }
+        });
     }
 
 
 
-    private float calculateDistance(double lat,double lon,Location origen){
-        Location destination=new Location("destination");
-        destination.setLatitude(lat);
-        destination.setLongitude(lon);
-        return origen.distanceTo(destination);
-
-    }
+//    private float calculateDistance(double lat,double lon,Location origen){
+//        Location destination=new Location("destination");
+//        destination.setLatitude(lat);
+//        destination.setLongitude(lon);
+//        return origen.distanceTo(destination);
+//
+//    }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
             HashMap hashMap=mMapPresenter.onGetHashMap();
             CustomMarker customMarker= (CustomMarker)hashMap.get(marker);
-
-            tvName.setBackgroundColor(customMarker.isOpen()?color_pharmacy_open:color_pharmacy_close);
-            tvName.setText(customMarker.getName());
-            tvDistance.setText(getString(R.string.format_distance,customMarker.getDistance()/1000));
-            tvAdress.setText(customMarker.getAddressFormatted());
-            tvHours.setText(customMarker.getHours());
-            tvPhone.setText(customMarker.getPhone());
-
+            showPharmacyInBottomSheet(customMarker);
             if( mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
-            mMapPresenter.onSetLastMarkerClick(customMarker);
-
             return false;
+    }
+
+    private void showPharmacyInBottomSheet(CustomMarker marker){
+        try {
+            int color = marker.isOpen() ? color_pharmacy_open : color_pharmacy_close;
+            llUper.setBackgroundColor(color);
+
+
+            setTintedVectorDrawable(ivCall, R.drawable.phone, color);
+            setTintedVectorDrawable(ivGo, R.drawable.directions, color);
+            setTintedDrawable(ivDistance, R.drawable.distance, color);
+            setTintedVectorDrawable(ivMarker, R.drawable.map_marker, color);
+            setTintedVectorDrawable(ivPhone, R.drawable.phone, color);
+            setTintedVectorDrawable(ivClock, R.drawable.clock, color);
+
+            tvCall.setTextColor(color);
+            tvGo.setTextColor(color);
+
+            tvName.setText(marker.getName());
+            tvDistance.setText(getString(R.string.format_distance, marker.getDistance() / 1000));
+            tvAdress.setText(marker.getAddressFormatted());
+            tvHours.setText(marker.getHours());
+            tvPhone.setText(marker.getPhone());
+            mMapPresenter.onSetLastMarkerClick(marker);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void setTintedDrawable(ImageView imageView,@DrawableRes int drawableResId,int color ){
+        Drawable drawable= ContextCompat.getDrawable(getActivity(),drawableResId);
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        imageView.setImageDrawable(drawable);
+
+    }
+    public void setTintedVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
+
+        VectorDrawableCompat drawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
+        if(drawable==null) return;
+        drawable.setTint(color);
+        imageView.setImageDrawable(drawable);
+
+
+    }
+    @SuppressWarnings({"MissingPermission"})
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Util.LOGD(LOG_TAG, "onConnected");
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                //min x secs x millisec
+                .setFastestInterval(10 * 60 * 1000);
+        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
+            new AllowMe.Builder()
+                    .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+                    .setRationale("Esta app necesita este permision para funcionar")
+                    .setCallback(new AllowMeCallback() {
+                        @Override
+                        public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
+                            if (permissionResultSet.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MapFragment.this);
+
+                            }
+                        }
+                    }).request(1);
+
+        } else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Util.LOGD(LOG_TAG, "onConnectionFailed");
     }
 
 
 
+    @Override
+    public void onLocationChanged(Location location) {
+        Util.LOGD(LOG_TAG, "onLocationChanged");
+        mLocation = location;
+        mMapPresenter.setLocation(mLocation);
+        mAddress = mMapPresenter.onGetAddressFromLocation(mLocation);
+        mMapPresenter.onStartLoader();
 
+
+    }
 
     @Override
     public void onDestroy() {
         Util.LOGD(LOG_TAG, "onDestroy");
         super.onDestroy();
     }
-
-
 }

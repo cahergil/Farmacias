@@ -23,7 +23,6 @@ public interface MainActivityContract {
 
         void detachView();
 
-        public String onGetAddressFromLocation(Location location);
 
     }
 }

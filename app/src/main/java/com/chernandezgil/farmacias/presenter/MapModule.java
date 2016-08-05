@@ -16,10 +16,10 @@ import dagger.Provides;
  * Created by Carlos on 01/08/2016.
  */
 @Module
-public class MainActivityModule {
+public class MapModule {
     private MainActivityContract mainActivityContract;
 
-    public MainActivityModule(){
+    public MapModule(){
 
     }
 

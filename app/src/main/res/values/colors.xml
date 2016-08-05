@@ -6,6 +6,7 @@
     <color name="white">#FFFFFF</color>
 
     <color name="ltgray">#EEEEEE</color>
+    <color name="gray300">#E0E0E0</color>
     <color name="gray400">#BDBDBD</color>
     <color name="gray600">#757575</color>
     <color name="gray700">#616161</color>
@@ -14,13 +15,14 @@
     <color name="green_500">#4CAF50</color>
     <color name="indigo_500">#3F51B5</color>
     <color name="indigo_700">#303F9F</color>
+    <color name="blue_100">#BBDEFB</color>
     <color name="blue_500">#2196F3</color>
     <color name="blue_700">#1976D2</color>
     <color name="blue_800">#1565C0</color>
     <color name="blue_900">#0D47A1</color>
     <color name="blue_mobile_web">#ff4285f4</color>
     <color name="pharmacy_close">#ff736161</color>
-    <color name="pharmacy_open">#ffff0000</color>
+    <color name="pharmacy_open">#ffd64646</color>
     <color name="bottom_sheet_icons">@color/colorPrimary</color>
     <color name="bottom_sheet_text">@color/black</color>
     <color name="fav_color">@color/blue_mobile_web</color>

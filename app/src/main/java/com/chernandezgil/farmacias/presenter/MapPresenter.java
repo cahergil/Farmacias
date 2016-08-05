@@ -3,14 +3,25 @@ package com.chernandezgil.farmacias.presenter;
 
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.telephony.PhoneNumberUtils;
 
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -24,14 +35,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 
@@ -41,25 +54,42 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by Carlos on 03/08/2016.
  */
 public class MapPresenter implements MapContract.Presenter<MapContract.View>,LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String LOG_TAG=MapPresenter.class.getSimpleName();
     private MapContract.View mMapView;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
+    private Geocoder mGeocoder;
     private static final int FARMACIAS_LOADER = 1;
     private HashMap mMarkersHashMap;
     private Location mLocation;
     private CustomMarker mLastClickMarker;
     private CustomMarker mUserUbicationMarker;
 
-    public MapPresenter(@NonNull LoaderProvider loaderProvider,@NonNull LoaderManager loaderManager){
+    Bitmap markerBitmap;
+
+
+    @Inject
+    public MapPresenter(@NonNull LoaderProvider loaderProvider,
+                        @NonNull LoaderManager loaderManager,
+                        @NonNull Geocoder geocoder){
         mLoaderProvider=checkNotNull(loaderProvider,"loader provider cannot be null");
         mLoaderManager=checkNotNull(loaderManager,"loader manager cannot be null");
+        mGeocoder=checkNotNull(geocoder,"geocoder cannot be null");
+
+
     }
     @Override
     public void setView(MapContract.View view) {
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
         mMapView =view;
+
+
     }
 
+    @Override
+    public void onSetMarkerBitMap(Bitmap markerBitmap) {
+        this.markerBitmap=markerBitmap;
+    }
     @Override
     public void detachView() {
         mMapView =null;
@@ -67,7 +97,8 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
 
     @Override
     public void onStartLoader() {
-        mLoaderManager.initLoader(FARMACIAS_LOADER, null, this);
+
+        mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
     }
 
     @Override
@@ -105,6 +136,77 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     @Override
     public String onGetDestinationPhoneNumber() {
         return mLastClickMarker.getPhone();
+    }
+
+    @Override
+    public String onGetAddressFromLocation(Location location) {
+
+
+            List<Address> addresses = null;
+            try {
+                addresses = mGeocoder.getFromLocation(
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        1);
+            } catch (IOException ioe) {
+
+            }
+
+            if (addresses == null || addresses.size()  == 0) {
+                Util.LOGD(LOG_TAG,"no address found");
+                return null;
+            }else {
+                Address address = addresses.get(0);
+                StringBuilder stringBuilder=new StringBuilder();
+
+                // Fetch the address lines using getAddressLine,
+                // join them, and send them to the thread.
+                for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    stringBuilder.append(address.getAddressLine(i));
+                    if(i!=address.getMaxAddressLineIndex()-1) {
+                        stringBuilder.append(Constants.COMMA);
+                    }
+                }
+                Util.LOGD(LOG_TAG,"address found");
+                return stringBuilder.toString();
+            }
+
+
+    }
+
+    @Override
+    public Bitmap onRequestCustomBitmap(String order, boolean isOpen) {
+        ColorMatrix matrix=new ColorMatrix();
+        float saturation=0.1f;
+        if(isOpen) {
+            saturation=0.8f;
+        }
+        matrix.setSaturation(saturation);
+        ColorFilter paintColorFilter = new ColorMatrixColorFilter(matrix);
+
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = Bitmap.createBitmap(144, 144, conf);
+
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+        paint.setTextSize(60);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setColor(Color.BLACK);
+        paint.setColorFilter(paintColorFilter);
+
+        Rect boundsText=new Rect();
+        paint.getTextBounds(order,0,order.length(),boundsText);
+        int x=(bmp.getWidth()- boundsText.width())/2;
+        //    int y=(bmp.getHeight()- boundsText.height())/2;
+        //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",boundsText.height()"+boundsText.height());
+        //    Log.d(LOG_TAG,"letra:"+order);
+
+      //  canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),
+      //          R.drawable.ic_maps_position), 0,0, paint);
+        canvas.drawBitmap(markerBitmap, 0,0, paint);
+        canvas.drawText(order, x-4,69, paint);
+
+        return bmp;
     }
 
     private double meterDistanceBetweenPoints(double lat_a, double lng_a, double lat_b, double lng_b) {
@@ -151,7 +253,7 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
         } else {
             Calendar morningOpen = buildCalendar(now, 9, 0);
             Calendar morningClose = buildCalendar(now, 14, 0);
-            Calendar eveningOpen = buildCalendar(now, 16, 30);
+            Calendar eveningOpen = buildCalendar(now, 18, 30);
             Calendar eveningClose = buildCalendar(now, 20, 30);
             if ( (date.after(morningOpen) && date.before(morningClose))
                     || ( date.after(eveningOpen) && date.before(eveningClose)) ) {
@@ -200,6 +302,9 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
 
         farmaciasList= toFilteredSortedOrderedList(farmaciasList);
         for (int i = 0;i < farmaciasList.size();i++) {
+            if(i==0) {
+                mMapView.displayFirstNearestOpenPharmacyInBottomSheet(farmaciasList.get(i));
+            }
             mMapView.addMarkerToMap(farmaciasList.get(i));
 
         }
@@ -231,7 +336,7 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
 
         return Observable.from(list)
                 .filter(f->{
-                    if(f.getDistance()<4000) {
+                    if(f.getDistance()<10000) {
                         return true;
                     }
                     return false;

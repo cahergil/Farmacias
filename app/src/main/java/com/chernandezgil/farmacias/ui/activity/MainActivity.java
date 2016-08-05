@@ -56,8 +56,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, MainActivityContract.View {
+                 MainActivityContract.View {
 
 
     @BindView(R.id.navigation_drawer_layout)
@@ -72,14 +71,12 @@ public class MainActivity extends AllowMeActivity implements
     private static final String TAG_FRAGMENT = "FRAG_MAP";
     private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private LocationRequest mLocationRequest;
-    private Location mLocation;
-    private String mAddress;
-    private MainActivityPresenter mMainActivityPresenter;
-    private Geocoder mGeocoder;
 
-    @Inject
-    GoogleApiClient mGoogleApiClient;
+
+    private MainActivityPresenter mMainActivityPresenter;
+
+
+
 
 
     static {
@@ -93,27 +90,19 @@ public class MainActivity extends AllowMeActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mGeocoder = new Geocoder(this, Locale.getDefault());
-        mMainActivityPresenter = new MainActivityPresenter(mGeocoder);
+
+        mMainActivityPresenter = new MainActivityPresenter();
         mMainActivityPresenter.setView(this);
         setUpToolBar();
         Stetho.initializeWithDefaults(this);
 
-
-        ((MyApplication) getApplication()).getMainActivityComponent().inject(this);
-
-        mGoogleApiClient.registerConnectionCallbacks(this);
-        mGoogleApiClient.registerConnectionFailedListener(this);
-
         if (savedInstanceState == null) {
             launchDownloadService();
-        } else {
-
-            mLocation = savedInstanceState.getParcelable("location_key");
+            setFragment(0);
         }
         setupNavigationDrawerContent(navigationView);
 
-        mGoogleApiClient.connect();
+
 
 
     }
@@ -122,7 +111,7 @@ public class MainActivity extends AllowMeActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         Util.LOGD(LOG_TAG,"onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key", mLocation);
+
     }
 
     @Override
@@ -140,7 +129,6 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onStop() {
         Util.LOGD(LOG_TAG,"onStop");
-        mGoogleApiClient.disconnect();
 
         super.onStop();
     }
@@ -229,10 +217,6 @@ public class MainActivity extends AllowMeActivity implements
             case 0:
                 fragmentManager = getSupportFragmentManager();
                 MapFragment mapFragment = new MapFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("address_key",mAddress);
-                bundle.putParcelable("location_key", mLocation);
-                mapFragment.setArguments(bundle);
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment, mapFragment, TAG_FRAGMENT)
                         .commit();
@@ -252,54 +236,6 @@ public class MainActivity extends AllowMeActivity implements
     }
 
 
-    @SuppressWarnings({"MissingPermission"})
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Util.LOGD(LOG_TAG, "onConnected");
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                //min x secs x millisec
-                .setFastestInterval(10 * 60 * 1000);
-
-        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
-            new AllowMe.Builder()
-                    .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
-                    .setRationale("Esta app necesita este permision para funcionar")
-                    .setCallback(new AllowMeCallback() {
-                        @Override
-                        public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
-                            if (permissionResultSet.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MainActivity.this);
-                            }
-                        }
-                    }).request(1);
-
-        } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Util.LOGD(LOG_TAG, "onConnectionFailed");
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Util.LOGD(LOG_TAG, "onLocationChanged");
-        mLocation = location;
-        mAddress = mMainActivityPresenter.onGetAddressFromLocation(mLocation);
-        //First fragment
-        setFragment(0);
-
-
-    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
