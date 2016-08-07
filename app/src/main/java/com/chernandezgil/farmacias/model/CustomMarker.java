@@ -1,9 +1,13 @@
 package com.chernandezgil.farmacias.model;
 
+import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomMarker>{
+public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomMarker>,Parcelable {
 
 
     Double distance;
@@ -11,6 +15,15 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
     Boolean isOpen;
     String order;
     String addressFormatted;
+    Bitmap markerImage;
+
+    public Bitmap getMarkerImage() {
+        return markerImage;
+    }
+
+    public void setMarkerImage(Bitmap markerImage) {
+        this.markerImage = markerImage;
+    }
 
     public Boolean getOpen() {
         return isOpen;
@@ -92,4 +105,40 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         result = 31 * result + getOrder().hashCode();
         return result;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.distance);
+        dest.writeString(this.hours);
+        dest.writeValue(this.isOpen);
+        dest.writeString(this.order);
+        dest.writeString(this.addressFormatted);
+        dest.writeParcelable(this.markerImage, flags);
+    }
+
+    protected CustomMarker(Parcel in) {
+        this.distance = (Double) in.readValue(Double.class.getClassLoader());
+        this.hours = in.readString();
+        this.isOpen = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.order = in.readString();
+        this.addressFormatted = in.readString();
+        this.markerImage = in.readParcelable(Bitmap.class.getClassLoader());
+    }
+
+    public static final Creator<CustomMarker> CREATOR = new Creator<CustomMarker>() {
+        @Override
+        public CustomMarker createFromParcel(Parcel source) {
+            return new CustomMarker(source);
+        }
+
+        @Override
+        public CustomMarker[] newArray(int size) {
+            return new CustomMarker[size];
+        }
+    };
 }

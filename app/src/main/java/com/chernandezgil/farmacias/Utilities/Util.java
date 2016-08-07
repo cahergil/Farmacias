@@ -38,7 +38,7 @@ public class Util {
         if (mapFragment == null) {
             mapFragment = new SupportMapFragment();
             fragmentManager.beginTransaction()
-                    .add(R.id.mapFragmentContainer, mapFragment, fragmentTag)
+                    .replace(R.id.mapFragmentContainer, mapFragment, fragmentTag)
                     .commit();
             fragmentManager.executePendingTransactions();
 

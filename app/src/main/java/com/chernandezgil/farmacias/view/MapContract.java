@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.view;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.view.MotionEvent;
 
@@ -20,9 +21,9 @@ public interface MapContract {
     public interface View {
         public void addMarkerToMap(CustomMarker marker);
         public void moveCamera(CameraUpdate cameraUpdate);
-        public boolean hideBottomSheet();
+        public boolean collapseBottomSheet();
         public void handleDispatchTouchEvent(MotionEvent event);
-        public void displayFirstNearestOpenPharmacyInBottomSheet(CustomMarker marker);
+        public void displayPharmacyInBottomSheet(CustomMarker firstSorter,CustomMarker lastClicked);
     }
     public interface Presenter<V> {
 
@@ -42,6 +43,7 @@ public interface MapContract {
         public String onGetAddressFromLocation(Location location);
         public Bitmap onRequestCustomBitmap(String order,boolean isOpen);
         public void onSetMarkerBitMap(Bitmap bitmap);
+        public CameraUpdate getCameraUpdate();
 
 
     }

@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.presenter;
 import com.chernandezgil.farmacias.ApplicationModule;
 import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.fragment.MapFragment;
+import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 
 import javax.inject.Singleton;
 
@@ -16,6 +17,6 @@ import dagger.Component;
         ApplicationModule.class})
 public interface MapComponent {
 
-    void inject(MapFragment fragment);
+    void inject(TabLayoutFragment fragment);
     void inject(MapPresenter presenter);
 }

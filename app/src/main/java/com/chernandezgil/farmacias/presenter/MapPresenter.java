@@ -12,6 +12,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,8 +21,10 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import com.chernandezgil.farmacias.Utilities.Constants;
+import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -66,15 +69,17 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     private CustomMarker mUserUbicationMarker;
 
     Bitmap markerBitmap;
-
+    private TimeMeasure mTm;
+    CameraUpdate mCameraUpdate;
 
     @Inject
     public MapPresenter(@NonNull LoaderProvider loaderProvider,
                         @NonNull LoaderManager loaderManager,
-                        @NonNull Geocoder geocoder){
+                        @NonNull Geocoder geocoder, TimeMeasure tm){
         mLoaderProvider=checkNotNull(loaderProvider,"loader provider cannot be null");
         mLoaderManager=checkNotNull(loaderManager,"loader manager cannot be null");
         mGeocoder=checkNotNull(geocoder,"geocoder cannot be null");
+        mTm=tm;
 
 
     }
@@ -90,6 +95,12 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     public void onSetMarkerBitMap(Bitmap markerBitmap) {
         this.markerBitmap=markerBitmap;
     }
+
+    @Override
+    public CameraUpdate getCameraUpdate() {
+        return mCameraUpdate;
+    }
+
     @Override
     public void detachView() {
         mMapView =null;
@@ -189,22 +200,28 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
 
         Canvas canvas = new Canvas(bmp);
         Paint paint = new Paint();
-        paint.setTextSize(60);
+        paint.setTextSize(38);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setColor(Color.BLACK);
+
+        paint.setColor(Color.parseColor("#FFCDD2"));
         paint.setColorFilter(paintColorFilter);
 
         Rect boundsText=new Rect();
         paint.getTextBounds(order,0,order.length(),boundsText);
+        if(boundsText.width()>40) {
+            paint.setTextSize(25);
+        }
+        paint.getTextBounds(order,0,order.length(),boundsText);
         int x=(bmp.getWidth()- boundsText.width())/2;
         //    int y=(bmp.getHeight()- boundsText.height())/2;
-        //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",boundsText.height()"+boundsText.height());
+        //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",bmp.with()"+bmp.getWidth());
         //    Log.d(LOG_TAG,"letra:"+order);
 
       //  canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),
       //          R.drawable.ic_maps_position), 0,0, paint);
         canvas.drawBitmap(markerBitmap, 0,0, paint);
-        canvas.drawText(order, x-4,69, paint);
+      //  canvas.drawText(order, x-4,69, paint);
+        canvas.drawText(order, x,115, paint);
 
         return bmp;
     }
@@ -268,47 +285,62 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
     private void bindView(Cursor data){
 
         List<CustomMarker> farmaciasList=new ArrayList<>();
+        CustomMarker firstSortedPharmacy=new CustomMarker();
         if(data.isClosed()) return;
+//        if(data.isAfterLast()) {
+//            data.moveToFirst();
+//        }
+        if(data.moveToFirst()) {
+            do {
 
-        while (data.moveToNext()) {
+                CustomMarker farmacia = new CustomMarker();
 
-            CustomMarker farmacia=new CustomMarker();
+                double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
+                double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
+                //float dist=calculateDistance(latDest,lonDest,mLocation);
+                double distance = meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
+                farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
+                farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
+                farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
+                farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
+                String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
+                farmacia.setPhone(Util.formatPhoneNumber(phone));
+                farmacia.setLat(latDest);
+                farmacia.setLon(lonDest);
+                farmacia.setDistance(distance);
+                String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
+                farmacia.setHours(hours);
+                farmacia.setOpen(isPharmacyOpen(hours));
+                String addressFormatted = Util.formatAddress(farmacia.getAddress(),
+                        farmacia.getPostal_code(),
+                        farmacia.getLocality(),
+                        farmacia.getProvince());
+                farmacia.setAddressFormatted(addressFormatted);
+                //  farmacia.setMarkerImage(onRequestCustomBitmap(farmacia.getOrder(),farmacia.isOpen()));
 
-            double latDest=data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
-            double lonDest=data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
-            //float dist=calculateDistance(latDest,lonDest,mLocation);
-            double distance=meterDistanceBetweenPoints(latDest,lonDest,mLocation.getLatitude(),mLocation.getLongitude());
-            farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
-            farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
-            farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
-            farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
-            farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
-            String phone=data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
-            farmacia.setPhone(Util.formatPhoneNumber(phone));
-            farmacia.setLat(latDest);
-            farmacia.setLon(lonDest);
-            farmacia.setDistance(distance);
-            String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
-            farmacia.setHours(hours);
-            farmacia.setOpen(isPharmacyOpen(hours));
-            String addressFormatted=Util.formatAddress(farmacia.getAddress(),
-                                                       farmacia.getPostal_code(),
-                                                       farmacia.getLocality(),
-                                                       farmacia.getProvince());
-            farmacia.setAddressFormatted(addressFormatted);
-            farmaciasList.add(farmacia);
+                farmaciasList.add(farmacia);
 
+            }while (data.moveToNext());
         }
-
         farmaciasList= toFilteredSortedOrderedList(farmaciasList);
         for (int i = 0;i < farmaciasList.size();i++) {
             if(i==0) {
-                mMapView.displayFirstNearestOpenPharmacyInBottomSheet(farmaciasList.get(i));
+                firstSortedPharmacy=farmaciasList.get(i);
             }
             mMapView.addMarkerToMap(farmaciasList.get(i));
 
         }
 
+        CustomMarker userLocation=getUserLocationMarker();
+        mUserUbicationMarker=userLocation;
+        mMapView.addMarkerToMap(userLocation);
+        mMapView.displayPharmacyInBottomSheet(firstSortedPharmacy,mLastClickMarker);
+
+        zoomAnimateLevelToFitMarkers(120);
+    }
+
+    private CustomMarker getUserLocationMarker(){
         CustomMarker userLocation=new CustomMarker();
         userLocation.setName("userLocation");
         userLocation.setLat(mLocation.getLatitude());
@@ -316,13 +348,7 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
         //for hascode and equals
         userLocation.setOrder("A");
         userLocation.setDistance(0d);
-        mUserUbicationMarker=userLocation;
-   //     mUserUbicationMarker.setAddress(mUserAddress);
-        mMapView.addMarkerToMap(userLocation);
-        //user location by defaul in bottom sheet
-        //tvName.setText();
-
-        zoomAnimateLevelToFitMarkers(120);
+        return userLocation;
     }
 
     /**
@@ -346,7 +372,9 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
                 .compose(Transformers.mapWithIndex())
                 .map(t->{t.value().setOrder(Util.characterFromInteger((int)t.index()));
                     return t.value();
-                }).toList()
+                }).map(f->{f.setMarkerImage(onRequestCustomBitmap(f.getOrder(),f.isOpen()));
+                   return f;})
+                .toList()
                 .toBlocking().first();
 
     }
@@ -360,13 +388,24 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
         while (iter.hasNext()) {
             Map.Entry mEntry = (Map.Entry) iter.next();
             Marker key = (Marker) mEntry.getKey();
+
             CustomMarker c= (CustomMarker) mMarkersHashMap.get(key);
             LatLng ll = new LatLng(c.getLat(), c.getLon());
             b.include(ll);
         }
         LatLngBounds bounds = b.build();
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMapView.moveCamera(cu);
+        mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+     //   CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 200,200,20);
+        //Util.LOGD(LOG_TAG,"beforeMoveCamera");
+//        mTm.log("beforeMoveCamera");
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mMapView.moveCamera(cu);
+//            }
+//        }, 1000);
+
 
     }
 
@@ -376,11 +415,11 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>,Loa
         }
     }
 
-    //this is method to help us add a Marker into the hashmap that stores the Markers
-    private void addMarkerToHashMap(CustomMarker customMarker, Marker marker) {
-        setUpMarkersHashMap();
-        mMarkersHashMap.put(marker,customMarker);
-    }
+//    //this is method to help us add a Marker into the hashmap that stores the Markers
+//    private void addMarkerToHashMap(CustomMarker customMarker, Marker marker) {
+//        setUpMarkersHashMap();
+//        mMarkersHashMap.put(marker,customMarker);
+//    }
 
 
     @Override

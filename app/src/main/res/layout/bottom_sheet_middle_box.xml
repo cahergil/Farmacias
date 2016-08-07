@@ -33,6 +33,13 @@
             android:layout_weight="2"
             android:gravity="center"
             app:srcCompat="@drawable/directions" />
+        <ImageView
+            android:id="@+id/ivShare"
+            android:layout_width="0dp"
+            android:layout_height="26dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            app:srcCompat="@drawable/share" />
 
     </LinearLayout>
 
@@ -63,6 +70,17 @@
             android:gravity="center"
             android:showDividers="end"
             android:text="IR"
+            android:textColor="@color/bottom_sheet_icons"
+            android:textSize="@dimen/bslb_text_size" />
+        <TextView
+            android:id="@+id/txtShare"
+            android:layout_width="0dp"
+            android:layout_height="26dp"
+            android:layout_weight="2"
+            android:divider="?android:dividerHorizontal"
+            android:gravity="center"
+            android:showDividers="end"
+            android:text="COMPARTIR"
             android:textColor="@color/bottom_sheet_icons"
             android:textSize="@dimen/bslb_text_size" />
 
