@@ -1,8 +1,6 @@
 package com.chernandezgil.farmacias.presenter;
 
 import com.chernandezgil.farmacias.ApplicationModule;
-import com.chernandezgil.farmacias.ui.activity.MainActivity;
-import com.chernandezgil.farmacias.ui.fragment.MapFragment;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 
 import javax.inject.Singleton;

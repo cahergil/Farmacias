@@ -9,8 +9,8 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.chernandezgil.farmacias.ui.fragment.ListFragment;
-import com.chernandezgil.farmacias.ui.fragment.MapFragment;
+import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
+import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 
 /**
  * Created by Carlos on 07/08/2016.
@@ -20,15 +20,15 @@ public class ViewPagerAdapter extends PagerAdapter {
     Fragment[] fragments;
     Location location;
 
-    public ViewPagerAdapter(FragmentManager fm, Location location){
+    public ViewPagerAdapter(FragmentManager fm, Location location) {
         fragmentManager = fm;
         fragments = new Fragment[2];
-        this.location=location;
+        this.location = location;
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        assert(0 <= position && position < fragments.length);
+        assert (0 <= position && position < fragments.length);
 //        FragmentTransaction trans = fragmentManager.beginTransaction();
 //        trans.remove(fragments[position]);
 //
@@ -37,10 +37,10 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public Fragment instantiateItem(ViewGroup container, int position){
+    public Fragment instantiateItem(ViewGroup container, int position) {
         Fragment fragment = getItem(position);
         FragmentTransaction trans = fragmentManager.beginTransaction();
-        trans.add(container.getId(),fragment,"fragment:"+position);
+        trans.add(container.getId(), fragment, "fragment:" + position);
         trans.commit();
         return fragment;
     }
@@ -55,21 +55,26 @@ public class ViewPagerAdapter extends PagerAdapter {
         return ((Fragment) fragment).getView() == view;
     }
 
-    public Fragment getItem(int position){
+    public Fragment getItem(int position) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("location_key", location);
+        if (fragments[position] == null && position == 0) {
 
-           if (fragments[position] == null && position==0) {
+            MapTabFragment mapTabFragment = new MapTabFragment();
+            mapTabFragment.setArguments(bundle);
+            fragments[position] = mapTabFragment; //make your fragment here
 
-               Bundle bundle=new Bundle();
-               bundle.putParcelable("location_key",location);
-               MapFragment mapFragment=new MapFragment();
-               mapFragment.setArguments(bundle);
-               fragments[position] =mapFragment; //make your fragment here
-           } else if(fragments[position] == null && position==1) {
-               fragments[position]=new ListFragment();
-           }
+        } else if (fragments[position] == null && position == 1) {
+
+            ListTabFragment listTabFragment = new ListTabFragment();
+            listTabFragment.setArguments(bundle);
+            fragments[position] = listTabFragment;
+
+        }
 
         return fragments[position];
     }
+
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
@@ -77,7 +82,8 @@ public class ViewPagerAdapter extends PagerAdapter {
                 return "mapa";
             case 1:
                 return "lista";
-            default: return null;
+            default:
+                return null;
 
         }
     }

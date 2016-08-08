@@ -19,7 +19,7 @@ import android.view.MotionEvent;
 import com.aitorvs.android.allowme.AllowMeActivity;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
-import com.chernandezgil.farmacias.ui.fragment.MapFragment;
+import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.services.DownloadFarmacias;
@@ -221,9 +221,9 @@ public class MainActivity extends AllowMeActivity implements
     public boolean dispatchTouchEvent(MotionEvent ev) {
         Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-           MapFragment mapFragment=getFragmentPressed();
-           if(mapFragment!=null) {
-               mapFragment.handleDispatchTouchEvent(ev);
+           MapTabFragment mapTabFragment =getFragmentPressed();
+           if(mapTabFragment !=null) {
+               mapTabFragment.handleDispatchTouchEvent(ev);
            }
         }
         return super.dispatchTouchEvent(ev);
@@ -234,9 +234,9 @@ public class MainActivity extends AllowMeActivity implements
     public void onBackPressed() {
 
         Util.LOGD(LOG_TAG,"onBackPressed");
-        MapFragment mapFragment=getFragmentPressed();
-        if(mapFragment!=null) {
-            if (!mapFragment.collapseBottomSheet()) {
+        MapTabFragment mapTabFragment =getFragmentPressed();
+        if(mapTabFragment !=null) {
+            if (!mapTabFragment.collapseBottomSheet()) {
                 super.onBackPressed();
             } else {
                 return;
@@ -247,15 +247,15 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
-    private MapFragment getFragmentPressed(){
+    private MapTabFragment getFragmentPressed(){
         List<Fragment> list=getSupportFragmentManager().getFragments();
 
         if(list!=null && list.size()>0) {
             Fragment tabs=list.get(0);
             if(tabs instanceof TabLayoutFragment) {
-                MapFragment mapFragment= (MapFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
-                if(mapFragment!=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
-                    return mapFragment;
+                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
+                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
+                    return mapTabFragment;
                 }
             }
 

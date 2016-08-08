@@ -218,12 +218,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
                 case 0:
                     Bundle bundle=new Bundle();
                     bundle.putParcelable("location_key",location);
-                    MapFragment mapFragment =new MapFragment();
-                    mapFragment.setArguments(bundle);
+                    MapTabFragment mapTabFragment =new MapTabFragment();
+                    mapTabFragment.setArguments(bundle);
 
-                    return mapFragment;
+                    return mapTabFragment;
                 case 1:
-                    return new ListFragment();
+                    return new ListTabFragment();
 
 
                 default: return null;

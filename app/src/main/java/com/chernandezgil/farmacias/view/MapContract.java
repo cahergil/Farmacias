@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.view.MotionEvent;
 
+import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,7 +21,7 @@ public interface MapContract {
 
     public interface View {
         public void addMarkerToMap(CustomMarker marker);
-        public void moveCamera(CameraUpdate cameraUpdate);
+        public void moveCamera(CustomCameraUpdate cameraUpdate);
         public boolean collapseBottomSheet();
         public void handleDispatchTouchEvent(MotionEvent event);
         public void displayPharmacyInBottomSheet(CustomMarker firstSorter,CustomMarker lastClicked);
@@ -41,9 +42,11 @@ public interface MapContract {
         public String onGetDestinationAddress();
         public String onGetDestinationPhoneNumber();
         public String onGetAddressFromLocation(Location location);
+        public void   onSetAddress(String address);
         public Bitmap onRequestCustomBitmap(String order,boolean isOpen);
         public void onSetMarkerBitMap(Bitmap bitmap);
-        public CameraUpdate getCameraUpdate();
+        public CustomCameraUpdate getCameraUpdate();
+
 
 
     }

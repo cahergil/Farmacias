@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/blue_mobile_web</color>
-    <color name="colorPrimaryDark">@color/blue_900</color>
+    <color name="colorPrimary">@color/pharmacy_open</color>
+    <color name="colorPrimaryDark">@color/red_700</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
-
     <color name="ltgray">#EEEEEE</color>
     <color name="red_100">#FFCDD2</color>
-
     <color name="gray300">#E0E0E0</color>
     <color name="gray400">#BDBDBD</color>
     <color name="gray600">#757575</color>
@@ -22,6 +20,7 @@
     <color name="blue_700">#1976D2</color>
     <color name="blue_800">#1565C0</color>
     <color name="blue_900">#0D47A1</color>
+    <color name="red_700">#D32F2F</color>
     <color name="blue_mobile_web">#ff4285f4</color>
     <color name="pharmacy_close">#ff736161</color>
     <color name="pharmacy_open">#ffd64646</color>

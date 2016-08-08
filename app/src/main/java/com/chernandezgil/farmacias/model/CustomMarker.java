@@ -130,15 +130,4 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         this.markerImage = in.readParcelable(Bitmap.class.getClassLoader());
     }
 
-    public static final Creator<CustomMarker> CREATOR = new Creator<CustomMarker>() {
-        @Override
-        public CustomMarker createFromParcel(Parcel source) {
-            return new CustomMarker(source);
-        }
-
-        @Override
-        public CustomMarker[] newArray(int size) {
-            return new CustomMarker[size];
-        }
-    };
 }

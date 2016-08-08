@@ -1,12 +1,10 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
@@ -14,18 +12,17 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.AppCompatDrawableManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,56 +36,41 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.aitorvs.android.allowme.AllowMe;
-import com.aitorvs.android.allowme.AllowMeCallback;
-import com.aitorvs.android.allowme.PermissionResultSet;
 import com.bettervectordrawable.utils.BitmapUtil;
-import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
+import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.CustomMarker;
 import com.chernandezgil.farmacias.presenter.MapPresenter;
 import com.chernandezgil.farmacias.view.MapContract;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Locale;
 
-import javax.inject.Inject;
-
-import butterknife.BindBitmap;
 import butterknife.BindColor;
-import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback,
+public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,MapContract.View {
 
 
-    private static final String LOG_TAG = MapFragment.class.getSimpleName();
+    private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
     private GoogleMap mMap;
     private Location mLocation;
     TimeMeasure mTm;
@@ -141,20 +123,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     ImageView ivClock;
     @BindView(R.id.ivShare)
     ImageView ivShare;
-  //  FloatingActionButton fab;
+
     @BindColor(R.color.pharmacy_close)
     int color_pharmacy_close;
     @BindColor(R.color.pharmacy_open)
     int color_pharmacy_open;
-   // @BindBitmap(R.drawable.ic_maps_position)
-   //Bitmap markerBitmap;
+    @BindView(R.id.coordinator)
+    CoordinatorLayout mRootView;
 
 
     private Geocoder mGeocoder;
     private CustomMarker mLastMarkerClicked;
     private Bitmap  markerBitmap;
-    private boolean mIsVisible;
-    public MapFragment() {
+
+    public MapTabFragment() {
     }
 
 
@@ -174,6 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mMapPresenter=new MapPresenter(mLoaderProvider,mLoaderManager,mGeocoder,mTm);
         mMapPresenter.setLocation(mLocation);
         mAddress = mMapPresenter.onGetAddressFromLocation(mLocation);
+        mMapPresenter.onSetAddress(mAddress);
         mMapPresenter.onStartLoader();
 
 
@@ -185,7 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreateView:"+this.toString());
-        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
         ButterKnife.bind(this,view);
         setUpBotomSheet();
         setUpTvPhone();
@@ -217,8 +200,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
 
     private Bitmap getBM(){
 
-        ;
-        Drawable drawable =VectorDrawableCompat.create(getResources(),R.drawable.pharmacy,null);
+
+        Drawable drawable =VectorDrawableCompat.create(getResources(),R.drawable.hospital_pin_stroke,null);
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         Bitmap bitmap = BitmapUtil.toBitmap(drawable, metrics, 48f, 0);
         return bitmap;
@@ -292,7 +275,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onMapLoaded() {
                 Log.d(LOG_TAG,"onmapLoaded");
-                CameraUpdate cu=mMapPresenter.getCameraUpdate();
+                CustomCameraUpdate cu=mMapPresenter.getCameraUpdate();
                 moveCamera(cu);
             }
         });
@@ -309,7 +292,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         );
         if(customMarker.getName().equals("userLocation")) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Tu ubicación");
+                    .title("Tu ubicación")
+                    .snippet(customMarker.getAddressFormatted());
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
@@ -336,12 +320,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         });
     }
     @Override
-    public void moveCamera(CameraUpdate cameraUpdate) {
+    public void moveCamera(CustomCameraUpdate cameraUpdate) {
+        if(cameraUpdate.isNoResultsPosition()) {
+            handleNoResults((cameraUpdate));
+        } else {
+            mMap.animateCamera(cameraUpdate.getmCameraUpdate());
+        }
 
 
-        mMap.animateCamera(cameraUpdate);
     }
 
+    private void handleNoResults(CustomCameraUpdate cameraUpdate){
+        mMap.moveCamera(cameraUpdate.getmCameraUpdate());
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15),2000, null);
+        String message="Sin resultados. Radio de busqueda insuficiente";
+        Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
+    }
     private void handlePhoneCall(){
         String uri="tel:" + mMapPresenter.onGetDestinationPhoneNumber();
         Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -396,12 +390,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
                 LatLng destinationLatLng=mMapPresenter.onGetDestinationLocale();
                 String destinationAddress=mMapPresenter.onGetDestinationAddress();
                 //mMapPresenter.getLocales()
-                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
-                        mLocation.getLatitude(),mLocation.getLongitude() , mAddress,
-                        destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                startActivity(intent);
+                Util.startGoogleDirections(getActivity(),new LatLng(mLocation.getLatitude(),mLocation.getLatitude())
+                        ,mAddress,
+                        destinationLatLng
+                        ,destinationAddress);
+//                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
+//                        mLocation.getLatitude(),mLocation.getLongitude() , mAddress,
+//                        destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+//                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+//                startActivity(intent);
             }
         });
     }
@@ -445,6 +443,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         //initially set hidden(in case there are no pharmacies around).Not working
+        mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -471,8 +470,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,
     public boolean onMarkerClick(Marker marker) {
             HashMap hashMap=mMapPresenter.onGetHashMap();
             CustomMarker customMarker= (CustomMarker)hashMap.get(marker);
+            if(customMarker.getName().equals("userLocation")) {
+                return false;
+            }
             showPharmacyInBottomSheet(customMarker);
-            if( mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED) {
+            if( mBottomSheetBehavior.getState()!=BottomSheetBehavior.STATE_EXPANDED) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             return false;
