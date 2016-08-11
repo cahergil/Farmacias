@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">@color/pharmacy_open</color>
     <color name="colorPrimaryDark">@color/red_700</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">@color/green_accent</color>
+    <color name="green_accent">#4CAF50</color>
     <color name="white">#FFFFFF</color>
     <color name="ltgray">#EEEEEE</color>
     <color name="red_100">#FFCDD2</color>

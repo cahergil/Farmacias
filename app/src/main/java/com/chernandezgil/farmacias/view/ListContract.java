@@ -23,6 +23,7 @@ public interface ListContract {
         public void showNoResults();
         public void showLoading();
         public void hideLoading();
+        public void setAddress(String address);
     }
     public interface Presenter<V> {
 
@@ -32,6 +33,7 @@ public interface ListContract {
         void detachView();
 
         public void onStartLoader();
+        public void onGetAddressFromLocation(Location location);
 
 
 

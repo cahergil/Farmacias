@@ -172,6 +172,11 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         } else {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
+        mLocation = new Location("hola");
+        mLocation.setLatitude(38.9766f);
+        mLocation.setLongitude(-5.79881);
+        setUpViewPager();
+        setUpTabLayout();
     }
 
 
@@ -189,9 +194,11 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onLocationChanged(Location location) {
         Util.LOGD(LOG_TAG,"onLocationChanged");
-        mLocation = location;
-        setUpViewPager();
-        setUpTabLayout();
+//        mLocation = location;
+//        mLocation.setLatitude(38.9766f);
+//        mLocation.setLongitude(-5.79881);
+//        setUpViewPager();
+//        setUpTabLayout();
 
     }
 

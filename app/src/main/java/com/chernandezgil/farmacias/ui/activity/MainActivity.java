@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.ui.activity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.aitorvs.android.allowme.AllowMeActivity;
+import com.chernandezgil.farmacias.SettingsActivity;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
@@ -26,6 +28,9 @@ import com.chernandezgil.farmacias.services.DownloadFarmacias;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.List;
 
@@ -49,6 +54,7 @@ public class MainActivity extends AllowMeActivity implements
 
     private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG_FRAGMENT = "TAB_FRAGMENT";
 
     private MainActivityPresenter mMainActivityPresenter;
@@ -74,9 +80,11 @@ public class MainActivity extends AllowMeActivity implements
         mMainActivityPresenter = new MainActivityPresenter();
         mMainActivityPresenter.setView(this);
         setUpToolBar();
-        Stetho.initializeWithDefaults(this);
+
 
         if (savedInstanceState == null) {
+            checkGooglePlayServicesAvailability();
+            Stetho.initializeWithDefaults(this);
             launchDownloadService();
             setFragment(0);
         }
@@ -129,6 +137,8 @@ public class MainActivity extends AllowMeActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent=new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
@@ -263,6 +273,20 @@ public class MainActivity extends AllowMeActivity implements
         return null;
     }
 
+    private void checkGooglePlayServicesAvailability(){
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        Integer resultCode = googleAPI.isGooglePlayServicesAvailable(this);
+        if (resultCode == ConnectionResult.SUCCESS) {
+            //Do what you want
+        } else {
+            if(googleAPI.isUserResolvableError(resultCode)) {
+                googleAPI.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+
+
+        }
+    }
     @Override
     protected void onDestroy() {
         Util.LOGD(LOG_TAG,"onDestroy");

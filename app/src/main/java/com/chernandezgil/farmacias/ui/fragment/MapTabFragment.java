@@ -24,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.AppCompatDrawableManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -36,7 +35,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
@@ -62,6 +60,7 @@ import java.util.Locale;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by Carlos on 10/07/2016.
@@ -74,7 +73,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private GoogleMap mMap;
     private Location mLocation;
     TimeMeasure mTm;
-    private boolean mBottomsheetLoaded = false;
+
     private BottomSheetBehavior mBottomSheetBehavior;
     private SupportMapFragment mMapFragment;
     private boolean mRotation=false;
@@ -84,7 +83,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private String mAddress;
     @BindView(R.id.ivOrder)
     ImageView ivOrder;
-
     @BindView(R.id.adress)
     TextView tvAdress;
     @BindView(R.id.phone)
@@ -135,6 +133,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private Geocoder mGeocoder;
     private CustomMarker mLastMarkerClicked;
     private Bitmap  markerBitmap;
+    private Unbinder unbinder;
 
     public MapTabFragment() {
     }
@@ -169,7 +168,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreateView:"+this.toString());
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
-        ButterKnife.bind(this,view);
+        unbinder=ButterKnife.bind(this,view);
         setUpBotomSheet();
         setUpTvPhone();
         setUpIvCall();
@@ -192,49 +191,41 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         }
 
         mMapPresenter.setView(this);
-       // markerBitmap=getBitmap(R.drawable.pharmacy1);
-        markerBitmap=getBM();
+        markerBitmap=Util.getBitmapFromVectorDrawable(getActivity(),R.drawable.hospital_pin_stroke);
         mMapPresenter.onSetMarkerBitMap(markerBitmap);
         return view;
     }
 
-    private Bitmap getBM(){
 
+//    private Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+//        Drawable drawable = AppCompatDrawableManager.get().getDrawable(context, drawableId);
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//            drawable = (DrawableCompat.wrap(drawable)).mutate();
+//        }
+//
+//        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+//                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap);
+//        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+//        drawable.draw(canvas);
+//
+//        return bitmap;
+//    }
 
-        Drawable drawable =VectorDrawableCompat.create(getResources(),R.drawable.hospital_pin_stroke,null);
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        Bitmap bitmap = BitmapUtil.toBitmap(drawable, metrics, 48f, 0);
-        return bitmap;
-    }
-    private Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
-        Drawable drawable = AppCompatDrawableManager.get().getDrawable(context, drawableId);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            drawable = (DrawableCompat.wrap(drawable)).mutate();
-        }
-
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private  Bitmap getBitmap(int drawableResId) {
-      //  VectorDrawableCompat vectorDrawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
-      //  Drawable vectorDrawable = AppCompatDrawableManager.get().getDrawable(getActivity(), drawableResId);
-        Drawable vectorDrawable= ContextCompat.getDrawable(getActivity(),drawableResId);
-       // vectorDrawable.setColorFilter(color_pharmacy_open, PorterDuff.Mode.SRC_ATOP);
-        vectorDrawable.setTint(color_pharmacy_open);
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        vectorDrawable.draw(canvas);
-        return bitmap;
-    }
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    private  Bitmap getBitmap(int drawableResId) {
+//      //  VectorDrawableCompat vectorDrawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
+//      //  Drawable vectorDrawable = AppCompatDrawableManager.get().getDrawable(getActivity(), drawableResId);
+//        Drawable vectorDrawable= ContextCompat.getDrawable(getActivity(),drawableResId);
+//       // vectorDrawable.setColorFilter(color_pharmacy_open, PorterDuff.Mode.SRC_ATOP);
+//        vectorDrawable.setTint(color_pharmacy_open);
+//        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+//                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(bitmap);
+//        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+//        vectorDrawable.draw(canvas);
+//        return bitmap;
+//    }
 
 
 
@@ -556,6 +547,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onDestroy() {
         Util.LOGD(LOG_TAG, "onDestroy");
+        unbinder.unbind();
         super.onDestroy();
     }
 

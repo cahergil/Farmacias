@@ -4,13 +4,18 @@ package com.chernandezgil.farmacias.Utilities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
+import android.support.annotation.DrawableRes;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.R;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -146,4 +151,12 @@ public class Util {
         context.startActivity(intent);
     }
 
+    public static Bitmap getBitmapFromVectorDrawable(Context context, @DrawableRes int drawableResId){
+
+
+        Drawable drawable = VectorDrawableCompat.create(context.getResources(),drawableResId,null);
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        Bitmap bitmap = BitmapUtil.toBitmap(drawable, metrics, 48f, 0);
+        return bitmap;
+    }
     }

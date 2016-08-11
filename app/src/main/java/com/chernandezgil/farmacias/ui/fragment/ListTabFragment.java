@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by Carlos on 06/08/2016.
@@ -43,29 +45,50 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
     private Location mLocation;
     private ListPresenter mPresenter;
     private ListTabAdapter mAdapter;
+    private String mAddress;
+    private List<Pharmacy> mPharmacyList;
+    private Unbinder unbinder;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle=getArguments();
+
         if(savedInstanceState==null) {
             if (bundle != null) {
                 mLocation=bundle.getParcelable("location_key");
-                LoaderProvider loaderProvider = new LoaderProvider(getActivity());
-                mPresenter = new ListPresenter(mLocation,loaderProvider,getLoaderManager());
-
-            }
+             }
+        } else {
+            mLocation=savedInstanceState.getParcelable("location_key");
+            mAddress = savedInstanceState.getString("address_key");
         }
+        LoaderProvider loaderProvider = new LoaderProvider(getActivity());
+        mPresenter = new ListPresenter(mLocation,loaderProvider,getLoaderManager(),new Geocoder(getActivity()));
+
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_tab_list,container,false);
-        ButterKnife.bind(this,view);
+        unbinder=ButterKnife.bind(this,view);
         setUpRecyclerView();
         mPresenter.setView(this);
+        if(savedInstanceState==null) {
+            mPresenter.onGetAddressFromLocation(mLocation);
+        }
         mPresenter.onStartLoader();
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("location_key",mLocation);
+        if(mAddress!=null) {
+            outState.putString("address_key", mAddress);
+        }
     }
 
     private void setUpRecyclerView(){
@@ -79,6 +102,7 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         mAdapter.swapData(pharmacyList);
+        mPharmacyList=pharmacyList;
     }
 
     @Override
@@ -96,17 +120,38 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
         tvLoading.setVisibility(View.INVISIBLE);
     }
 
+    @Override
+    public void setAddress(String address) {
+        mAddress=address;
+    }
+
 
     @Override
     public void onClickGo(ListTabAdapter.ViewHolder vh,int position) {
 
-//        Util.startGoogleDirections(getActivity(),
-//                new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),
-//                );
+        Pharmacy pharmacy=mPharmacyList.get(position);
+        Util.startGoogleDirections(getActivity(),
+                new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),
+                mAddress,new LatLng(pharmacy.getLat(),pharmacy.getLon()),
+                pharmacy.getAddressFormatted()
+                );
+    }
+
+    @Override
+    public void onClickToogle(ListTabAdapter.ViewHolder vh, int position) {
+//        for(int i =0; i<)
+//        ListTabAdapter.ViewHolder holder=mRecyclerView.findViewHolderForAdapterPosition(position);
+//        vh.isRecyclable()
     }
 
     @Override
     public void onClick(ListTabAdapter.ViewHolder vh) {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        unbinder.unbind();
+        super.onDestroy();
     }
 }

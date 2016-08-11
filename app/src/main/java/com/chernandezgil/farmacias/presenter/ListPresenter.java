@@ -11,6 +11,8 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import android.support.v4.app.LoaderManager;
 
 import android.support.v4.content.Loader;
 
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -26,6 +29,7 @@ import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.view.ListContract;
 import com.github.davidmoten.rx.Transformers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,18 +41,20 @@ import rx.Observable;
 public class ListPresenter implements ListContract.Presenter<ListContract.View>,
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String LOG_TAG=ListPresenter.class.getSimpleName();
     private final LoaderManager mLoaderManager;
     private ListContract.View mView;
     private LoaderProvider mLoaderProvider;
-
+    private Geocoder mGeocoder;
     private Location mLocation;
 
     private int FARMACIAS_LOADER=1;
 
-    public ListPresenter(Location location, LoaderProvider loaderProvider,LoaderManager loadermanager) {
+    public ListPresenter(Location location, LoaderProvider loaderProvider, LoaderManager loadermanager, Geocoder geocoder) {
         mLocation=location;
         mLoaderProvider=loaderProvider;
         mLoaderManager=loadermanager;
+        mGeocoder=geocoder;
     }
     @Override
     public void setView(ListContract.View view) {
@@ -65,6 +71,40 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
     public void onStartLoader() {
         mView.showLoading();
         mLoaderManager.restartLoader(FARMACIAS_LOADER,null,this);
+
+    }
+
+    @Override
+    public void onGetAddressFromLocation(Location location) {
+        List<Address> addresses = null;
+        try {
+            addresses = mGeocoder.getFromLocation(
+                    location.getLatitude(),
+                    location.getLongitude(),
+                    1);
+        } catch (IOException ioe) {
+
+        }
+
+        if (addresses == null || addresses.size() == 0) {
+            Util.LOGD(LOG_TAG, "no address found");
+            mView.setAddress(null);
+        } else {
+            Address address = addresses.get(0);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            // Fetch the address lines using getAddressLine,
+            // join them, and send them to the thread.
+            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                stringBuilder.append(address.getAddressLine(i));
+                if (i != address.getMaxAddressLineIndex() - 1) {
+                    stringBuilder.append(Constants.COMMA);
+                }
+            }
+            Util.LOGD(LOG_TAG, "address found");
+
+            mView.setAddress(stringBuilder.toString());
+        }
 
     }
 
@@ -99,7 +139,7 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
                         farmacia.getLocality(),
                         farmacia.getProvince());
                 farmacia.setAddressFormatted(addressFormatted);
-
+                farmacia.setArrow_down(true);
 
                 farmaciasList.add(farmacia);
 

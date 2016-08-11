@@ -38,6 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SettingsActivity" >
+
+        </activity>
         <service android:name=".services.DownloadFarmacias" android:exported="false" />
         <!-- Content provider -->
         <provider
