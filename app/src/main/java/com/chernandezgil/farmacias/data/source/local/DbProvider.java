@@ -31,8 +31,6 @@ public class DbProvider extends ContentProvider {
         final UriMatcher matcher=new UriMatcher(UriMatcher.NO_MATCH);
         final String authority= DbContract.CONTENT_AUTHORITY;
         matcher.addURI(authority,DbContract.PATH_FARMACIAS + "/*", FARMACIAS_ID);
-
-
         matcher.addURI(authority,DbContract.PATH_FARMACIAS,FARMACIAS);
 
         return matcher;
@@ -106,7 +104,7 @@ public class DbProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db=mDbHelper.getWritableDatabase();
+        final SQLiteDatabase db=mDbHelper.getWritableDatabase();
         int rowsDeleted=0;
         final int match = mUriMatcher.match(uri);
         switch (match){
@@ -124,7 +122,22 @@ public class DbProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        final int match = mUriMatcher.match(uri);
+        int rowsUpdated;
+        switch (match) {
+            case FARMACIAS_ID:
+                rowsUpdated=db.update(DbContract.FarmaciasEntity.TABLE_NAME,contentValues,s,strings);
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
     @Override

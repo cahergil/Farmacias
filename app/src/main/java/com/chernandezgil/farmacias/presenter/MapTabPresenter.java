@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.presenter;
 
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,6 +28,7 @@ import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.CustomMarker;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapContract;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,8 +39,6 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,8 +53,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Created by Carlos on 03/08/2016.
  */
-public class MapPresenter implements MapContract.Presenter<MapContract.View>, LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String LOG_TAG = MapPresenter.class.getSimpleName();
+public class MapTabPresenter implements MapContract.Presenter<MapContract.View>, LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String LOG_TAG = MapTabPresenter.class.getSimpleName();
     private MapContract.View mView;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
@@ -66,18 +66,19 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>, Lo
     private CustomMarker mLastClickMarker;
     private CustomMarker mUserUbicationMarker;
 
-    Bitmap markerBitmap;
-    private TimeMeasure mTm;
-    CustomCameraUpdate mCameraUpdate;
-
+    private Bitmap markerBitmap;
+    private CustomCameraUpdate mCameraUpdate;
+    private PreferencesManager preferencesManager;
+    private int mRadio;
     @Inject
-    public MapPresenter(@NonNull LoaderProvider loaderProvider,
-                        @NonNull LoaderManager loaderManager,
-                        @NonNull Geocoder geocoder, TimeMeasure tm) {
+    public MapTabPresenter(@NonNull LoaderProvider loaderProvider,
+                           @NonNull LoaderManager loaderManager,
+                           @NonNull Geocoder geocoder, PreferencesManager preferencesManager) {
         mLoaderProvider = checkNotNull(loaderProvider, "loader provider cannot be null");
         mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
         mGeocoder = checkNotNull(geocoder, "geocoder cannot be null");
-        mTm = tm;
+        this.preferencesManager = preferencesManager;
+        mRadio=this.preferencesManager.retrieveRadioBusquedaFromSp()*1000;
         mCameraUpdate=new CustomCameraUpdate();
 
 
@@ -269,7 +270,14 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>, Lo
                         farmacia.getLocality(),
                         farmacia.getProvince());
                 farmacia.setAddressFormatted(addressFormatted);
-
+                boolean favorite;
+                int j=data.getInt(data.getColumnIndex(DbContract.FarmaciasEntity.FAVORITE));
+                if (j==0){
+                    favorite=false;
+                } else {
+                    favorite=true;
+                }
+                farmacia.setFavorite(favorite);
 
                 farmaciasList.add(farmacia);
 
@@ -318,7 +326,7 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>, Lo
 
         return Observable.from(list)
                 .filter(f -> {
-                    if (f.getDistance() < 10000) {
+                    if (f.getDistance() < mRadio) {
                         return true;
                     }
                     return false;
@@ -367,6 +375,8 @@ public class MapPresenter implements MapContract.Presenter<MapContract.View>, Lo
             mCameraUpdate.setNoResultsPosition(false);
 
         }
+
+
         //   CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 200,200,20);
         //Util.LOGD(LOG_TAG,"beforeMoveCamera");
 //        mTm.log("beforeMoveCamera");

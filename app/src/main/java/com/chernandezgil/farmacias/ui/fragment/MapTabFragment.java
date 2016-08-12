@@ -1,17 +1,14 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,9 +18,6 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.widget.AppCompatDrawableManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -42,7 +36,9 @@ import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.CustomMarker;
-import com.chernandezgil.farmacias.presenter.MapPresenter;
+import com.chernandezgil.farmacias.presenter.MapTabPresenter;
+import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapContract;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -77,7 +73,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private BottomSheetBehavior mBottomSheetBehavior;
     private SupportMapFragment mMapFragment;
     private boolean mRotation=false;
-    private MapPresenter mMapPresenter;
+    private MapTabPresenter mMapTabPresenter;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
     private String mAddress;
@@ -152,11 +148,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         mLoaderProvider=new LoaderProvider(getActivity());
         mLoaderManager=getLoaderManager();
-        mMapPresenter=new MapPresenter(mLoaderProvider,mLoaderManager,mGeocoder,mTm);
-        mMapPresenter.setLocation(mLocation);
-        mAddress = mMapPresenter.onGetAddressFromLocation(mLocation);
-        mMapPresenter.onSetAddress(mAddress);
-        mMapPresenter.onStartLoader();
+        PreferencesManager preferencesManager=new AndroidPrefsManager(getActivity());
+        mMapTabPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,preferencesManager);
+        mMapTabPresenter.setLocation(mLocation);
+        mAddress = mMapTabPresenter.onGetAddressFromLocation(mLocation);
+        mMapTabPresenter.onSetAddress(mAddress);
+        mMapTabPresenter.onStartLoader();
 
 
 
@@ -187,12 +184,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             mRotation=true;
             mLocation = savedInstanceState.getParcelable("location_key");
             mLastMarkerClicked=savedInstanceState.getParcelable("lastMarkerClicked_key");
-            mMapPresenter.onSetLastMarkerClick(mLastMarkerClicked);
+            mMapTabPresenter.onSetLastMarkerClick(mLastMarkerClicked);
         }
 
-        mMapPresenter.setView(this);
+        mMapTabPresenter.setView(this);
         markerBitmap=Util.getBitmapFromVectorDrawable(getActivity(),R.drawable.hospital_pin_stroke);
-        mMapPresenter.onSetMarkerBitMap(markerBitmap);
+        mMapTabPresenter.onSetMarkerBitMap(markerBitmap);
         return view;
     }
 
@@ -266,8 +263,40 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onMapLoaded() {
                 Log.d(LOG_TAG,"onmapLoaded");
-                CustomCameraUpdate cu=mMapPresenter.getCameraUpdate();
-                moveCamera(cu);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        CustomCameraUpdate cu=null;
+                        while(cu==null) {
+                            cu= mMapTabPresenter.getCameraUpdate();
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        moveCamera(cu);
+                    }
+                });
+
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        CustomCameraUpdate cu=null;
+//                        while(cu==null) {
+//                           cu= mMapTabPresenter.getCameraUpdate();
+//                            try {
+//                                Thread.sleep(200);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        moveCamera(cu);
+//                    }
+//                }).start();
+
             }
         });
 
@@ -284,11 +313,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if(customMarker.getName().equals("userLocation")) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Tu ubicación")
-                    .snippet(customMarker.getAddressFormatted());
+                    .snippet(Util.getStreetFromAddress(customMarker.getAddressFormatted()));
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
-            Bitmap bitmap=mMapPresenter.onRequestCustomBitmap(customMarker.getOrder(),customMarker.isOpen());
+            Bitmap bitmap= mMapTabPresenter.onRequestCustomBitmap(customMarker.getOrder(),customMarker.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(customMarker.getName())
                     .snippet(getString(R.string.format_distance,customMarker.getDistance()/1000));
@@ -297,7 +326,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         Marker newMark = mMap.addMarker(markerOption);
         newMark.showInfoWindow();//only last infowindow shows up
-        mMapPresenter.onAddMarkerToHash(newMark, customMarker);
+        mMapTabPresenter.onAddMarkerToHash(newMark, customMarker);
 
     }
 
@@ -328,7 +357,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
     }
     private void handlePhoneCall(){
-        String uri="tel:" + mMapPresenter.onGetDestinationPhoneNumber();
+        String uri="tel:" + mMapTabPresenter.onGetDestinationPhoneNumber();
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(uri));
         startActivity(intent);
@@ -367,7 +396,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         //http://stackoverflow.com/questions/37822264/android-bottom-sheet-behavior-not-working-properly-views-not-show-on-first-run
         mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
         //a trick to show expanded, else doesn't show
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 
@@ -378,19 +407,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LatLng destinationLatLng=mMapPresenter.onGetDestinationLocale();
-                String destinationAddress=mMapPresenter.onGetDestinationAddress();
-                //mMapPresenter.getLocales()
+                LatLng destinationLatLng= mMapTabPresenter.onGetDestinationLocale();
+                String destinationAddress= mMapTabPresenter.onGetDestinationAddress();
+
                 Util.startGoogleDirections(getActivity(),new LatLng(mLocation.getLatitude(),mLocation.getLatitude())
                         ,mAddress,
                         destinationLatLng
                         ,destinationAddress);
-//                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
-//                        mLocation.getLatitude(),mLocation.getLongitude() , mAddress,
-//                        destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-//                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-//                startActivity(intent);
+
             }
         });
     }
@@ -410,21 +434,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
                 //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
-                String nombre="Farmacia:";
-                String distancia="distancia:";
-                String direccion="direccion:";
-                String telefono="tef:";
-
-                String textToShare=nombre +  mLastMarkerClicked.getName() + Constants.CR
-                        + distancia + getString(R.string.format_distance,mLastMarkerClicked.getDistance()/1000) + Constants.CR
-                        + direccion + mLastMarkerClicked.getAddressFormatted() + Constants.CR
-                        + telefono  + mLastMarkerClicked.getPhone();
-
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                String name=mLastMarkerClicked.getName();
+                double dist=mLastMarkerClicked.getDistance()/1000;
+                String dir=mLastMarkerClicked.getAddressFormatted();
+                String tel=mLastMarkerClicked.getPhone();
+                Util.startShare(getActivity(),name,dist,dir,tel);
             }
         });
 
@@ -459,7 +473,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-            HashMap hashMap=mMapPresenter.onGetHashMap();
+            HashMap hashMap= mMapTabPresenter.onGetHashMap();
             CustomMarker customMarker= (CustomMarker)hashMap.get(marker);
             if(customMarker.getName().equals("userLocation")) {
                 return false;
@@ -497,7 +511,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             tvAdress.setText(marker.getAddressFormatted());
             tvHours.setText(marker.getHours());
             tvPhone.setText(marker.getPhone());
-            mMapPresenter.onSetLastMarkerClick(marker);
+            mMapTabPresenter.onSetLastMarkerClick(marker);
             mLastMarkerClicked=marker;
 
 

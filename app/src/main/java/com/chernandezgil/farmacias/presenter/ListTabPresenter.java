@@ -2,20 +2,10 @@ package com.chernandezgil.farmacias.presenter;
 
 
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 
 import android.support.v4.content.Loader;
@@ -24,8 +14,8 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
-import com.chernandezgil.farmacias.model.CustomMarker;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListContract;
 import com.github.davidmoten.rx.Transformers;
 
@@ -38,10 +28,10 @@ import rx.Observable;
 /**
  * Created by Carlos on 08/08/2016.
  */
-public class ListPresenter implements ListContract.Presenter<ListContract.View>,
+public class ListTabPresenter implements ListContract.Presenter<ListContract.View>,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG=ListPresenter.class.getSimpleName();
+    private static final String LOG_TAG=ListTabPresenter.class.getSimpleName();
     private final LoaderManager mLoaderManager;
     private ListContract.View mView;
     private LoaderProvider mLoaderProvider;
@@ -50,11 +40,19 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
 
     private int FARMACIAS_LOADER=1;
 
-    public ListPresenter(Location location, LoaderProvider loaderProvider, LoaderManager loadermanager, Geocoder geocoder) {
+    private PreferencesManager preferencesManager;
+    private int mRadio;
+    public ListTabPresenter(Location location, LoaderProvider loaderProvider, LoaderManager loadermanager,
+                            Geocoder geocoder,PreferencesManager preferencesManager
+                            ) {
         mLocation=location;
         mLoaderProvider=loaderProvider;
         mLoaderManager=loadermanager;
         mGeocoder=geocoder;
+        this.preferencesManager=preferencesManager;
+        mRadio=this.preferencesManager.retrieveRadioBusquedaFromSp()*1000;
+
+
     }
     @Override
     public void setView(ListContract.View view) {
@@ -127,7 +125,7 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
                 farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
                 farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
                 String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
-                farmacia.setPhone(Util.formatPhoneNumber(phone));
+                farmacia.setPhone(phone);
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance);
@@ -141,6 +139,15 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
                 farmacia.setAddressFormatted(addressFormatted);
                 farmacia.setArrow_down(true);
 
+                boolean favorite;
+                int j=data.getInt(data.getColumnIndex(DbContract.FarmaciasEntity.FAVORITE));
+                if (j==0){
+                    favorite=false;
+                } else {
+                    favorite=true;
+                }
+
+                farmacia.setFavorite(favorite);
                 farmaciasList.add(farmacia);
 
             } while (data.moveToNext());
@@ -168,7 +175,7 @@ public class ListPresenter implements ListContract.Presenter<ListContract.View>,
 
         return Observable.from(list)
                 .filter(f -> {
-                    if (f.getDistance() < 10000) {
+                    if (f.getDistance() <mRadio) {
                         return true;
                     }
                     return false;

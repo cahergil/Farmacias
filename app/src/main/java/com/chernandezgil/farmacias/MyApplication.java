@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias;
 
 import android.app.Application;
+import android.content.Context;
 
 
 import com.chernandezgil.farmacias.presenter.DaggerMapComponent;
@@ -13,10 +14,11 @@ import com.chernandezgil.farmacias.presenter.MapModule;
 public class MyApplication extends Application{
 
     private MapComponent mMapComponent;
+    private static Context context;
     @Override
     public void onCreate() {
         super.onCreate();
-
+          this.context=getApplicationContext();
           mMapComponent= DaggerMapComponent.builder()
                     .mapModule(new MapModule())
                     .applicationModule(new ApplicationModule(this))
@@ -24,7 +26,10 @@ public class MyApplication extends Application{
 
 
     }
-    public MapComponent getMainActivityComponent(){
+    public static Context getContext(){
+        return context;
+    }
+    public MapComponent getComponent(){
         return mMapComponent;
     }
 }

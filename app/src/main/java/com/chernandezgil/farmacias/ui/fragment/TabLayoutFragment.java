@@ -53,13 +53,13 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private  Location mLocation;
-
+    private PagerAdapter pagerAdapter=null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        ((MyApplication) getActivity().getApplication()).getMainActivityComponent().inject(this);
+        ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
         if(savedInstanceState==null) {
             mGoogleApiClient.registerConnectionCallbacks(this);
             mGoogleApiClient.registerConnectionFailedListener(this);
@@ -114,13 +114,14 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
     private void setUpViewPager(){
-    //    final PagerAdapter pagerAdapter=new Adapter(getActivity(),mLocation,getFragmentManager());
-        final PagerAdapter pagerAdapter=new ViewPagerAdapter(getChildFragmentManager(),mLocation);
+        pagerAdapter=new Adapter(getActivity(),mLocation,getChildFragmentManager());
+    //    final PagerAdapter pagerAdapter=new ViewPagerAdapter(getChildFragmentManager(),mLocation);
         mViewPager.setAdapter(pagerAdapter);
     }
     private void setUpTabLayout(){
         mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.addOnTabSelectedListener(this);
+        mTabLayout.setOnTabSelectedListener(this);
+       // mTabLayout.addOnTabSelectedListener(this); 24.0.0
     }
 
     @Override
@@ -201,9 +202,11 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 //        setUpTabLayout();
 
     }
-
+    public SparseArray<Fragment> getFragments(){
+        return Adapter.registeredFragments;
+    }
     public static class Adapter extends FragmentPagerAdapter {
-        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+        public static SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
         Location location;
 
 
@@ -220,17 +223,19 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
         @Override
         public Fragment getItem(int position) {
-
+            Bundle bundle=new Bundle();
+            bundle.putParcelable("location_key",location);
             switch (position) {
                 case 0:
-                    Bundle bundle=new Bundle();
-                    bundle.putParcelable("location_key",location);
+
                     MapTabFragment mapTabFragment =new MapTabFragment();
                     mapTabFragment.setArguments(bundle);
 
                     return mapTabFragment;
                 case 1:
-                    return new ListTabFragment();
+                    ListTabFragment listTabFragment=new ListTabFragment();
+                    listTabFragment.setArguments(bundle);
+                    return listTabFragment;
 
 
                 default: return null;

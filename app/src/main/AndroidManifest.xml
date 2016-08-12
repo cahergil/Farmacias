@@ -38,7 +38,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" >
+        <activity android:name=".ui.activity.SettingsActivity" android:parentActivityName=".ui.activity.MainActivity"
+             >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activity.MainActivity" >
+            </meta-data>>
 
         </activity>
         <service android:name=".services.DownloadFarmacias" android:exported="false" />

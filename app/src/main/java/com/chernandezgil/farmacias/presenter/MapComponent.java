@@ -16,5 +16,6 @@ import dagger.Component;
 public interface MapComponent {
 
     void inject(TabLayoutFragment fragment);
-    void inject(MapPresenter presenter);
+
+
 }

@@ -1,6 +1,5 @@
 package com.chernandezgil.farmacias.ui.activity;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,13 +12,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.aitorvs.android.allowme.AllowMeActivity;
-import com.chernandezgil.farmacias.SettingsActivity;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
+import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
@@ -30,7 +31,6 @@ import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.List;
 
@@ -63,9 +63,9 @@ public class MainActivity extends AllowMeActivity implements
 
 
 
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
+//    static {
+//        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+//    }
 
     private TabLayoutFragment mtabFragment;
 
@@ -76,16 +76,17 @@ public class MainActivity extends AllowMeActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        mMainActivityPresenter = new MainActivityPresenter();
+        PreferencesManager preferencesManager=new AndroidPrefsManager(this);
+        mMainActivityPresenter = new MainActivityPresenter(preferencesManager);
         mMainActivityPresenter.setView(this);
+
         setUpToolBar();
 
 
         if (savedInstanceState == null) {
             checkGooglePlayServicesAvailability();
             Stetho.initializeWithDefaults(this);
-            launchDownloadService();
+
             setFragment(0);
         }
         setupNavigationDrawerContent(navigationView);
@@ -149,10 +150,7 @@ public class MainActivity extends AllowMeActivity implements
     }
 
 
-    private void launchDownloadService() {
-        Intent intent = new Intent(this, DownloadFarmacias.class);
-        startService(intent);
-    }
+
 
     private void setUpToolBar() {
 
@@ -263,10 +261,15 @@ public class MainActivity extends AllowMeActivity implements
         if(list!=null && list.size()>0) {
             Fragment tabs=list.get(0);
             if(tabs instanceof TabLayoutFragment) {
-                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
-                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
+                if(((TabLayoutFragment) tabs).getCurrentItem()==0) {
+                    SparseArray<Fragment> registeredFragments=((TabLayoutFragment) tabs).getFragments();
+                    MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(0);
                     return mapTabFragment;
                 }
+//                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
+//                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
+//                    return mapTabFragment;
+//                }
             }
 
         }

@@ -1,6 +1,8 @@
 package com.chernandezgil.farmacias.presenter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,7 +35,9 @@ public class MapModule {
                 .build();
 
 
+
     }
+
 
 
 }

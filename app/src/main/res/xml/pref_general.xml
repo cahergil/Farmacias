@@ -12,7 +12,35 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_title_second_section">
+        <Preference
 
+            android:key="@string/pref_rate_key"
+            android:summary="@string/rate_app"
+            android:title="@string/rate_app_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias" />
+        </Preference>
+
+        <Preference
+            android:icon="@drawable/gmail"
+            android:key="@string/pref_email_key"
+            android:title="@string/email_title">
+
+        </Preference>
+
+        <Preference
+            android:icon="@drawable/share"
+            android:key="@string/pref_share_app_key"
+            android:title="@string/share_app_title">
+
+
+        </Preference>
+        <Preference
+            android:key="@string/pref_version_key"
+            android:title="@string/version_title">
+
+        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>

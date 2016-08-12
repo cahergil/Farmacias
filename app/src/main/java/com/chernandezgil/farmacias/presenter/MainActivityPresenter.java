@@ -1,17 +1,11 @@
 package com.chernandezgil.farmacias.presenter;
 
-import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.text.TextUtils;
 
-import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.data.source.MainActivityInteractor;
+import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MainActivityContract;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Carlos on 01/08/2016.
@@ -20,10 +14,12 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
 
     private static final String LOG_TAG=MainActivityPresenter.class.getSimpleName();
     private MainActivityContract.View mMainActivityView;
-    private Geocoder mGeocoder;
+    private MainActivityInteractor mMainActivityInteractor;
+    private PreferencesManager mPreferencesManager;
 
+    public MainActivityPresenter(PreferencesManager mPreferencesManager){
+        this.mPreferencesManager = mPreferencesManager;
 
-    public MainActivityPresenter(){
     }
 
 
@@ -31,6 +27,8 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
     public void setView(MainActivityContract.View view) {
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
         mMainActivityView =view;
+        mMainActivityInteractor=new MainActivityInteractor(mPreferencesManager);
+        mMainActivityInteractor.loadDatabase();
     }
 
     @Override

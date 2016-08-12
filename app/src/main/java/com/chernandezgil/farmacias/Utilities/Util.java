@@ -139,6 +139,30 @@ public class Util {
 
     }
 
+    public static void startPhoneIntent(Context context,String telephone) {
+        String uri="tel:" + telephone;;
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        context.startActivity(intent);
+    }
+
+    public static void startShare(Context context,String name,double dist,String aformatted,String tel) {
+        String nombre="Farmacia:";
+        String distancia="distancia:";
+        String direccion="direccion:";
+        String telefono="tef:";
+
+        String textToShare=nombre +  name + Constants.CR
+                + distancia + context.getString(R.string.format_distance,dist/1000) + Constants.CR
+                + direccion + aformatted + Constants.CR
+                + telefono  + tel;
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+        sendIntent.setType("text/plain");
+        context.startActivity(sendIntent);
+    }
     public static void startGoogleDirections(Context context, LatLng sourceLatLng,
                                              String sourceAddress,
                                              LatLng destinationLatLng,
@@ -159,4 +183,36 @@ public class Util {
         Bitmap bitmap = BitmapUtil.toBitmap(drawable, metrics, 48f, 0);
         return bitmap;
     }
+
+    public static Bitmap createScaledBitMapFromVectorDrawable(Context context,VectorDrawableCompat vd,float dimension) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return BitmapUtil.toBitmap(vd, metrics, dimension, 0);
+
+
+    }
+
+    public static String getStreetFromAddress(String address) {
+        String result;
+        boolean found = false;
+        int n = 0;
+        int cont = 0;
+        if(address==null) return null;
+        while (n != -1) {
+            cont++;
+            n = address.indexOf(Constants.COMMA, n);
+            if (cont == 2) {
+                found = true;
+                break;
+            }
+            n++;
+
+        }
+        if (found) {
+            return address.substring(0, n);
+        } else {
+            return address;
+        }
+
+    }
+
     }

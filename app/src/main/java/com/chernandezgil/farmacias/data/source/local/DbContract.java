@@ -29,12 +29,15 @@ public class DbContract {
         public static final String LAT="lat";
         public static final String LON="lon";
         public static final String HOURS="hours";
+        public static final String FAVORITE="favorite";
 
         public static Uri buildFarmaciasUri(long id){
 
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-
+        public static Uri buildFarmaciasUri(String id) {
+            return CONTENT_URI.buildUpon().appendPath(id).build();
+        }
 
 
     }

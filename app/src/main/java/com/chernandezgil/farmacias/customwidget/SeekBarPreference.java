@@ -35,7 +35,7 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 
         try {
 
-            mMax = a.getInteger(R.styleable.SeekBarPreference_max, 1);
+            mMax = a.getInteger(R.styleable.SeekBarPreference_max, 50);
         } finally {
             a.recycle();
         }

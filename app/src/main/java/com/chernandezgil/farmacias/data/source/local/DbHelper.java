@@ -34,6 +34,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 DbContract.FarmaciasEntity.PHONE + " TEXT NOT NULL,"+
                 DbContract.FarmaciasEntity.LAT + " REAL NOT NULL,"+
                 DbContract.FarmaciasEntity.LON + " REAL NOT NULL," +
+                DbContract.FarmaciasEntity.FAVORITE + " INTEGER DEFAULT 0," +
                 " UNIQUE (" + DbContract.FarmaciasEntity.PHONE + ") ON CONFLICT IGNORE)";
 
         Log.d("sql-statments",SQL_CREATE_FARMACIAS_TABLE);

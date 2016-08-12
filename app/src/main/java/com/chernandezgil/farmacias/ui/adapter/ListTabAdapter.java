@@ -1,8 +1,10 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
@@ -52,7 +54,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         ViewHolder viewHolder=new ViewHolder(view);
         viewHolder.ivArrow.setOnClickListener(this);
         viewHolder.tvOpen.setOnClickListener(this);
-
+        viewHolder.ivPhone.setOnClickListener(this);
+        viewHolder.ivGo.setOnClickListener(this);
+        viewHolder.ivShare.setOnClickListener(this);
+        viewHolder.ivFavorite.setOnClickListener(this);
         return  viewHolder;
     }
 
@@ -72,8 +77,14 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         }
 
         holder.tvOpen.setTextColor(color);
+        int favDraResid;
+        if(pharmacy.isFavorite()) {
+            favDraResid=R.drawable.heart;
+        } else {
+            favDraResid=R.drawable.heart_outline;
+        }
         setBitmapFromVectorDrawable(holder.ivClock,R.drawable.clock,color);
-        setBitmapFromVectorDrawable(holder.ivFavorite,R.drawable.heart,color);
+        setBitmapFromVectorDrawable(holder.ivFavorite,favDraResid,color);
         setBitmapFromVectorDrawable(holder.ivGo,R.drawable.directions,color);
         setBitmapFromVectorDrawable(holder.ivShare,R.drawable.share,color);
         setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
@@ -92,6 +103,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
         holder.ivArrow.setTag(holder);
         holder.tvOpen.setTag(holder);
+        holder.ivPhone.setTag(holder);
+        holder.ivGo.setTag(position);
+        holder.ivShare.setTag(position);
+        holder.ivFavorite.setTag(position);
     }
     public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
@@ -100,19 +115,14 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         if(drawable==null) return;
         drawable.setTint(color);
         //convert tinted vector drawable to bitmap
-        Bitmap bitmap= createScaledBitMapFromVectorDrawable(drawable,40f);
+        Bitmap bitmap= Util.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
         imageView.setImageBitmap(bitmap);
 
 
 
     }
 
-    private Bitmap createScaledBitMapFromVectorDrawable(VectorDrawableCompat vd,float dimension) {
-        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        return BitmapUtil.toBitmap(vd, metrics, dimension, 0);
 
-
-    }
     private int getColor(@ColorRes int resId){
         int color=ContextCompat.getColor(mContext,resId);
         return color;
@@ -132,11 +142,12 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     @Override
     public void onClick(View view) {
         int position;
+        ViewHolder vh;
         int id= view.getId();
         switch (id) {
             case R.id.tvOpen:
             case R.id.ivArrow:
-                ViewHolder vh= (ViewHolder) view.getTag();
+                vh= (ViewHolder) view.getTag();
                 position=vh.getAdapterPosition();
                 for(int i = 0;i<mPharmacyList.size();i++) {
                     if(i==position) {
@@ -174,8 +185,28 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
                         }
                     });
                     vh.ivArrow.startAnimation(rotate);
-
-
+                    break;
+            case R.id.ivPhoneb:
+                vh= (ViewHolder) view.getTag();
+                position=vh.getAdapterPosition();
+                Util.startPhoneIntent(mContext,mPharmacyList.get(position).getPhone());
+                break;
+            case R.id.ivGob:
+                position= (int) view.getTag();
+                mClickHandler.onClickGo(position);
+                break;
+            case R.id.ivShareb:
+                position=(int) view.getTag();
+                Pharmacy pharmacy=mPharmacyList.get(position);
+                String name=pharmacy.getName();
+                double dist=pharmacy.getDistance();
+                String dir=pharmacy.getAddressFormatted();
+                String tel=pharmacy.getPhone();
+                Util.startShare(mContext,name,dist,dir,tel);
+                break;
+            case R.id.ivFavoriteb:
+                position = (int) view.getTag();
+                mClickHandler.onClickFavorite(position);
 
 
         }
@@ -215,79 +246,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         }
 
 
-//        @Override
-//        public void onClick(View view) {
-//            int position;
-//            int id= view.getId();
-//            switch (id) {
-//                case R.id.tvOpen:
-//                case R.id.ivArrow:
-//
-//                    position=getAdapterPosition();
-//                    for(int i = 0;i<mPharmacyList.size();i++) {
-//                        if(i==position) {
-//                            mPharmacyList.get(position).setOptionsRow(!mPharmacyList.get(position).isOptionsRow());
-//                            continue;
-//                        }
-//                        mPharmacyList.get(i).setOptionsRow(false);
-//                    }
-//                    notifyDataSetChanged();
-//                    mClickHandler.onClickToogle(this,position);
-//        //            AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
-//        //            ivArrow.setImageDrawable(drawableCompat);
-//                    ViewHolder holder= (ViewHolder) view.getTag();
-//                    AnimatedVectorDrawableCompat drawableCompat= (AnimatedVectorDrawableCompat) holder.ivArrow.getDrawable();
-//                    if (drawableCompat instanceof Animatable) {
-//                        ((Animatable) drawableCompat).start();
-//                    }
-//
-//                  //  Animation animation=AnimationUtils.loadAnimation(mContext,R.anim.rotate_animation);
-////                    RotateAnimation rotate = new RotateAnimation(0, 180,
-////                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-////                            0.5f);
-////
-////                    rotate.setDuration(4000);
-////                    rotate.setRepeatCount(1);
-////                    rotate.setAnimationListener(new Animation.AnimationListener() {
-////                        @Override
-////                        public void onAnimationStart(Animation animation) {
-////                            Util.LOGD(LOG_TAG,"onAnimationStart");
-////                        }
-////
-////                        @Override
-////                        public void onAnimationEnd(Animation animation) {
-////                            Util.LOGD(LOG_TAG,"onAnimationEnd");
-////                        }
-////
-////                        @Override
-////                        public void onAnimationRepeat(Animation animation) {
-////                            Util.LOGD(LOG_TAG,"onAnimationRepeat");
-////                        }
-////                    });
-////                    ivArrow.startAnimation(rotate);
-//
-//                    break;
-//
-//                case R.id.ivGob:
-//                    position=getAdapterPosition();
-//                    mClickHandler.onClickGo(this,position);
-//                    int color=ContextCompat.getColor(view.getContext(),R.color.blue_mobile_web);
-//                    setBitmapFromVectorDrawable(ivClock,R.drawable.clock,color);
-//                    break;
-//                case R.id.ivFavoriteb:break;
-//                case R.id.ivShareb:break;
-//                case R.id.ivPhoneb:break;
-//                case R.id.ivScheduleb:break;
-//
-//            }
-//        }
-//
-//
-//    }
+
     }
     public static interface ListTabAdapterOnClickHandler {
-        void onClickGo(ViewHolder vh,int position);
-        void onClickToogle(ViewHolder vh,int position);
+        void onClickGo(int position);
+        void onClickFavorite(int position);
         void onClick(ViewHolder vh);
     }
 }

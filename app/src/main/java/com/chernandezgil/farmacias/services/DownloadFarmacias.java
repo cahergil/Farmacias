@@ -30,6 +30,8 @@ public class DownloadFarmacias extends IntentService {
         Vector<ContentValues> vector=new Vector<>();
         if(listFarmacias!=null) {
             getContentResolver().delete(DbContract.FarmaciasEntity.CONTENT_URI,null,null);
+        } else {
+            return;
         }
         for(int i = 0; i<listFarmacias.size();i++) {
             FarmaciasCsvBean farmaciasCsvBean=listFarmacias.get(i);

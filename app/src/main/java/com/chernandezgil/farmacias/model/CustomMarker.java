@@ -16,6 +16,15 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
     String order;
     String addressFormatted;
     Bitmap markerImage;
+    boolean isFavorite;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     public Bitmap getMarkerImage() {
         return markerImage;
@@ -119,6 +128,7 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         dest.writeString(this.order);
         dest.writeString(this.addressFormatted);
         dest.writeParcelable(this.markerImage, flags);
+        dest.writeByte(this.isFavorite ? (byte) 1 : (byte) 0);
     }
 
     protected CustomMarker(Parcel in) {
@@ -128,6 +138,18 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         this.order = in.readString();
         this.addressFormatted = in.readString();
         this.markerImage = in.readParcelable(Bitmap.class.getClassLoader());
+        this.isFavorite = in.readByte() != 0;
     }
 
+    public static final Creator<CustomMarker> CREATOR = new Creator<CustomMarker>() {
+        @Override
+        public CustomMarker createFromParcel(Parcel source) {
+            return new CustomMarker(source);
+        }
+
+        @Override
+        public CustomMarker[] newArray(int size) {
+            return new CustomMarker[size];
+        }
+    };
 }

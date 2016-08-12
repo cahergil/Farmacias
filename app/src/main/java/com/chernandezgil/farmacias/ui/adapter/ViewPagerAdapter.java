@@ -29,11 +29,11 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         assert (0 <= position && position < fragments.length);
-//        FragmentTransaction trans = fragmentManager.beginTransaction();
-//        trans.remove(fragments[position]);
-//
-//            trans.commit();
-//        fragments[position] = null;
+        FragmentTransaction trans = fragmentManager.beginTransaction();
+        trans.remove(fragments[position]);
+
+            trans.commit();
+        fragments[position] = null;
     }
 
     @Override

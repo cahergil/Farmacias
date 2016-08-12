@@ -12,7 +12,29 @@
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
     <string name="settings_title" translatable="true">Settings Activity</string>
-    <string name="pref_title_first_section">App</string>
-    <string name="pref_title_second_section">Other</string>
+    <string name="pref_title_first_section" translatable="false">App</string>
+    <string name="pref_title_second_section" translatable="true">Otras</string>
     <string name="seek_bar_key">seekbar_key</string>
+
+    <!-- Preferences -->
+    <string name="pref_rate_key" translatable="false">rate</string>
+    <string name="rate_app" translatable="true">Si te gusta la app, por favor evaluala en Play Store</string>
+    <string name="rate_app_title" translatable="true">Evalua la app</string>
+    <string name="pref_email_key" translatable="false">email</string>
+    <string name="email_title">Manda un email al desarrollador</string>
+
+    <string name="pref_share_app_key" translatable="false">share app</string>
+    <string name="share_app_string">Recomienda a un amigo nuestra aplicacion</string>
+    <string name="share_app_title">Comparte esta app con amigos</string>
+
+    <string name="pref_version_key" translatable="false">version</string>
+    <string name="version_title">Version</string>
+
+    <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
+    <string name="subject" translatable="true">Comentario sobre la aplicacion Farmacias de Extremadura</string>
+
+    <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
+
+    <!-- ListTabFragment -->
+    <string name="manager_key" translatable="false">manager_key</string>
 </resources>
