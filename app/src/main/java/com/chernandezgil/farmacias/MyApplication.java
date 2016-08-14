@@ -3,24 +3,24 @@ package com.chernandezgil.farmacias;
 import android.app.Application;
 import android.content.Context;
 
+import com.chernandezgil.farmacias.presenter.DaggerMainComponent;
+import com.chernandezgil.farmacias.presenter.MainComponent;
+import com.chernandezgil.farmacias.presenter.MainModule;
 
-import com.chernandezgil.farmacias.presenter.DaggerMapComponent;
-import com.chernandezgil.farmacias.presenter.MapComponent;
-import com.chernandezgil.farmacias.presenter.MapModule;
 
 /**
  * Created by Carlos on 01/08/2016.
  */
 public class MyApplication extends Application{
 
-    private MapComponent mMapComponent;
+    private MainComponent mMapComponent;
     private static Context context;
     @Override
     public void onCreate() {
         super.onCreate();
           this.context=getApplicationContext();
-          mMapComponent= DaggerMapComponent.builder()
-                    .mapModule(new MapModule())
+          mMapComponent= DaggerMainComponent.builder()
+                    .mainModule(new MainModule())
                     .applicationModule(new ApplicationModule(this))
                     .build();
 
@@ -29,7 +29,7 @@ public class MyApplication extends Application{
     public static Context getContext(){
         return context;
     }
-    public MapComponent getComponent(){
+    public MainComponent getComponent(){
         return mMapComponent;
     }
 }

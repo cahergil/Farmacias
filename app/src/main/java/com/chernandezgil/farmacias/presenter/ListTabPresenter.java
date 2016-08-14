@@ -171,7 +171,6 @@ public class ListTabPresenter implements ListContract.Presenter<ListContract.Vie
      * @return
      */
     public List<Pharmacy> toFilteredSortedOrderedList(List<Pharmacy> list) {
-        String str;
 
         return Observable.from(list)
                 .filter(f -> {

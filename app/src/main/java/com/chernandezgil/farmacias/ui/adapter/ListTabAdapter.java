@@ -25,6 +25,7 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,14 +38,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     private List<Pharmacy> mPharmacyList;
     private Context mContext;
-    private View mEmptyView;
     private ListTabAdapterOnClickHandler mClickHandler;
-    private View mLastClicked;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
 
-    public ListTabAdapter(Context context,View emptyView,ListTabAdapterOnClickHandler clickHandler){
+    public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
-        mEmptyView=emptyView;
         mClickHandler=clickHandler;
 
     }
@@ -68,15 +66,17 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
         holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()/1000));
         boolean isOpen=pharmacy.isOpen();
-        holder.tvOpen.setText(isOpen? "Open":"Close");
+        holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
         int color;
         if(isOpen) {
             color=getColor(R.color.pharmacy_open);
+            holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
         } else {
             color=getColor(R.color.pharmacy_close);
+            holder.tvOpen.setTextColor(color);
         }
 
-        holder.tvOpen.setTextColor(color);
+     //   holder.tvOpen.setTextColor(color);
         int favDraResid;
         if(pharmacy.isFavorite()) {
             favDraResid=R.drawable.heart;
@@ -136,9 +136,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     public void swapData(List<Pharmacy> pharmacyList) {
         mPharmacyList=pharmacyList;
         notifyDataSetChanged();
-        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
-    }
 
+    }
+    public List<Pharmacy>  getPharmaList() {
+        return mPharmacyList;
+    }
     @Override
     public void onClick(View view) {
         int position;
@@ -166,7 +168,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
                             0.5f);
 
                     rotate.setDuration(100);
-                   // rotate.setRepeatCount(1);
+
                     rotate.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {

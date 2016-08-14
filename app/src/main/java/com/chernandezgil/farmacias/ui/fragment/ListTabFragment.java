@@ -28,6 +28,8 @@ import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListContract;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,12 +52,13 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
     private ListTabPresenter mPresenter;
     private ListTabAdapter mAdapter;
     private String mAddress;
-    private List<Pharmacy> mPharmacyList;
+    private ArrayList<Pharmacy> mPharmacyList;
     private Unbinder unbinder;
     private static final String LOG_TAG=ListTabFragment.class.getSimpleName();
-    private LinearLayoutManager mLinearLayoutManager;
-    private Parcelable mState;
-    private int mRecyclerViewPosition;
+    private static final String RECYCLER_STATE_KEY ="recycler_key";
+    private static final String LIST_PHARMACY_KEY="pharmacyList_key";
+    private Parcelable mLayoutManagerState;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,9 +68,7 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
         if(savedInstanceState==null) {
             if (bundle != null) {
                 mLocation=bundle.getParcelable("location_key");
-                if(true) {
 
-                }
              }
         } else {
             mLocation=savedInstanceState.getParcelable("location_key");
@@ -90,8 +91,12 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
         if(savedInstanceState==null) {
            mPresenter.onGetAddressFromLocation(mLocation);
         } else {
-            mState=savedInstanceState.getParcelable(getString(R.string.manager_key));
-            mRecyclerViewPosition=savedInstanceState.getInt("rv_position_key");
+            if(savedInstanceState.containsKey(RECYCLER_STATE_KEY)) {
+                mLayoutManagerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
+            }
+            if(savedInstanceState.containsKey(LIST_PHARMACY_KEY)) {
+                mPharmacyList=savedInstanceState.getParcelableArrayList(LIST_PHARMACY_KEY);
+            }
 
         }
         mPresenter.onStartLoader();
@@ -106,15 +111,15 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
         if(mAddress!=null) {
             outState.putString("address_key", mAddress);
         }
-        outState.putInt("rv_position_key",getFirstElementInRecyclerView());
-        outState.putParcelable(getString(R.string.manager_key),mRecyclerView.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(RECYCLER_STATE_KEY,mRecyclerView.getLayoutManager().onSaveInstanceState());
+        if(mPharmacyList!=null) {
+            outState.putParcelableArrayList(LIST_PHARMACY_KEY,mPharmacyList);
+        }
     }
 
-    private int getFirstElementInRecyclerView(){
-         return ((LinearLayoutManager)mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition();
-    }
+
     private void setUpRecyclerView(){
-        mAdapter=new ListTabAdapter(getActivity(),mEmptyView,this);
+        mAdapter=new ListTabAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         mRecyclerView.setLayoutManager(new  LinearLayoutManager(getActivity()));
@@ -123,14 +128,19 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
 
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
-
+    //    mPharmacyList= (ArrayList<Pharmacy>) mAdapter.getPharmaList();
+        //copy the state of the adapter to the results of Loader
+        if(mPharmacyList!=null) {
+            for (int i = 0;i<mPharmacyList.size();i++) {
+                pharmacyList.get(i).setArrow_down(mPharmacyList.get(i).isArrow_down());
+                pharmacyList.get(i).setOptionsRow(mPharmacyList.get(i).isOptionsRow());
+            }
+        }
         mAdapter.swapData(pharmacyList);
-
-        mRecyclerView.scrollToPosition(mRecyclerViewPosition);
-//        if(mState!=null){
-//            mRecyclerView.getLayoutManager().onRestoreInstanceState(mState);
-//        }
-        mPharmacyList=pharmacyList;
+        if(mLayoutManagerState !=null){
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
+        }
+        mPharmacyList= (ArrayList<Pharmacy>) pharmacyList;
     }
 
     @Override
@@ -195,6 +205,21 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
     @Override
     public void onClick(ListTabAdapter.ViewHolder vh) {
 
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

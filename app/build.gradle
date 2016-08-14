@@ -79,7 +79,7 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
 
     //to convert some web obtained svg(transformed to vector drawable) to bitmap
-    compile 'com.bettervectordrawable:lib:0.8+'
+    compile 'com.bettervectordrawable:lib:0.8'
 
 
 }

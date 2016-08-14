@@ -30,7 +30,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -50,6 +49,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -362,9 +362,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         intent.setData(Uri.parse(uri));
         startActivity(intent);
     }
+
+
     @Override
     public boolean collapseBottomSheet() {
-       if(mBottomSheetBehavior.STATE_EXPANDED==mBottomSheetBehavior.getState()) {
+       if(isBottomSheetExpanded()) {
            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
            return true;
        }
@@ -373,7 +375,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void handleDispatchTouchEvent(MotionEvent event) {
-        if(mBottomSheetBehavior.getState()==mBottomSheetBehavior.STATE_EXPANDED){
+        if(isBottomSheetExpanded()){
             Rect rect=new Rect();
             bottomSheet.getGlobalVisibleRect(rect);
             if(!rect.contains((int)event.getRawX(),(int)event.getRawY())){
@@ -449,7 +451,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         //initially set hidden(in case there are no pharmacies around).Not working
         mBottomSheetBehavior.setHideable(true);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -479,7 +481,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                 return false;
             }
             showPharmacyInBottomSheet(customMarker);
-            if( mBottomSheetBehavior.getState()!=BottomSheetBehavior.STATE_EXPANDED) {
+            if( !isBottomSheetExpanded()) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             return false;
@@ -538,6 +540,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+    private boolean isBottomSheetExpanded(){
+       return mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED;
+    }
 
     @Override
     public void onStart() {
@@ -564,6 +569,20 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         unbinder.unbind();
         super.onDestroy();
     }
+    @Override
+    public void onDetach() {
+        super.onDetach();
 
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

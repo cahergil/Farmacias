@@ -26,8 +26,10 @@
             android:id="@+id/tvDistance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="0.8"
             android:gravity="center"
+            android:background="@drawable/distance_box"
+            android:textColor="@android:color/white"
             tools:text="0,124 Km"/>
 
     </LinearLayout>
@@ -71,6 +73,7 @@
             android:layout_height="30dp"
             android:layout_weight="1"
             android:gravity="left|center_vertical"
+            android:fontFamily="sans-serif-medium"
             tools:text="Open"/>
 
     </LinearLayout>

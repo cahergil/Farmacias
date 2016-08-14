@@ -1,8 +1,12 @@
 package com.chernandezgil.farmacias.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +21,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 
+import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
+import com.aitorvs.android.allowme.AllowMeCallback;
+import com.aitorvs.android.allowme.PermissionResultSet;
+import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -31,15 +39,22 @@ import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
-                 MainActivityContract.View {
+                 MainActivityContract.View,GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
 
     @BindView(R.id.navigation_drawer_layout)
@@ -50,8 +65,11 @@ public class MainActivity extends AllowMeActivity implements
     Drawable menuDrawable;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @Inject
+    GoogleApiClient mGoogleApiClient;
 
-
+    private LocationRequest mLocationRequest;
+    private  Location mLocation;
     private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -68,6 +86,7 @@ public class MainActivity extends AllowMeActivity implements
 //    }
 
     private TabLayoutFragment mtabFragment;
+    private static boolean mRotation;
 
 
     @Override
@@ -84,11 +103,25 @@ public class MainActivity extends AllowMeActivity implements
 
 
         if (savedInstanceState == null) {
+
+            mLocation = new Location("hola");
+            mLocation.setLatitude(38.9766f);
+            mLocation.setLongitude(-5.79881);
             checkGooglePlayServicesAvailability();
             Stetho.initializeWithDefaults(this);
 
-            setFragment(0);
+
+
+        } else {
+            mRotation=true;
+            mLocation=savedInstanceState.getParcelable("location_key");
+
         }
+        ((MyApplication) getApplication()).getComponent().inject(this);
+        mGoogleApiClient.registerConnectionCallbacks(this);
+        mGoogleApiClient.registerConnectionFailedListener(this);
+        mGoogleApiClient.connect();
+
         setupNavigationDrawerContent(navigationView);
 
 
@@ -100,6 +133,7 @@ public class MainActivity extends AllowMeActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         Util.LOGD(LOG_TAG,"onSaveInstanceState");
         super.onSaveInstanceState(outState);
+        outState.putParcelable("location_key",mLocation);
 
     }
 
@@ -118,7 +152,9 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onStop() {
         Util.LOGD(LOG_TAG,"onStop");
-
+        if(mGoogleApiClient!=null) {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
@@ -200,14 +236,19 @@ public class MainActivity extends AllowMeActivity implements
     private void setFragment(int position) {
         Util.LOGD(LOG_TAG,"setFragment");
         FragmentManager fragmentManager;
-        FragmentTransaction fragmentTransaction;
+
         switch (position) {
             case 0:
+                Bundle bundle=new Bundle();
+                bundle.putParcelable("location_key",mLocation);
                 fragmentManager = getSupportFragmentManager();
                 mtabFragment = new TabLayoutFragment();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment, mtabFragment)
+                mtabFragment.setArguments(bundle);
+                FragmentTransaction ft=fragmentManager.beginTransaction();
+                ft.replace(R.id.fragment, mtabFragment)
                         .commit();
+
+
 
                 break;
             case 1:
@@ -216,7 +257,6 @@ public class MainActivity extends AllowMeActivity implements
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment, starredFragment)
                         .commit();
-
 
 
                 break;
@@ -290,12 +330,67 @@ public class MainActivity extends AllowMeActivity implements
 
         }
     }
+
+    @SuppressWarnings({"MissingPermission"})
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Util.LOGD(LOG_TAG, "onConnected");
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                //min x secs x millisec
+                .setFastestInterval(10 * 60 * 1000);
+
+        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
+            new AllowMe.Builder()
+                    .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+                    .setRationale("Esta app necesita este permision para funcionar")
+                    .setCallback(new AllowMeCallback() {
+                        @Override
+                        public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
+                            if (permissionResultSet.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MainActivity.this);
+
+                            }
+                        }
+                    }).request(1);
+
+        } else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        }
+
+
+        onLocationChanged(mLocation);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLocation=location;
+        if(!mRotation) {
+            setFragment(0);
+
+        } else {
+            mRotation = false;
+        }
+
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
     @Override
     protected void onDestroy() {
         Util.LOGD(LOG_TAG,"onDestroy");
         mMainActivityPresenter.detachView();
         super.onDestroy();
     }
-
 
 }

@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
@@ -38,8 +39,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Carlos on 06/08/2016.
  */
-public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelectedListener,GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,LocationListener{
+public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelectedListener{
 
     private static final String LOG_TAG=TabLayoutFragment.class.getSimpleName();
     private static final String TAG_FRAGMENT = "TAB_FRAGMENT";
@@ -49,24 +49,25 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @BindView(R.id.tabs)
     TabLayout mTabLayout;
 
-    @Inject
-    GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
+
     private  Location mLocation;
     private PagerAdapter pagerAdapter=null;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        ((MyApplication) getActivity().getApplication()).getComponent().inject(this);
-        if(savedInstanceState==null) {
-            mGoogleApiClient.registerConnectionCallbacks(this);
-            mGoogleApiClient.registerConnectionFailedListener(this);
-            mGoogleApiClient.connect();
-        } else {
 
+        if(savedInstanceState==null) {
+            Bundle bundle=getArguments();
+            if(bundle!=null) {
+                mLocation=bundle.getParcelable("location_key");
+            }
+        } else {
+           mLocation=savedInstanceState.getParcelable("location_key");
         }
+
     }
 
     @Override
@@ -74,6 +75,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         Util.LOGD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key",mLocation);
+
+
     }
 
     @Nullable
@@ -82,18 +85,24 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         Util.LOGD(LOG_TAG, "onCreateView");
         View view=inflater.inflate(R.layout.fragment_tablayout,container,false);
         ButterKnife.bind(this,view);
-        if(savedInstanceState!=null) {
-            mLocation=savedInstanceState.getParcelable("location_key");
-            setUpViewPager();
-            setUpTabLayout();
-        }
 
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setUpViewPager();
+        setUpTabLayout();
+     }
+
     public int getCurrentItem(){
         return mTabLayout.getSelectedTabPosition();
     }
+
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -109,13 +118,14 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onStop() {
         Util.LOGD(LOG_TAG, "onStop");
-        mGoogleApiClient.disconnect();
+
         super.onStop();
     }
 
     private void setUpViewPager(){
         pagerAdapter=new Adapter(getActivity(),mLocation,getChildFragmentManager());
-    //    final PagerAdapter pagerAdapter=new ViewPagerAdapter(getChildFragmentManager(),mLocation);
+
+        //    final PagerAdapter pagerAdapter=new ViewPagerAdapter(getChildFragmentManager(),mLocation);
         mViewPager.setAdapter(pagerAdapter);
     }
     private void setUpTabLayout(){
@@ -148,60 +158,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     }
 
-    @SuppressWarnings({"MissingPermission"})
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Util.LOGD(LOG_TAG, "onConnected");
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                //min x secs x millisec
-                .setFastestInterval(10 * 60 * 1000);
-        if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
-            new AllowMe.Builder()
-                    .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
-                    .setRationale("Esta app necesita este permision para funcionar")
-                    .setCallback(new AllowMeCallback() {
-                        @Override
-                        public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
-                            if (permissionResultSet.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, TabLayoutFragment.this);
-
-                            }
-                        }
-                    }).request(1);
-
-        } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-        mLocation = new Location("hola");
-        mLocation.setLatitude(38.9766f);
-        mLocation.setLongitude(-5.79881);
-        setUpViewPager();
-        setUpTabLayout();
-    }
 
 
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Util.LOGD(LOG_TAG,"onLocationChanged");
-//        mLocation = location;
-//        mLocation.setLatitude(38.9766f);
-//        mLocation.setLongitude(-5.79881);
-//        setUpViewPager();
-//        setUpTabLayout();
-
-    }
     public SparseArray<Fragment> getFragments(){
         return Adapter.registeredFragments;
     }
@@ -230,7 +188,6 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
                     MapTabFragment mapTabFragment =new MapTabFragment();
                     mapTabFragment.setArguments(bundle);
-
                     return mapTabFragment;
                 case 1:
                     ListTabFragment listTabFragment=new ListTabFragment();

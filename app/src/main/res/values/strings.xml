@@ -36,5 +36,5 @@
     <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
     <!-- ListTabFragment -->
-    <string name="manager_key" translatable="false">manager_key</string>
+
 </resources>

@@ -1,10 +1,7 @@
 package com.chernandezgil.farmacias.presenter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
-import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -15,13 +12,13 @@ import dagger.Module;
 import dagger.Provides;
 
 /**
- * Created by Carlos on 01/08/2016.
+ * Created by Carlos on 14/08/2016.
  */
 @Module
-public class MapModule {
-    private MainActivityContract mainActivityContract;
+public class MainModule {
 
-    public MapModule(){
+
+    public MainModule(){
 
     }
 
