@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -14,7 +16,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -33,7 +34,6 @@ import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.services.DownloadFarmacias;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
@@ -69,7 +69,7 @@ public class MainActivity extends AllowMeActivity implements
     GoogleApiClient mGoogleApiClient;
 
     private LocationRequest mLocationRequest;
-    private  Location mLocation;
+    private Location mLocation;
     private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -77,9 +77,9 @@ public class MainActivity extends AllowMeActivity implements
 
     private MainActivityPresenter mMainActivityPresenter;
 
-
-
-
+    private PreferencesManager mPreferencesManager;
+    private int mCurrentFragment=0;
+    private Handler mHandler;
 
 //    static {
 //        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -95,26 +95,23 @@ public class MainActivity extends AllowMeActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        PreferencesManager preferencesManager=new AndroidPrefsManager(this);
-        mMainActivityPresenter = new MainActivityPresenter(preferencesManager);
+        mPreferencesManager =new AndroidPrefsManager(this);
+        mMainActivityPresenter = new MainActivityPresenter(mPreferencesManager);
         mMainActivityPresenter.setView(this);
-
+        mHandler=createHandler();
         setUpToolBar();
 
 
         if (savedInstanceState == null) {
 
-            mLocation = new Location("hola");
-            mLocation.setLatitude(38.9766f);
-            mLocation.setLongitude(-5.79881);
             checkGooglePlayServicesAvailability();
             Stetho.initializeWithDefaults(this);
-
 
 
         } else {
             mRotation=true;
             mLocation=savedInstanceState.getParcelable("location_key");
+            mCurrentFragment=savedInstanceState.getInt("current_fragment_key");
 
         }
         ((MyApplication) getApplication()).getComponent().inject(this);
@@ -129,11 +126,22 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+    private Handler createHandler(){
+        return  new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+
+                    setFragment(mCurrentFragment);
+
+            }
+        };
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Util.LOGD(LOG_TAG,"onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key",mLocation);
+        outState.putInt("current_fragment_key",mCurrentFragment);
 
     }
 
@@ -144,6 +152,13 @@ public class MainActivity extends AllowMeActivity implements
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Util.LOGD(LOG_TAG,"onResume");
+    }
+
     @Override
     protected void onPause() {
         Util.LOGD(LOG_TAG,"onPause");
@@ -160,6 +175,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Util.LOGD(LOG_TAG,"onCreateOptionsMeu");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -206,22 +222,26 @@ public class MainActivity extends AllowMeActivity implements
                         item.setChecked(true);
                         setFragment(0);
                         drawerLayout.closeDrawer(GravityCompat.START);
+                        mCurrentFragment=0;
                         return true;
 
                     case R.id.item_navigation_buscar:
                         item.setChecked(true);
                         setFragment(1);
                         drawerLayout.closeDrawer(GravityCompat.START);
+                        mCurrentFragment=1;
                         return true;
                     case R.id.item_navigation_favoritas:
                         item.setChecked(true);
                         setFragment(2);
                         drawerLayout.closeDrawer(GravityCompat.START);
+                        mCurrentFragment=2;
                         return true;
                     case R.id.item_navigation_opcion2:
                         item.setChecked(true);
                         setFragment(3);
                         drawerLayout.closeDrawer(GravityCompat.START);
+                        mCurrentFragment=3;
                         return true;
 
                 }
@@ -239,16 +259,19 @@ public class MainActivity extends AllowMeActivity implements
 
         switch (position) {
             case 0:
-                Bundle bundle=new Bundle();
-                bundle.putParcelable("location_key",mLocation);
-                fragmentManager = getSupportFragmentManager();
-                mtabFragment = new TabLayoutFragment();
-                mtabFragment.setArguments(bundle);
-                FragmentTransaction ft=fragmentManager.beginTransaction();
-                ft.replace(R.id.fragment, mtabFragment)
-                        .commit();
+                try {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("location_key", mLocation);
+                    fragmentManager = getSupportFragmentManager();
+                    mtabFragment = new TabLayoutFragment();
+                    mtabFragment.setArguments(bundle);
+                    FragmentTransaction ft = fragmentManager.beginTransaction();
+                    ft.replace(R.id.fragment, mtabFragment)
+                            .commit();
 
+                }catch(IllegalStateException ignored) {
 
+                }
 
                 break;
             case 1:
@@ -334,6 +357,7 @@ public class MainActivity extends AllowMeActivity implements
     @SuppressWarnings({"MissingPermission"})
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+
         Util.LOGD(LOG_TAG, "onConnected");
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -359,7 +383,7 @@ public class MainActivity extends AllowMeActivity implements
         }
 
 
-        onLocationChanged(mLocation);
+       // onLocationChanged(mLocation);
 
     }
 
@@ -370,9 +394,12 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
+        Util.LOGD(LOG_TAG,"onLocationChanged");
         mLocation=location;
         if(!mRotation) {
-            setFragment(0);
+
+            mHandler.sendEmptyMessage(0);
+
 
         } else {
             mRotation = false;
