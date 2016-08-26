@@ -324,9 +324,9 @@ public class MainActivity extends AllowMeActivity implements
         if(list!=null && list.size()>0) {
             Fragment tabs=list.get(0);
             if(tabs instanceof TabLayoutFragment) {
-                if(((TabLayoutFragment) tabs).getCurrentItem()==0) {
+                if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
                     SparseArray<Fragment> registeredFragments=((TabLayoutFragment) tabs).getFragments();
-                    MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(0);
+                    MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
                     return mapTabFragment;
                 }
 //                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");

@@ -124,8 +124,6 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     private void setUpViewPager(){
         pagerAdapter=new Adapter(getActivity(),mLocation,getChildFragmentManager());
-
-        //    final PagerAdapter pagerAdapter=new ViewPagerAdapter(getChildFragmentManager(),mLocation);
         mViewPager.setAdapter(pagerAdapter);
     }
     private void setUpTabLayout(){
@@ -137,15 +135,16 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         int position=tab.getPosition();
-        switch(position){
-            case 0:
-                mViewPager.setCurrentItem(position);
-                break;
-            case 1:
-                mViewPager.setCurrentItem(position);
-
-
-        }
+        mViewPager.setCurrentItem(position);
+//        switch(position){
+//            case 0:
+//
+//                break;
+//            case 1:
+//                mViewPager.setCurrentItem(position);
+//
+//
+//        }
     }
 
     @Override
@@ -185,15 +184,14 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             bundle.putParcelable("location_key",location);
             switch (position) {
                 case 0:
+                    ListTabFragment listTabFragment=new ListTabFragment();
+                    listTabFragment.setArguments(bundle);
+                    return listTabFragment;
+                case 1:
 
                     MapTabFragment mapTabFragment =new MapTabFragment();
                     mapTabFragment.setArguments(bundle);
                     return mapTabFragment;
-                case 1:
-                    ListTabFragment listTabFragment=new ListTabFragment();
-                    listTabFragment.setArguments(bundle);
-                    return listTabFragment;
-
 
                 default: return null;
 
@@ -223,9 +221,9 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "mapa";
+                    return context.getString(R.string.tlf_tab_list_string);
                 case 1:
-                    return "lista";
+                    return context.getString(R.string.tlf_tab_map_string);
                 default: return null;
 
             }
