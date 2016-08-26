@@ -8,10 +8,12 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
+import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -213,6 +215,11 @@ public class Util {
             return address;
         }
 
+    }
+
+    public static int getColor(Context context,@ColorRes int resId){
+        int color= ContextCompat.getColor(context,resId);
+        return color;
     }
 
     }

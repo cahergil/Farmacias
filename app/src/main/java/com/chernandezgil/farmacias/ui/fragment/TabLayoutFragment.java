@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.internal.Utils;
 
 /**
  * Created by Carlos on 06/08/2016.
@@ -129,6 +131,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     private void setUpTabLayout(){
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setOnTabSelectedListener(this);
+
+
        // mTabLayout.addOnTabSelectedListener(this); 24.0.0
     }
 

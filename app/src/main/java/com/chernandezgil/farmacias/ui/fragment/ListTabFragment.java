@@ -35,6 +35,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import it.gmariotti.recyclerview.adapter.AlphaAnimatorAdapter;
+import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 
 /**
  * Created by Carlos on 06/08/2016.
@@ -120,8 +122,10 @@ public class ListTabFragment extends Fragment implements ListContract.View,ListT
 
     private void setUpRecyclerView(){
         mAdapter=new ListTabAdapter(getActivity(),this);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
+
+   //     mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
+        SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
+        mRecyclerView.setAdapter(animatorAdapter);
         mRecyclerView.setLayoutManager(new  LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
     }

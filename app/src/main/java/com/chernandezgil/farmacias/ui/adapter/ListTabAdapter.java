@@ -9,6 +9,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     private Context mContext;
     private ListTabAdapterOnClickHandler mClickHandler;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
+    private int lastPosition = -1;
 
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
@@ -69,7 +71,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
         int color;
         if(isOpen) {
-            color=getColor(R.color.pharmacy_open);
+            color=getColor(R.color.pharmacy_open_list);
             holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
         } else {
             color=getColor(R.color.pharmacy_close);
@@ -107,6 +109,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         holder.ivGo.setTag(position);
         holder.ivShare.setTag(position);
         holder.ivFavorite.setTag(position);
+
+       // setAnimation(holder.cardView,position);
     }
     public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
@@ -121,7 +125,16 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
 
     }
-
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
+    }
 
     private int getColor(@ColorRes int resId){
         int color=ContextCompat.getColor(mContext,resId);
@@ -240,6 +253,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         @BindView(R.id.ivGob)
         ImageView ivGo;
 
+        @BindView(R.id.holderContainer)
+        CardView cardView;
 
         public ViewHolder(View v) {
             super(v);

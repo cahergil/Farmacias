@@ -288,17 +288,17 @@ public class MainActivity extends AllowMeActivity implements
 
 
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-           MapTabFragment mapTabFragment =getFragmentPressed();
-           if(mapTabFragment !=null) {
-               mapTabFragment.handleDispatchTouchEvent(ev);
-           }
-        }
-        return super.dispatchTouchEvent(ev);
-    }
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
+//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+//           MapTabFragment mapTabFragment =getFragmentPressed();
+//           if(mapTabFragment !=null) {
+//               mapTabFragment.handleDispatchTouchEvent(ev);
+//           }
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
 
     @Override

@@ -171,12 +171,23 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvCall();
         setUpIvGo();
         setUpIvShare();
+        mRootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    handleDispatchTouchEvent(event);
+                }
+                return true;
+            }
+        });
+
 
 
 
         SupportMapFragment    mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
+
 
         mMapFragment=mapFragment;
 
@@ -258,6 +269,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     getResources().getDisplayMetrics());
             params.setMargins(margin, margin, margin, margin);
         }
+
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -279,23 +291,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                         moveCamera(cu);
                     }
                 });
-
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        CustomCameraUpdate cu=null;
-//                        while(cu==null) {
-//                           cu= mMapTabPresenter.getCameraUpdate();
-//                            try {
-//                                Thread.sleep(200);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        moveCamera(cu);
-//                    }
-//                }).start();
 
             }
         });

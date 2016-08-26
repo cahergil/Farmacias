@@ -23,9 +23,11 @@
     <color name="blue_800">#1565C0</color>
     <color name="blue_900">#0D47A1</color>
     <color name="red_700">#D32F2F</color>
+    <color name="red_200">#EF9A9A</color>
     <color name="blue_mobile_web">#ff4285f4</color>
     <color name="pharmacy_close">#ff736161</color>
     <color name="pharmacy_open">#ffd64646</color>
+    <color name="pharmacy_open_list">@color/green_500</color>
     <color name="bottom_sheet_icons">@color/colorPrimary</color>
     <color name="bottom_sheet_text">@color/black</color>
     <color name="fav_color">@color/blue_mobile_web</color>

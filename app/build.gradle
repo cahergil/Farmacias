@@ -42,10 +42,11 @@ android {
 repositories {
 
     maven { url "https://jitpack.io" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 
 }
 dependencies {
-    def SUPPORT = "23.3.0"
+    def SUPPORT = "24.0.0"
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:$SUPPORT"
@@ -80,6 +81,8 @@ dependencies {
 
     //to convert some web obtained svg(transformed to vector drawable) to bitmap
     compile 'com.bettervectordrawable:lib:0.8'
+
+    compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
 
 
 }
