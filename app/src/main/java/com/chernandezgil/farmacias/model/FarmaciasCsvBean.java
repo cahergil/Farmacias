@@ -11,6 +11,7 @@ public class FarmaciasCsvBean {
     Double lon;
     String name;
     String phone;
+
     String locality;
     String province;
     String postal_code;
@@ -119,14 +120,29 @@ public class FarmaciasCsvBean {
 
         FarmaciasCsvBean that = (FarmaciasCsvBean) o;
 
-        return get_id() == that.get_id();
+        return phone.equals(that.phone);
 
     }
 
     @Override
     public int hashCode() {
-        return get_id();
+        return phone.hashCode();
     }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        FarmaciasCsvBean that = (FarmaciasCsvBean) o;
+//
+//        return get_id() == that.get_id();
+//
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return get_id();
+//    }
 
     @Override
     public String toString() {

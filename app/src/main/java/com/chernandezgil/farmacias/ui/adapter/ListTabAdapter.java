@@ -1,32 +1,27 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -70,14 +65,17 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         boolean isOpen=pharmacy.isOpen();
         holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
         int color;
+        GradientDrawable gradientDrawable;
         if(isOpen) {
             color=getColor(R.color.pharmacy_open_list);
             holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
+            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_open);
         } else {
             color=getColor(R.color.pharmacy_close);
             holder.tvOpen.setTextColor(color);
+            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_close);
         }
-
+        holder.tvDistance.setBackground(gradientDrawable);
      //   holder.tvOpen.setTextColor(color);
         int favDraResid;
         if(pharmacy.isFavorite()) {
@@ -110,7 +108,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         holder.ivShare.setTag(position);
         holder.ivFavorite.setTag(position);
 
-       // setAnimation(holder.cardView,position);
+
     }
     public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
@@ -125,16 +123,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
 
     }
-    private void setAnimation(View viewToAnimate, int position)
-    {
-        // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition)
-        {
-            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-            viewToAnimate.startAnimation(animation);
-            lastPosition = position;
-        }
-    }
+
 
     private int getColor(@ColorRes int resId){
         int color=ContextCompat.getColor(mContext,resId);

@@ -1,8 +1,10 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -32,17 +35,18 @@ import android.widget.TextView;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.LoaderProvider;
+import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
-import com.chernandezgil.farmacias.model.CustomMarker;
+import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.presenter.MapTabPresenter;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
-import com.chernandezgil.farmacias.view.MapContract;
+import com.chernandezgil.farmacias.view.MapTabContract;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -51,7 +55,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -62,7 +68,7 @@ import butterknife.Unbinder;
  * Created by Carlos on 10/07/2016.
  */
 public class MapTabFragment extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener,MapContract.View {
+        GoogleMap.OnMarkerClickListener,MapTabContract.View {
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
@@ -71,7 +77,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     TimeMeasure mTm;
 
     private BottomSheetBehavior mBottomSheetBehavior;
-    private SupportMapFragment mMapFragment;
+    private CustomSupporMapFragment mMapFragment;
     private boolean mRotation=false;
     private MapTabPresenter mMapTabPresenter;
     private LoaderProvider mLoaderProvider;
@@ -124,12 +130,18 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     int color_pharmacy_open;
     @BindView(R.id.coordinator)
     CoordinatorLayout mRootView;
+    @BindView(R.id.ivFavoriteMap)
+    ImageView ivFavorite;
 
 
     private Geocoder mGeocoder;
-    private CustomMarker mLastMarkerClicked;
+    private PharmacyObjectMap mLastMarkerClicked;
     private Bitmap  markerBitmap;
     private Unbinder unbinder;
+    private static final int STATE_COLLAPSED=0;
+    private static final int STATE_EXPANDED=1;
+    private int mBottomSheetState;
+    private boolean mFromListTab;
 
     public MapTabFragment() {
     }
@@ -171,20 +183,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvCall();
         setUpIvGo();
         setUpIvShare();
-        mRootView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    handleDispatchTouchEvent(event);
-                }
-                return true;
-            }
-        });
+        setUpIvFavorite();
 
 
-
-
-        SupportMapFragment    mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
+        CustomSupporMapFragment mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
 
@@ -196,6 +198,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             mLocation = savedInstanceState.getParcelable("location_key");
             mLastMarkerClicked=savedInstanceState.getParcelable("lastMarkerClicked_key");
             mMapTabPresenter.onSetLastMarkerClick(mLastMarkerClicked);
+            mBottomSheetState=savedInstanceState.getInt("bottom_sheet_state");
         }
 
         mMapTabPresenter.setView(this);
@@ -243,6 +246,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key",mLocation);
         outState.putParcelable("lastMarkerClicked_key",mLastMarkerClicked);
+        outState.putInt("bottom_sheet_state",mBottomSheetBehavior.getState());
     }
     //this callback executes after onstart
     @SuppressWarnings("ResourceType")
@@ -301,30 +305,49 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     //BitmapDescriptorFactory.defaultMarker()
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
-    public void addMarkerToMap(CustomMarker customMarker) {
+    public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap,boolean flagFavorite) {
         MarkerOptions markerOption = new MarkerOptions().position(
-                new LatLng(customMarker.getLat(), customMarker.getLon())
+                new LatLng(pharmacyObjectMap.getLat(), pharmacyObjectMap.getLon())
         );
-        if(customMarker.getName().equals("userLocation")) {
+        if(pharmacyObjectMap.getName().equals("userLocation")) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Tu ubicación")
-                    .snippet(Util.getStreetFromAddress(customMarker.getAddressFormatted()));
+                    .snippet(Util.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
-            Bitmap bitmap= mMapTabPresenter.onRequestCustomBitmap(customMarker.getOrder(),customMarker.isOpen());
+            Bitmap bitmap= mMapTabPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                    .title(customMarker.getName())
-                    .snippet(getString(R.string.format_distance,customMarker.getDistance()/1000));
+                    .title(pharmacyObjectMap.getName())
+                    .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance()/1000));
         }
         markerOption.anchor(0.5f, 0.5f);
+        if(flagFavorite) {
 
+        }
         Marker newMark = mMap.addMarker(markerOption);
         newMark.showInfoWindow();//only last infowindow shows up
-        mMapTabPresenter.onAddMarkerToHash(newMark, customMarker);
+        mMapTabPresenter.onAddMarkerToHash(newMark, pharmacyObjectMap);
 
     }
 
+//    private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
+//        HashMap hashMap=mMapTabPresenter.onGetHashMap();
+//        Iterator<Map.Entry> iter = hashMap.entrySet().iterator();
+//        int count=0;
+//        while (iter.hasNext()) {
+//            count++;
+//            Map.Entry mEntry = (Map.Entry) iter.next();
+//            Marker key = (Marker) mEntry.getKey();
+//            PharmacyObjectMap c = (PharmacyObjectMap) hashMap.get(key);
+//            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+////            if(c.equals(pharmacy)) {
+////                return key;
+////            }
+//        }
+//        Util.LOGD(LOG_TAG,"count"+count);
+//        return null;
+//    }
     public void setUpTvPhone(){
 
         tvPhone.setOnClickListener(new View.OnClickListener() {
@@ -339,7 +362,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if(cameraUpdate.isNoResultsPosition()) {
             handleNoResults((cameraUpdate));
         } else {
-            mMap.animateCamera(cameraUpdate.getmCameraUpdate());
+            mMap.moveCamera(cameraUpdate.getmCameraUpdate());
         }
 
 
@@ -381,11 +404,18 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
     @Override
-    public void displayPharmacyInBottomSheet(CustomMarker firstSortedPharmacy,CustomMarker lastClicked) {
+    public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
+        Util.LOGD(LOG_TAG,"preshowPharmacy");
         if(mRotation) {
-            addMarkerToMap(lastClicked);
-            firstSortedPharmacy=mLastMarkerClicked;
+            if(lastClicked!=null) {
+                addMarkerToMap(lastClicked,false);
+                firstSortedPharmacy=mLastMarkerClicked;
+                setStateBottomShett(mBottomSheetState);
+            }
+
             mRotation=false;
+        } else {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
 
@@ -394,12 +424,36 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
         //a trick to show expanded, else doesn't show
 //        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
 
 
 
     }
 
+    @Override
+    public void refreshMap(PharmacyObjectMap updatedPharmacy) {
+        if(mFromListTab) {
+            mFromListTab=false;
+            if(mLastMarkerClicked.getPhone().equals(updatedPharmacy.getPhone())) {
+                showPharmacyInBottomSheet(updatedPharmacy);
+            }
+            return;
+        }
+        showPharmacyInBottomSheet(updatedPharmacy);
+    }
+
+    @Override
+    public void removeMarker(Marker marker) {
+
+    }
+
+    private void setStateBottomShett(int state) {
+        if(state==STATE_COLLAPSED) {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+    }
     private void setUpIvGo(){
         ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -452,8 +506,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if(newState==BottomSheetBehavior.STATE_COLLAPSED) {
-
-                } else {
+                   // setStatusBarDim(false);
+                } else if(newState==BottomSheetBehavior.STATE_EXPANDED) {
+                   // setStatusBarDim(true);
 
                 }
             }
@@ -466,28 +521,91 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             }
         });
     }
+    public void updateClickedPhoneToPresenter(String phone,boolean fromListTab) {
+        mFromListTab=fromListTab;
+        mMapTabPresenter.updateFavoriteFlag(phone);
+    }
+
+    public void removeMarkerFromHashInPresenter(String phone) {
+        mMapTabPresenter.removeMarkerInHashFromList(phone);
+
+    }
+    private void setUpIvFavorite(){
+        ivFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String phone=mLastMarkerClicked.getPhone();
+                updateClickedPhoneToPresenter(phone,false);
+                phone=phone.replaceAll(" ","");
+                mMapTabPresenter.removeMarkerInHashFromMap(mLastMarkerClicked);
+
+                int favorite;
+                String snackMessage;
+                if(mLastMarkerClicked.isFavorite()) {
+                    snackMessage="Pharmacy deleted from favorites";
+                    favorite=0;
+                } else {
+                    snackMessage="Pharmacy added to favorites";
+                    favorite=1;
+                }
+                Uri uri= DbContract.FarmaciasEntity.buildFarmaciasUri(phone);
+                ContentValues contentValues=new ContentValues();
+                contentValues.put(DbContract.FarmaciasEntity.FAVORITE,favorite);
+
+                int rowsUpdated=getActivity().getContentResolver().update(uri,contentValues,
+                        DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
+                        null);
+                if(rowsUpdated==1) {
+                    Snackbar.make(mRootView,snackMessage,Snackbar.LENGTH_SHORT).show();
+
+                }
+                Util.LOGD(LOG_TAG,"rows updates: " + rowsUpdated);
+            }
 
 
+        });
+    }
     @Override
     public boolean onMarkerClick(Marker marker) {
             HashMap hashMap= mMapTabPresenter.onGetHashMap();
-            CustomMarker customMarker= (CustomMarker)hashMap.get(marker);
-            if(customMarker.getName().equals("userLocation")) {
+            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
+            if(pharmacyObjectMap.getName().equals("userLocation")) {
                 return false;
             }
-            showPharmacyInBottomSheet(customMarker);
-            if( !isBottomSheetExpanded()) {
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
+            showPharmacyInBottomSheet(pharmacyObjectMap);
+//            if( !isBottomSheetExpanded()) {
+//                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//            }
             return false;
     }
 
-    private void showPharmacyInBottomSheet(CustomMarker marker){
+    private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
+        HashMap hashMap=mMapTabPresenter.onGetHashMap();
+        Iterator<Map.Entry> iter = hashMap.entrySet().iterator();
+        int count=0;
+        while (iter.hasNext()) {
+            count++;
+            Map.Entry mEntry = (Map.Entry) iter.next();
+            Marker key = (Marker) mEntry.getKey();
+            PharmacyObjectMap c = (PharmacyObjectMap) hashMap.get(key);
+            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+            if(c.equals(pharmacy)) {
+                return key;
+            }
+        }
+        Util.LOGD(LOG_TAG,"count"+count);
+        return null;
+    }
+    private void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy){
 
-            int color = marker.isOpen() ? color_pharmacy_open : color_pharmacy_close;
+            int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
             llUper.setBackgroundColor(color);
-
-
+//            Marker marker=getKeyFromValue(pharmacy);
+//            HashMap hashMap= mMapTabPresenter.onGetHashMap();
+//            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
+            Drawable favDraResid=ContextCompat.getDrawable(getActivity(),pharmacy.isFavorite()?R.drawable.heart:R.drawable.heart_outline);
+            ivFavorite.setImageDrawable(favDraResid);
             setTintedVectorDrawable(ivCall, R.drawable.phone, color);
             setTintedVectorDrawable(ivGo, R.drawable.directions, color);
             setTintedVectorDrawable(ivDistance, R.drawable.distance, color);
@@ -496,20 +614,25 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             setTintedVectorDrawable(ivClock, R.drawable.clock, color);
             setTintedVectorDrawable(ivShare,R.drawable.share,color);
 
-            tvName.setText(marker.getName());
-            ivOrder.setImageBitmap(marker.getMarkerImage());
+            tvName.setText(pharmacy.getName());
+            ivOrder.setImageBitmap(pharmacy.getMarkerImage());
 
             tvCall.setTextColor(color);
             tvGo.setTextColor(color);
             tvShare.setTextColor(color);
 
 
-            tvDistance.setText(getString(R.string.format_distance, marker.getDistance() / 1000));
-            tvAdress.setText(marker.getAddressFormatted());
-            tvHours.setText(marker.getHours());
-            tvPhone.setText(marker.getPhone());
-            mMapTabPresenter.onSetLastMarkerClick(marker);
-            mLastMarkerClicked=marker;
+            tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
+            tvAdress.setText(pharmacy.getAddressFormatted());
+            tvHours.setText(pharmacy.getHours());
+            tvPhone.setText(pharmacy.getPhoneFormatted());
+            mMapTabPresenter.onSetLastMarkerClick(pharmacy);
+            mLastMarkerClicked=pharmacy;
+
+            if( !isBottomSheetExpanded()) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+
 
 
     }
@@ -564,6 +687,21 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         unbinder.unbind();
         super.onDestroy();
     }
+
+//    @SuppressWarnings("ResourceType")
+//    private void setStatusBarDim(boolean dim) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            getActivity().getWindow().setStatusBarColor(dim ? Color.TRANSPARENT :
+//                    ContextCompat.getColor(getActivity(), getThemedResId(R.attr.colorPrimaryDark)));
+//        }
+//    }
+//
+//    private int getThemedResId(@AttrRes int attr) {
+//        TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]{attr});
+//        int resId = a.getResourceId(0, 0);
+//        a.recycle();
+//        return resId;
+//    }
     @Override
     public void onDetach() {
         super.onDetach();

@@ -82,7 +82,11 @@ dependencies {
     //to convert some web obtained svg(transformed to vector drawable) to bitmap
     compile 'com.bettervectordrawable:lib:0.8'
 
+    //recylerview animatino
     compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
+
+    //guava for collections
+    compile 'com.google.guava:guava:19.0'
 
 
 }

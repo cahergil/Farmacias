@@ -2,7 +2,9 @@
 <resources>
     <declare-styleable name="SeekBarPreference">
         <attr name="max" format="integer" />
-
-
     </declare-styleable>
+
+
+
+
 </resources>

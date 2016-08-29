@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by Carlos on 08/08/2016.
  */
-public class Pharmacy extends CustomMarker implements Parcelable {
+public class Pharmacy extends PharmacyObjectMap implements Parcelable {
 
     private boolean optionsRow;
     private boolean arrow_down;

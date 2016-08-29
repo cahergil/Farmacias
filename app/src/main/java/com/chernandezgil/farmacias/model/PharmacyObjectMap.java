@@ -7,16 +7,25 @@ import android.os.Parcelable;
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomMarker>,Parcelable {
+public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<PharmacyObjectMap>,Parcelable {
 
 
     Double distance;
     String hours;
     Boolean isOpen;
     String order;
+    String phoneFormatted;
     String addressFormatted;
     Bitmap markerImage;
     boolean isFavorite;
+
+    public String getPhoneFormatted() {
+        return phoneFormatted;
+    }
+
+    public void setPhoneFormatted(String phoneFormatted) {
+        this.phoneFormatted = phoneFormatted;
+    }
 
     public boolean isFavorite() {
         return isFavorite;
@@ -62,7 +71,7 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         this.hours = hours;
     }
 
-    public CustomMarker(){
+    public PharmacyObjectMap(){
 
     }
 
@@ -85,7 +94,7 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
 
 
     @Override
-    public int compareTo(CustomMarker other) {
+    public int compareTo(PharmacyObjectMap other) {
         int res=other.isOpen().compareTo(this.isOpen());
         if(res==0) {
             return this.getDistance().compareTo(other.getDistance());
@@ -98,20 +107,22 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        return super.equals(o);
+//        if (!super.equals(o)) return false;
+//
+//
+//
+//        FarmaciasCsvBean that = (FarmaciasCsvBean) o;
+//        return getPhone().equals(that.getPhone());
 
-        CustomMarker that = (CustomMarker) o;
-
-        if (!getDistance().equals(that.getDistance())) return false;
-        return getOrder().equals(that.getOrder());
 
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + getDistance().hashCode();
-        result = 31 * result + getOrder().hashCode();
+//        result = 31 * result + getDistance().hashCode();
+//        result = 31 * result + getOrder().hashCode();
         return result;
     }
 
@@ -126,30 +137,39 @@ public class CustomMarker extends FarmaciasCsvBean implements Comparable<CustomM
         dest.writeString(this.hours);
         dest.writeValue(this.isOpen);
         dest.writeString(this.order);
+        dest.writeString(this.phoneFormatted);
         dest.writeString(this.addressFormatted);
         dest.writeParcelable(this.markerImage, flags);
         dest.writeByte(this.isFavorite ? (byte) 1 : (byte) 0);
     }
 
-    protected CustomMarker(Parcel in) {
+    protected PharmacyObjectMap(Parcel in) {
         this.distance = (Double) in.readValue(Double.class.getClassLoader());
         this.hours = in.readString();
         this.isOpen = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.order = in.readString();
+        this.phoneFormatted = in.readString();
         this.addressFormatted = in.readString();
         this.markerImage = in.readParcelable(Bitmap.class.getClassLoader());
         this.isFavorite = in.readByte() != 0;
     }
 
-    public static final Creator<CustomMarker> CREATOR = new Creator<CustomMarker>() {
+    public static final Creator<PharmacyObjectMap> CREATOR = new Creator<PharmacyObjectMap>() {
         @Override
-        public CustomMarker createFromParcel(Parcel source) {
-            return new CustomMarker(source);
+        public PharmacyObjectMap createFromParcel(Parcel source) {
+            return new PharmacyObjectMap(source);
         }
 
         @Override
-        public CustomMarker[] newArray(int size) {
-            return new CustomMarker[size];
+        public PharmacyObjectMap[] newArray(int size) {
+            return new PharmacyObjectMap[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "PharmacyObjectMap{" + "nombre"+getName()+
+                "isFavorite=" + isFavorite +
+                '}';
+    }
 }

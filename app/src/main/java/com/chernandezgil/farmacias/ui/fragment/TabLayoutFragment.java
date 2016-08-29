@@ -54,6 +54,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     private  Location mLocation;
     private PagerAdapter pagerAdapter=null;
+    private int mCurrentItem=0;
 
 
     @Override
@@ -68,6 +69,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             }
         } else {
            mLocation=savedInstanceState.getParcelable("location_key");
+           mCurrentItem=savedInstanceState.getInt("current_item_key");
         }
 
     }
@@ -77,6 +79,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         Util.LOGD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key",mLocation);
+        outState.putInt("current_item_key",mViewPager.getCurrentItem());
 
 
     }
@@ -94,9 +97,10 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        Util.LOGD(LOG_TAG, "onActivityCreated");
         setUpViewPager();
         setUpTabLayout();
+        mViewPager.setCurrentItem(mCurrentItem);
      }
 
     public int getCurrentItem(){
@@ -127,10 +131,13 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     private void setUpViewPager(){
         pagerAdapter=new Adapter(getActivity(),mLocation,getChildFragmentManager());
         mViewPager.setAdapter(pagerAdapter);
+
+
     }
     private void setUpTabLayout(){
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setOnTabSelectedListener(this);
+
 
 
        // mTabLayout.addOnTabSelectedListener(this); 24.0.0

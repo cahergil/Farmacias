@@ -1,30 +1,29 @@
 package com.chernandezgil.farmacias.view;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.view.MotionEvent;
 
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
-import com.chernandezgil.farmacias.model.CustomMarker;
-import com.google.android.gms.maps.CameraUpdate;
+import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * Created by Carlos on 03/08/2016.
  */
-public interface MapContract {
+public interface MapTabContract {
 
     public interface View {
-        public void addMarkerToMap(CustomMarker marker);
+        public void addMarkerToMap(PharmacyObjectMap marker,boolean flagUpdateFavorite);
         public void moveCamera(CustomCameraUpdate cameraUpdate);
         public boolean collapseBottomSheet();
         public void handleDispatchTouchEvent(MotionEvent event);
-        public void displayPharmacyInBottomSheet(CustomMarker firstSorter,CustomMarker lastClicked);
+        public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSorter, PharmacyObjectMap lastClicked);
+        public void refreshMap(PharmacyObjectMap updatedPharmacy);
+        public void removeMarker(Marker marker);
     }
     public interface Presenter<V> {
 
@@ -34,10 +33,12 @@ public interface MapContract {
         void detachView();
 
         public void onStartLoader();
-        public void onAddMarkerToHash(Marker marker,CustomMarker object);
+        public void onAddMarkerToHash(Marker marker,PharmacyObjectMap object);
+        public void removeMarkerInHashFromMap(PharmacyObjectMap pharmacy);
+        public void removeMarkerInHashFromList(String phone);
         public HashMap onGetHashMap();
         public void setLocation(Location location);
-        public void onSetLastMarkerClick(CustomMarker customMarker);
+        public void onSetLastMarkerClick(PharmacyObjectMap pharmacyObjectMap);
         public LatLng onGetDestinationLocale();
         public String onGetDestinationAddress();
         public String onGetDestinationPhoneNumber();
@@ -46,6 +47,7 @@ public interface MapContract {
         public Bitmap onRequestCustomBitmap(String order,boolean isOpen);
         public void onSetMarkerBitMap(Bitmap bitmap);
         public CustomCameraUpdate getCameraUpdate();
+        public void updateFavoriteFlag(String phone);
 
 
 

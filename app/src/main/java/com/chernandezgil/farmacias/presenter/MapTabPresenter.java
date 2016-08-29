@@ -1,7 +1,6 @@
 package com.chernandezgil.farmacias.presenter;
 
 
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,19 +21,20 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
-import com.chernandezgil.farmacias.model.CustomMarker;
+import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
-import com.chernandezgil.farmacias.view.MapContract;
+import com.chernandezgil.farmacias.view.MapTabContract;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 
 import java.io.IOException;
@@ -43,7 +43,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -53,9 +55,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Created by Carlos on 03/08/2016.
  */
-public class MapTabPresenter implements MapContract.Presenter<MapContract.View>, LoaderManager.LoaderCallbacks<Cursor> {
+public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.View>, LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = MapTabPresenter.class.getSimpleName();
-    private MapContract.View mView;
+    private MapTabContract.View mView;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
     private Geocoder mGeocoder;
@@ -63,13 +65,15 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
     private HashMap mMarkersHashMap;
     private Location mLocation;
     private String mAddress;
-    private CustomMarker mLastClickMarker;
-    private CustomMarker mUserUbicationMarker;
+    private PharmacyObjectMap mLastClickMarker;
+    private PharmacyObjectMap mUserUbicationMarker;
 
     private Bitmap markerBitmap;
     private CustomCameraUpdate mCameraUpdate;
     private PreferencesManager preferencesManager;
     private int mRadio;
+    private boolean mUserPressedFavorite;
+    private String mPhoneUpdatedFavorite;
     @Inject
     public MapTabPresenter(@NonNull LoaderProvider loaderProvider,
                            @NonNull LoaderManager loaderManager,
@@ -85,7 +89,7 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
     }
 
     @Override
-    public void setView(MapContract.View view) {
+    public void setView(MapTabContract.View view) {
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
         mView = view;
 
@@ -103,22 +107,73 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
     }
 
     @Override
+    public void updateFavoriteFlag(String phone) {
+        mUserPressedFavorite =true;
+        mPhoneUpdatedFavorite =phone;
+    }
+
+    @Override
     public void detachView() {
         mView = null;
     }
 
     @Override
     public void onStartLoader() {
-
+        Util.LOGD(LOG_TAG,"onStartLoader");
         mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
     }
 
     @Override
-    public void onAddMarkerToHash(Marker marker, CustomMarker pharmacy) {
+    public void onAddMarkerToHash(Marker marker, PharmacyObjectMap pharmacy) {
         setUpMarkersHashMap();
         mMarkersHashMap.put(marker, pharmacy);
     }
 
+    @Override
+    public void removeMarkerInHashFromMap(PharmacyObjectMap pharmacy) {
+        logHashMap();
+        Marker marker=getKeyFromValue(pharmacy);
+        if(marker != null) {
+            marker.remove();
+        }
+        mMarkersHashMap.values().remove(pharmacy);
+       // mMarkersHashMap.remove(marker);
+        //mView.removeMarker(marker);
+        logHashMap();
+
+    }
+
+    @Override
+    public void removeMarkerInHashFromList(String phone) {
+        PharmacyObjectMap pharmacy=new PharmacyObjectMap();
+        pharmacy.setPhone(phone);
+        Marker marker=getKeyFromValue(pharmacy);
+        if(marker != null) {
+            marker.remove();
+        }
+        mMarkersHashMap.values().remove(pharmacy);
+        // mMarkersHashMap.remove(marker);
+        //mView.removeMarker(marker);
+        logHashMap();
+    }
+
+    private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
+        Iterator<Map.Entry> iter = mMarkersHashMap.entrySet().iterator();
+        int count=0;
+        while (iter.hasNext()) {
+            count++;
+            Map.Entry mEntry = (Map.Entry) iter.next();
+            Marker key = (Marker) mEntry.getKey();
+            PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
+
+            if(c.equals(pharmacy)) {
+                Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+                return key;
+            }
+        }
+        Util.LOGD(LOG_TAG,"count"+count);
+        return null;
+    }
     @Override
     public HashMap onGetHashMap() {
         return mMarkersHashMap;
@@ -130,8 +185,8 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
     }
 
     @Override
-    public void onSetLastMarkerClick(CustomMarker customMarker) {
-        mLastClickMarker = customMarker;
+    public void onSetLastMarkerClick(PharmacyObjectMap pharmacyObjectMap) {
+        mLastClickMarker = pharmacyObjectMap;
     }
 
     @Override
@@ -239,14 +294,14 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
 
 
     private void bindView(Cursor data) {
-
-        List<CustomMarker> farmaciasList = new ArrayList<>();
-        CustomMarker firstSortedPharmacy = null;
+        Util.LOGD(LOG_TAG,"onBindView");
+        List<PharmacyObjectMap> farmaciasList = new ArrayList<>();
+        PharmacyObjectMap firstSortedPharmacy = null;
         if (data.isClosed()) return;
         if (data.moveToFirst()) {
             do {
 
-                CustomMarker farmacia = new CustomMarker();
+                PharmacyObjectMap farmacia = new PharmacyObjectMap();
 
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
@@ -258,7 +313,8 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
                 farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
                 farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
                 String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
-                farmacia.setPhone(Util.formatPhoneNumber(phone));
+                farmacia.setPhone(phone);
+                farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance);
@@ -284,26 +340,65 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
             } while (data.moveToNext());
         }
         farmaciasList = toFilteredSortedOrderedList(farmaciasList);
+        PharmacyObjectMap updatedPharmacy;
+        if(mUserPressedFavorite) {
+            PharmacyObjectMap objComp=new PharmacyObjectMap();
+            objComp.setPhone(mPhoneUpdatedFavorite);
+            if(farmaciasList.contains(objComp)) {
+                   // farmaciasList.get
+                updatedPharmacy=Iterables.find(farmaciasList, new Predicate<PharmacyObjectMap>() {
+                    @Override
+                    public boolean apply(@Nullable PharmacyObjectMap input) {
+
+                       return input.getPhone().equals(objComp.getPhone());
+
+                    }
+                });
+                mView.addMarkerToMap(updatedPharmacy,true);
+                mView.refreshMap(updatedPharmacy);
+                mUserPressedFavorite =false;
+                logHashMap();
+                return;
+
+            }
+        }
+
         for (int i = 0; i < farmaciasList.size(); i++) {
             if (i == 0) {
                 firstSortedPharmacy = farmaciasList.get(i);
             }
-            mView.addMarkerToMap(farmaciasList.get(i));
+
+            mView.addMarkerToMap(farmaciasList.get(i),false);
 
         }
 
-        CustomMarker userLocation = getUserLocationMarker();
+        PharmacyObjectMap userLocation = getUserLocationMarker();
         mUserUbicationMarker = userLocation;
-        mView.addMarkerToMap(userLocation);
+        mView.addMarkerToMap(userLocation,false);
         if (firstSortedPharmacy != null) {
-            mView.displayPharmacyInBottomSheet(firstSortedPharmacy, mLastClickMarker);
+            mView.preShowPharmacyInBottomSheet(firstSortedPharmacy, mLastClickMarker);
         }
 
         zoomAnimateLevelToFitMarkers(120);
     }
 
-    private CustomMarker getUserLocationMarker() {
-        CustomMarker userLocation = new CustomMarker();
+    private void logHashMap(){
+        Iterator<Map.Entry> iter = mMarkersHashMap.entrySet().iterator();
+        int count=0;
+        while (iter.hasNext()) {
+            count++;
+            Map.Entry mEntry = (Map.Entry) iter.next();
+            Marker key = (Marker) mEntry.getKey();
+            PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
+            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+//            if(c.equals(pharmacy)) {
+//                return key;
+//            }
+        }
+        Util.LOGD(LOG_TAG,"count"+count);
+    }
+    private PharmacyObjectMap getUserLocationMarker() {
+        PharmacyObjectMap userLocation = new PharmacyObjectMap();
         userLocation.setName("userLocation");
         userLocation.setLat(mLocation.getLatitude());
         userLocation.setLon(mLocation.getLongitude());
@@ -311,6 +406,7 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
         //for hascode and equals
         userLocation.setOrder("A");
         userLocation.setDistance(0d);
+        userLocation.setPhone("0");
         return userLocation;
     }
 
@@ -321,7 +417,7 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
      * @param list
      * @return
      */
-    public List<CustomMarker> toFilteredSortedOrderedList(List<CustomMarker> list) {
+    public List<PharmacyObjectMap> toFilteredSortedOrderedList(List<PharmacyObjectMap> list) {
         String str;
 
         return Observable.from(list)
@@ -356,7 +452,7 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
             Map.Entry mEntry = (Map.Entry) iter.next();
             Marker key = (Marker) mEntry.getKey();
 
-            CustomMarker c = (CustomMarker) mMarkersHashMap.get(key);
+            PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
             LatLng ll = new LatLng(c.getLat(), c.getLon());
             b.include(ll);
         }
@@ -395,10 +491,11 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
         if (mMarkersHashMap == null) {
             mMarkersHashMap = new HashMap();
         }
+
     }
 
 //    //this is method to help us add a Marker into the hashmap that stores the Markers
-//    private void addMarkerToHashMap(CustomMarker customMarker, Marker marker) {
+//    private void addMarkerToHashMap(PharmacyObjectMap customMarker, Marker marker) {
 //        setUpMarkersHashMap();
 //        mMarkersHashMap.put(marker,customMarker);
 //    }
@@ -414,6 +511,7 @@ public class MapTabPresenter implements MapContract.Presenter<MapContract.View>,
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Util.LOGD(LOG_TAG,"onLoadFinished");
         if (loader.getId() == FARMACIAS_LOADER) {
             //delay of 50 milliseconds, waiting to mapready
             Handler handler = new Handler();

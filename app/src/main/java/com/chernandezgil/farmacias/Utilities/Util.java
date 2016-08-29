@@ -20,6 +20,7 @@ import android.util.Log;
 import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -47,11 +48,11 @@ public class Util {
 
     }
 
-    public static SupportMapFragment handleMapFragmentRecreation(FragmentManager fragmentManager, int fragmentId,
+    public static CustomSupporMapFragment handleMapFragmentRecreation(FragmentManager fragmentManager, int fragmentId,
                                                                  String fragmentTag) {
-        SupportMapFragment mapFragment = (SupportMapFragment) fragmentManager.findFragmentByTag("mapFragment");
+        CustomSupporMapFragment mapFragment = (CustomSupporMapFragment) fragmentManager.findFragmentByTag("mapFragment");
         if (mapFragment == null) {
-            mapFragment = new SupportMapFragment();
+            mapFragment = new CustomSupporMapFragment();
             fragmentManager.beginTransaction()
                     .replace(R.id.mapFragmentContainer, mapFragment, fragmentTag)
                     .commit();

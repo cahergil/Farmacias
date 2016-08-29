@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -27,10 +28,12 @@ import com.aitorvs.android.allowme.AllowMeActivity;
 import com.aitorvs.android.allowme.AllowMeCallback;
 import com.aitorvs.android.allowme.PermissionResultSet;
 import com.chernandezgil.farmacias.MyApplication;
+import com.chernandezgil.farmacias.customwidget.TouchableWrapper;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
+import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
@@ -54,7 +57,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AllowMeActivity implements
                  MainActivityContract.View,GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,LocationListener {
+        GoogleApiClient.OnConnectionFailedListener,LocationListener,TouchableWrapper.UpdateMapUserClick,
+        ListTabFragment.UpdateFavorite{
 
 
     @BindView(R.id.navigation_drawer_layout)
@@ -74,19 +78,20 @@ public class MainActivity extends AllowMeActivity implements
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG_FRAGMENT = "TAB_FRAGMENT";
-
     private MainActivityPresenter mMainActivityPresenter;
-
     private PreferencesManager mPreferencesManager;
     private int mCurrentFragment=0;
     private Handler mHandler;
-
-//    static {
-//        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-//    }
-
     private TabLayoutFragment mtabFragment;
     private static boolean mRotation;
+    private static int GPS_FATEST_INTERVAL =10 * 60 * 1000;
+    private static int GPS_INTERVAL = GPS_FATEST_INTERVAL;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
+
 
 
     @Override
@@ -117,7 +122,7 @@ public class MainActivity extends AllowMeActivity implements
         ((MyApplication) getApplication()).getComponent().inject(this);
         mGoogleApiClient.registerConnectionCallbacks(this);
         mGoogleApiClient.registerConnectionFailedListener(this);
-        mGoogleApiClient.connect();
+
 
         setupNavigationDrawerContent(navigationView);
 
@@ -130,9 +135,9 @@ public class MainActivity extends AllowMeActivity implements
         return  new Handler(){
             @Override
             public void handleMessage(Message msg) {
-
-                    setFragment(mCurrentFragment);
-
+                    if(mCurrentFragment==0) {
+                        setFragment(mCurrentFragment);
+                    }
             }
         };
     }
@@ -149,6 +154,9 @@ public class MainActivity extends AllowMeActivity implements
     protected void onStart() {
         Util.LOGD(LOG_TAG,"onStart");
         super.onStart();
+        if(mGoogleApiClient!=null && !mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
+            mGoogleApiClient.connect();
+        }
 
 
     }
@@ -163,13 +171,17 @@ public class MainActivity extends AllowMeActivity implements
     protected void onPause() {
         Util.LOGD(LOG_TAG,"onPause");
         super.onPause();
+        stopLocationUpdates();
+
     }
     @Override
     protected void onStop() {
         Util.LOGD(LOG_TAG,"onStop");
-        if(mGoogleApiClient!=null) {
-            mGoogleApiClient.disconnect();
-        }
+//        don't know why but disconnecting causes onConnected be called twice
+//        if(mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.disconnect();
+//        }
+
         super.onStop();
     }
 
@@ -287,12 +299,12 @@ public class MainActivity extends AllowMeActivity implements
     }
 
 
-
+//    I've implemente ontouch event in map, there is no need for this now
 //    @Override
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
 //        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-//           MapTabFragment mapTabFragment =getFragmentPressed();
+//           MapTabFragment mapTabFragment =getMapTabFragment();
 //           if(mapTabFragment !=null) {
 //               mapTabFragment.handleDispatchTouchEvent(ev);
 //           }
@@ -305,7 +317,7 @@ public class MainActivity extends AllowMeActivity implements
     public void onBackPressed() {
 
         Util.LOGD(LOG_TAG,"onBackPressed");
-        MapTabFragment mapTabFragment =getFragmentPressed();
+        MapTabFragment mapTabFragment = getMapTabFragment();
         if(mapTabFragment !=null) {
             if (!mapTabFragment.collapseBottomSheet()) {
                 super.onBackPressed();
@@ -318,17 +330,17 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
-    private MapTabFragment getFragmentPressed(){
+    private MapTabFragment getMapTabFragment(){
         List<Fragment> list=getSupportFragmentManager().getFragments();
 
         if(list!=null && list.size()>0) {
             Fragment tabs=list.get(0);
             if(tabs instanceof TabLayoutFragment) {
-                if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
+              //  if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
                     SparseArray<Fragment> registeredFragments=((TabLayoutFragment) tabs).getFragments();
                     MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
                     return mapTabFragment;
-                }
+              //  }
 //                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
 //                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
 //                    return mapTabFragment;
@@ -354,15 +366,31 @@ public class MainActivity extends AllowMeActivity implements
         }
     }
 
+    private void createLocationRequest(){
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                //min x secs x millisec
+                .setFastestInterval(GPS_FATEST_INTERVAL)
+                .setInterval(GPS_INTERVAL);
+    }
+
+    @SuppressWarnings({"MissingPermission"})
+    public void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest,MainActivity.this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
     @SuppressWarnings({"MissingPermission"})
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
         Util.LOGD(LOG_TAG, "onConnected");
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                //min x secs x millisec
-                .setFastestInterval(10 * 60 * 1000);
+        createLocationRequest();
 
         if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION )) {
             new AllowMe.Builder()
@@ -372,18 +400,18 @@ public class MainActivity extends AllowMeActivity implements
                         @Override
                         public void onPermissionResult(int i, PermissionResultSet permissionResultSet) {
                             if (permissionResultSet.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MainActivity.this);
+                              startLocationUpdates();
 
                             }
                         }
                     }).request(1);
 
         } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+           startLocationUpdates();
         }
 
 
-       // onLocationChanged(mLocation);
+
 
     }
 
@@ -420,4 +448,21 @@ public class MainActivity extends AllowMeActivity implements
         super.onDestroy();
     }
 
+    @Override
+    public void onClickMap(MotionEvent event) {
+            Util.LOGD(LOG_TAG,"onClickMap");
+        MapTabFragment mapTabFragment = getMapTabFragment();
+        if(mapTabFragment !=null) {
+               mapTabFragment.handleDispatchTouchEvent(event);
+        }
+    }
+
+    @Override
+    public void onUpdateFavorite(String phone,boolean flag) {
+        MapTabFragment mapTabFragment = getMapTabFragment();
+        if(mapTabFragment != null) {
+                mapTabFragment.updateClickedPhoneToPresenter(phone,true);
+                mapTabFragment.removeMarkerFromHashInPresenter(phone);
+        }
+    }
 }

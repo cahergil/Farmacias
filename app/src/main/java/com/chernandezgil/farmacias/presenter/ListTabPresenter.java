@@ -16,7 +16,7 @@ import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
-import com.chernandezgil.farmacias.view.ListContract;
+import com.chernandezgil.farmacias.view.ListTabContract;
 import com.github.davidmoten.rx.Transformers;
 
 import java.io.IOException;
@@ -28,12 +28,12 @@ import rx.Observable;
 /**
  * Created by Carlos on 08/08/2016.
  */
-public class ListTabPresenter implements ListContract.Presenter<ListContract.View>,
+public class ListTabPresenter implements ListTabContract.Presenter<ListTabContract.View>,
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG=ListTabPresenter.class.getSimpleName();
     private final LoaderManager mLoaderManager;
-    private ListContract.View mView;
+    private ListTabContract.View mView;
     private LoaderProvider mLoaderProvider;
     private Geocoder mGeocoder;
     private Location mLocation;
@@ -55,7 +55,7 @@ public class ListTabPresenter implements ListContract.Presenter<ListContract.Vie
 
     }
     @Override
-    public void setView(ListContract.View view) {
+    public void setView(ListTabContract.View view) {
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
         mView=view;
     }
