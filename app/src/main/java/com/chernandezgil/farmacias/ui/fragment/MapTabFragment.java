@@ -142,6 +142,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private static final int STATE_EXPANDED=1;
     private int mBottomSheetState;
     private boolean mFromListTab;
+    CustomSupporMapFragment mapFragment;
 
     public MapTabFragment() {
     }
@@ -186,9 +187,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvFavorite();
 
 
-        CustomSupporMapFragment mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
+        mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
+
 
 
         mMapFragment=mapFragment;
@@ -248,15 +250,35 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         outState.putParcelable("lastMarkerClicked_key",mLastMarkerClicked);
         outState.putInt("bottom_sheet_state",mBottomSheetBehavior.getState());
     }
+    @Override
+    public void onStart() {
+        Util.LOGD(LOG_TAG, "onStart:"+this.toString());
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Util.LOGD(LOG_TAG, "onResume:"+this.toString());
+
+    }
+
+    @Override
+    public void onStop() {
+        Util.LOGD(LOG_TAG, "onStop");
+        super.onStop();
+    }
     //this callback executes after onstart
     @SuppressWarnings("ResourceType")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-   //     Util.LOGD(LOG_TAG, "onMapsReady");
-        mTm.log("onMapsReady:"+this.toString());
+        Util.LOGD(LOG_TAG, "onMapsReady");
+        //mTm.log("onMapsReady:"+this.toString());
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        //to disable the two little images in the right-bottom side of the map
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         //reposition zoom control to upper right side of the map
         //http://stackoverflow.com/questions/14071230/android-maps-library-v2-zoom-controls-custom-position
         View mZoomControls = mMapFragment.getView().findViewById(0x1);
@@ -282,9 +304,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
+                        int count=0;
                         CustomCameraUpdate cu=null;
                         while(cu==null) {
+                            count++;
                             cu= mMapTabPresenter.getCameraUpdate();
+                            Util.LOGD(LOG_TAG,"count"+count);
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
@@ -298,6 +323,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
             }
         });
+        //mapFragment.onResume();
+        setUserVisibleHint(true);
 
     }
 
@@ -331,23 +358,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-//    private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
-//        HashMap hashMap=mMapTabPresenter.onGetHashMap();
-//        Iterator<Map.Entry> iter = hashMap.entrySet().iterator();
-//        int count=0;
-//        while (iter.hasNext()) {
-//            count++;
-//            Map.Entry mEntry = (Map.Entry) iter.next();
-//            Marker key = (Marker) mEntry.getKey();
-//            PharmacyObjectMap c = (PharmacyObjectMap) hashMap.get(key);
-//            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
-////            if(c.equals(pharmacy)) {
-////                return key;
-////            }
-//        }
-//        Util.LOGD(LOG_TAG,"count"+count);
-//        return null;
-//    }
+
     public void setUpTvPhone(){
 
         tvPhone.setOnClickListener(new View.OnClickListener() {
@@ -580,23 +591,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             return false;
     }
 
-    private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
-        HashMap hashMap=mMapTabPresenter.onGetHashMap();
-        Iterator<Map.Entry> iter = hashMap.entrySet().iterator();
-        int count=0;
-        while (iter.hasNext()) {
-            count++;
-            Map.Entry mEntry = (Map.Entry) iter.next();
-            Marker key = (Marker) mEntry.getKey();
-            PharmacyObjectMap c = (PharmacyObjectMap) hashMap.get(key);
-            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
-            if(c.equals(pharmacy)) {
-                return key;
-            }
-        }
-        Util.LOGD(LOG_TAG,"count"+count);
-        return null;
-    }
+
     private void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy){
 
             int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
@@ -662,24 +657,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
        return mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED;
     }
 
-    @Override
-    public void onStart() {
-        Util.LOGD(LOG_TAG, "onStart:"+this.toString());
-        super.onStart();
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Util.LOGD(LOG_TAG, "onResume:"+this.toString());
-
-    }
-
-    @Override
-    public void onStop() {
-        Util.LOGD(LOG_TAG, "onStop");
-        super.onStop();
-    }
 
     @Override
     public void onDestroy() {

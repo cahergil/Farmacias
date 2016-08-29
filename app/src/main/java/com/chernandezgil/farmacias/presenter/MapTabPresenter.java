@@ -121,6 +121,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     public void onStartLoader() {
         Util.LOGD(LOG_TAG,"onStartLoader");
         mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
+        mLoaderManager.getLoader(FARMACIAS_LOADER).forceLoad();
     }
 
     @Override
@@ -131,15 +132,14 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void removeMarkerInHashFromMap(PharmacyObjectMap pharmacy) {
-        logHashMap();
+        //logHashMap();
         Marker marker=getKeyFromValue(pharmacy);
         if(marker != null) {
             marker.remove();
         }
         mMarkersHashMap.values().remove(pharmacy);
-       // mMarkersHashMap.remove(marker);
-        //mView.removeMarker(marker);
-        logHashMap();
+
+        //logHashMap();
 
     }
 
@@ -152,9 +152,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             marker.remove();
         }
         mMarkersHashMap.values().remove(pharmacy);
-        // mMarkersHashMap.remove(marker);
-        //mView.removeMarker(marker);
-        logHashMap();
+
+     //   logHashMap();
     }
 
     private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {

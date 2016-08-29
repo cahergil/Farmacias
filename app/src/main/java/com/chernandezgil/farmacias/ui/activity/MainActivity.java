@@ -131,6 +131,7 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+
     private Handler createHandler(){
         return  new Handler(){
             @Override
@@ -148,6 +149,12 @@ public class MainActivity extends AllowMeActivity implements
         outState.putParcelable("location_key",mLocation);
         outState.putInt("current_fragment_key",mCurrentFragment);
 
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Util.LOGD(LOG_TAG,"onStart");
     }
 
     @Override
