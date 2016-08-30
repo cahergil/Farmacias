@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -25,6 +26,8 @@ import com.aitorvs.android.allowme.PermissionResultSet;
 import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.adapter.ViewPagerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,14 +57,13 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     private  Location mLocation;
     private PagerAdapter pagerAdapter=null;
-    private int mCurrentItem=0;
-
+    private PreferencesManager mSharedPreferences;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Util.LOGD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-
+        mSharedPreferences=new AndroidPrefsManager(getContext());
         if(savedInstanceState==null) {
             Bundle bundle=getArguments();
             if(bundle!=null) {
@@ -69,9 +71,9 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             }
         } else {
            mLocation=savedInstanceState.getParcelable("location_key");
-           mCurrentItem=savedInstanceState.getInt("current_item_key");
+           mSharedPreferences.setCurrentItemTabLayout(savedInstanceState.getInt("current_item_key"));
         }
-
+        Util.LOGD(LOG_TAG,"****main thread?:"+(Looper.myLooper() == Looper.getMainLooper()));
     }
 
     @Override
@@ -100,7 +102,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         Util.LOGD(LOG_TAG, "onActivityCreated");
         setUpViewPager();
         setUpTabLayout();
-        mViewPager.setCurrentItem(mCurrentItem);
+        mViewPager.setCurrentItem(mSharedPreferences.getCurrentItemTabLayout());
      }
 
     public int getCurrentItem(){
@@ -136,26 +138,15 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
     private void setUpTabLayout(){
         mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.setOnTabSelectedListener(this);
-
-
-
-       // mTabLayout.addOnTabSelectedListener(this); 24.0.0
+     //   mTabLayout.setOnTabSelectedListener(this);
+        mTabLayout.addOnTabSelectedListener(this); //24.0.0
     }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         int position=tab.getPosition();
         mViewPager.setCurrentItem(position);
-//        switch(position){
-//            case 0:
-//
-//                break;
-//            case 1:
-//                mViewPager.setCurrentItem(position);
-//
-//
-//        }
+        mSharedPreferences.setCurrentItemTabLayout(position);
     }
 
     @Override
@@ -173,6 +164,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     public SparseArray<Fragment> getFragments(){
         return Adapter.registeredFragments;
     }
+    //to remember: https://code.google.com/p/android/issues/detail?id=69586
     public static class Adapter extends FragmentPagerAdapter {
         public static SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
         Location location;

@@ -419,6 +419,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Util.LOGD(LOG_TAG,"preshowPharmacy");
         if(mRotation) {
             if(lastClicked!=null) {
+                Util.LOGD(LOG_TAG,"firstsor");
+                //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
                 addMarkerToMap(lastClicked,false);
                 firstSortedPharmacy=mLastMarkerClicked;
                 setStateBottomShett(mBottomSheetState);

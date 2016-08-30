@@ -33,6 +33,18 @@ public class AndroidPrefsManager implements PreferencesManager {
     public void setFirstExecutionFalse() {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("first_execution_key",false);
-        editor.commit();
+        editor.apply();
+    }
+
+    public int getCurrentItemTabLayout(){
+        SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getInt("current_item_key",0);
+
+    }
+
+    public void setCurrentItemTabLayout(int currentItemTabLayout){
+        SharedPreferences.Editor editor=prefs.edit();
+        editor.putInt("current_item_key",currentItemTabLayout);
+        editor.apply();
     }
 }

@@ -9,4 +9,6 @@ public interface PreferencesManager {
     int retrieveRadioBusquedaFromSp();
     boolean isFirstExecution();
     void setFirstExecutionFalse();
+    public int getCurrentItemTabLayout();
+    public void setCurrentItemTabLayout(int currentItemTabLayout);
 }
