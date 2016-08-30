@@ -192,8 +192,11 @@ public class MainActivity extends AllowMeActivity implements
         Util.LOGD(LOG_TAG, "onPause");
         super.onPause();
 
-        stopLocationUpdates();
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+            mGoogleApiClient.disconnect();
+        }
+
 
     }
 
