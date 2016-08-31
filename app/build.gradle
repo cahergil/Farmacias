@@ -88,5 +88,8 @@ dependencies {
     //guava for collections
     compile 'com.google.guava:guava:19.0'
 
+    //expandable linerlayout
+    compile 'com.github.aakira:expandable-layout:1.5.1@aar'
+
 
 }

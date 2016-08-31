@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/holderContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/holderContainer"
-    card_view:cardElevation="5dp"
     app:contentPadding="24dp"
-    card_view:cardUseCompatPadding="true"
-    >
+    card_view:cardElevation="5dp"
+    card_view:cardUseCompatPadding="true">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -28,12 +27,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
+                android:alpha="0.87"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textSize="15sp"
                 android:paddingRight="15dp"
                 android:textColor="@android:color/black"
-                android:alpha="0.87"
+                android:textSize="15sp"
                 tools:text="Farmacia Fernandez de los Rios" />
 
             <TextView
@@ -58,9 +57,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
-                android:textSize="12sp"
-                android:textColor="@android:color/black"
                 android:alpha="0.54"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
                 tools:text="Calle Conde de Cartagena 36" />
 
             <TextView
@@ -73,119 +72,130 @@
 
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="16dp">
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@android:color/black"
-                android:alpha="0.12"/>
+                android:alpha="0.12"
+                android:background="@android:color/black" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-           >
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tvOpen"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:textSize="15sp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="left|center_vertical"
+                android:textSize="15sp"
 
                 tools:text="Open" />
+
             <ImageView
                 android:id="@+id/ivArrow"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:layout_weight="0.1"
                 android:layout_gravity="center_vertical"
-                android:scaleType="fitStart"
+                android:layout_weight="0.1"
                 android:alpha="0.38"
+                android:scaleType="fitStart"
                 app:srcCompat="@drawable/arrow_down" />
 
 
-
         </LinearLayout>
-        <LinearLayout
+
+        <com.github.aakira.expandablelayout.ExpandableLinearLayout
             android:id="@+id/optionsRow"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_margin="4dp"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:gravity="center_vertical"
-            tools:visibility="visible"
+            android:orientation="vertical"
+            app:ael_duration="200"
+            app:ael_expanded="false">
 
-            >
+            <LinearLayout
 
-            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_margin="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
 
-                android:id="@+id/ivPhoneb"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/phone" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/gray700" />
+                >
 
-            <ImageView
-                android:id="@+id/ivGob"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/directions" />
+                <ImageView
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/gray700" />
+                    android:id="@+id/ivPhoneb"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/phone" />
 
-            <ImageView
-                android:id="@+id/ivShareb"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/share" />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/gray700" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/gray700" />
+                <ImageView
+                    android:id="@+id/ivGob"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/directions" />
 
-            <ImageView
-                android:id="@+id/ivScheduleb"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/clock" />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/gray700" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="12dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/gray700" />
+                <ImageView
+                    android:id="@+id/ivShareb"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/share" />
 
-            <ImageView
-                android:id="@+id/ivFavoriteb"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/heart" />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/gray700" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/ivScheduleb"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/clock" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/gray700" />
+
+                <ImageView
+                    android:id="@+id/ivFavoriteb"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/heart" />
+
+            </LinearLayout>
+        </com.github.aakira.expandablelayout.ExpandableLinearLayout>
+
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

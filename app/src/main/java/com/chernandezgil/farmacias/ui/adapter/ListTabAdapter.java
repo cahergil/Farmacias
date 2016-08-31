@@ -11,6 +11,7 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,9 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.github.aakira.expandablelayout.ExpandableLayout;
+import com.github.aakira.expandablelayout.ExpandableLayoutListener;
+import com.github.aakira.expandablelayout.ExpandableLinearLayout;
 
 import java.util.List;
 
@@ -39,8 +43,9 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     private Context mContext;
     private ListTabAdapterOnClickHandler mClickHandler;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
-    private int lastPosition = -1;
+
     private TimeMeasure mTm;
+    private SparseBooleanArray expandState = new SparseBooleanArray();
 
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
@@ -51,6 +56,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
+
         ViewHolder viewHolder=new ViewHolder(view);
         viewHolder.ivArrow.setOnClickListener(this);
         viewHolder.tvOpen.setOnClickListener(this);
@@ -58,12 +64,46 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         viewHolder.ivGo.setOnClickListener(this);
         viewHolder.ivShare.setOnClickListener(this);
         viewHolder.ivFavorite.setOnClickListener(this);
+
         return  viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Pharmacy pharmacy=mPharmacyList.get(position);
+        holder.viewOptionsRow.setExpanded(expandState.get(position));
+        holder.viewOptionsRow.setListener(new ExpandableLayoutListener() {
+            @Override
+            public void onAnimationStart() {
+
+            }
+
+            @Override
+            public void onAnimationEnd() {
+
+            }
+
+            @Override
+            public void onPreOpen() {
+                expandState.put(position, true);
+
+            }
+
+            @Override
+            public void onPreClose() {
+                expandState.put(position, false);
+            }
+
+            @Override
+            public void onOpened() {
+
+            }
+
+            @Override
+            public void onClosed() {
+
+            }
+        });
         holder.tvName.setText(pharmacy.getName());
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
         holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()/1000));
@@ -94,11 +134,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         setBitmapFromVectorDrawable(holder.ivShare,R.drawable.share,color);
         setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
         if(pharmacy.isOptionsRow()) {
-            holder.viewOptionsRow.setVisibility(View.VISIBLE);
-            mTm.log("viewVisible");
+         //   holder.viewOptionsRow.setVisibility(View.VISIBLE);
+         //   mTm.log("viewVisible");
         } else {
-            holder.viewOptionsRow.setVisibility(View.GONE);
-            mTm.log("viewInvisible");
+         //   holder.viewOptionsRow.setVisibility(View.GONE);
+         //   mTm.log("viewInvisible");
         }
         if(pharmacy.isArrow_down()) {
             setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_down, Color.BLACK);
@@ -144,6 +184,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     public void swapData(List<Pharmacy> pharmacyList) {
         mPharmacyList=pharmacyList;
+        for (int i = 0; i < mPharmacyList.size(); i++) {
+            expandState.append(i, false);
+
+        }
         notifyDataSetChanged();
 
     }
@@ -176,7 +220,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
                             Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
                             0.5f);
 
-                    rotate.setDuration(100);
+                    rotate.setDuration(200);
 
                     rotate.setAnimationListener(new Animation.AnimationListener() {
                         @Override
@@ -196,6 +240,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
                         }
                     });
                     vh.ivArrow.startAnimation(rotate);
+                    vh.viewOptionsRow.toggle();
+
                     break;
             case R.id.ivPhoneb:
                 vh= (ViewHolder) view.getTag();
@@ -234,7 +280,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         TextView tvOpen;
 
         @BindView(R.id.optionsRow)
-        LinearLayout viewOptionsRow;
+        ExpandableLinearLayout viewOptionsRow;
 
         @BindView(R.id.ivArrow)
         ImageView ivArrow;
@@ -255,6 +301,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         public ViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
+            viewOptionsRow.collapse();
 
 
         }
