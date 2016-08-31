@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
+import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -16,9 +17,11 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
@@ -37,10 +40,12 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     private ListTabAdapterOnClickHandler mClickHandler;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
     private int lastPosition = -1;
+    private TimeMeasure mTm;
 
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
         mClickHandler=clickHandler;
+        mTm=new TimeMeasure("start ListTabAdapter");
 
     }
     @Override
@@ -90,8 +95,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
         if(pharmacy.isOptionsRow()) {
             holder.viewOptionsRow.setVisibility(View.VISIBLE);
+            mTm.log("viewVisible");
         } else {
             holder.viewOptionsRow.setVisibility(View.GONE);
+            mTm.log("viewInvisible");
         }
         if(pharmacy.isArrow_down()) {
             setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_down, Color.BLACK);
@@ -227,7 +234,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         TextView tvOpen;
 
         @BindView(R.id.optionsRow)
-        View viewOptionsRow;
+        LinearLayout viewOptionsRow;
 
         @BindView(R.id.ivArrow)
         ImageView ivArrow;
@@ -248,6 +255,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
         public ViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
+
 
         }
 

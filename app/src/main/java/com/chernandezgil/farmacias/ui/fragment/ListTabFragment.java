@@ -117,6 +117,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
         }
         mPresenter.onStartLoader();
+        //in both fragment, since map fragment could be the currentItem in TabLayout
+        setUserVisibleHint(true);
         return view;
     }
 

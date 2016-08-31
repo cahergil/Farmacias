@@ -86,6 +86,7 @@ public class MainActivity extends AllowMeActivity implements
     private Handler mHandler;
     private TabLayoutFragment mtabFragment;
     private static boolean mRotation;
+    private static boolean mFromSettings;
     //  private static  boolean mActivityRestarted;
 
     private static int GPS_FATEST_INTERVAL = 10 * 60 * 1000;
@@ -228,6 +229,7 @@ public class MainActivity extends AllowMeActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            mFromSettings=true;
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
@@ -358,17 +360,19 @@ public class MainActivity extends AllowMeActivity implements
         List<Fragment> list = getSupportFragmentManager().getFragments();
 
         if (list != null && list.size() > 0) {
-            Fragment tabs = list.get(0);
-            if (tabs instanceof TabLayoutFragment) {
-                //  if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
-                SparseArray<Fragment> registeredFragments = ((TabLayoutFragment) tabs).getFragments();
-                MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
-                return mapTabFragment;
-                //  }
+            for(int i = 0;i<list.size();i++) {
+                Fragment tabs = list.get(i);
+                if (tabs instanceof TabLayoutFragment) {
+                    //  if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
+                    SparseArray<Fragment> registeredFragments = ((TabLayoutFragment) tabs).getFragments();
+                    MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
+                    return mapTabFragment;
+                    //  }
 //                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
 //                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
 //                    return mapTabFragment;
 //                }
+                }
             }
 
         }
@@ -468,7 +472,10 @@ public class MainActivity extends AllowMeActivity implements
             if(firsRun) {
                 mHandler.sendEmptyMessage(0);
                 firsRun=false;
-            } else if(mElapsedTime > 420) {
+            } else if (mFromSettings) {
+                mHandler.sendEmptyMessage(0);
+                mFromSettings=false;
+            }else if(mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
                 mHandler.sendEmptyMessage(0);
                 startCounter();
             }
