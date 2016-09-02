@@ -12,12 +12,12 @@ android {
             storePassword 'naci1978'
         }
     }
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "24.0.0"
     defaultConfig {
         applicationId "com.chernandezgil.farmacias"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0.0"
         vectorDrawables.useSupportLibrary = true
@@ -30,7 +30,8 @@ android {
         }
     }
     dexOptions {
-        incremental true
+        //By default incremental is turned on Java compilation in 2.1.0-rc1 (2016/4/22) or later. So its redundant to declare it in build.gradle file.
+        //incremental true
         javaMaxHeapSize "3048M"
     }
     //for use of retrolambda

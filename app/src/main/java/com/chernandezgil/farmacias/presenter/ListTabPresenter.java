@@ -6,6 +6,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 
 import android.support.v4.content.Loader;
@@ -37,8 +39,9 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     private LoaderProvider mLoaderProvider;
     private Geocoder mGeocoder;
     private Location mLocation;
-
+    private List<Pharmacy> mFarmaciasList;
     private int FARMACIAS_LOADER=1;
+    Handler mainHandler;
 
     private PreferencesManager preferencesManager;
     private int mRadio;
@@ -51,6 +54,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
         mGeocoder=geocoder;
         this.preferencesManager=preferencesManager;
         mRadio=this.preferencesManager.retrieveRadioBusquedaFromSp()*1000;
+        mainHandler = new Handler(Looper.getMainLooper());
 
 
     }
@@ -107,7 +111,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     private void bindView(Cursor data) {
-        List<Pharmacy> farmaciasList = new ArrayList<>();
+        mFarmaciasList=new ArrayList<>();
 
         if (data.isClosed()) return;
         if (data.moveToFirst()) {
@@ -148,17 +152,25 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                 }
 
                 farmacia.setFavorite(favorite);
-                farmaciasList.add(farmacia);
+                mFarmaciasList.add(farmacia);
 
             } while (data.moveToNext());
         }
-        farmaciasList = toFilteredSortedOrderedList(farmaciasList);
-        mView.hideLoading();
-        if(farmaciasList.size()>0) {
-            mView.showResults(farmaciasList);
-        } else {
-            mView.showNoResults();
-        }
+        mFarmaciasList = toFilteredSortedOrderedList(mFarmaciasList);
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mView.hideLoading();
+                if(mFarmaciasList !=null && mFarmaciasList.size()>0) {
+                    mView.showResults(mFarmaciasList);
+                } else {
+                    mView.showNoResults();
+                }
+            } // This is your code
+        });
+
+
 
 
 
@@ -204,7 +216,13 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (loader.getId() == FARMACIAS_LOADER) {
-            bindView(data);
+            new Thread() {
+                @Override
+                public void run() {
+                    bindView(data);
+
+                }
+            }.start();
         }
     }
 

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="cargando lista..."
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        tools:visibility="visible"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/pharmaciesRecyclerView"

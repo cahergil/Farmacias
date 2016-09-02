@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,7 +47,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     private TimeMeasure mTm;
     private SparseBooleanArray expandState = new SparseBooleanArray();
-
+    //to handle Loader loading again
+    private SparseBooleanArray oldexpandState;
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
         mClickHandler=clickHandler;
@@ -56,8 +58,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
-
         ViewHolder viewHolder=new ViewHolder(view);
+
         viewHolder.ivArrow.setOnClickListener(this);
         viewHolder.tvOpen.setOnClickListener(this);
         viewHolder.ivPhone.setOnClickListener(this);
@@ -140,11 +142,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
          //   holder.viewOptionsRow.setVisibility(View.GONE);
          //   mTm.log("viewInvisible");
         }
-        if(pharmacy.isArrow_down()) {
-            setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_down, Color.BLACK);
-        } else {
-            setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_up,Color.BLACK);
-        }
+//        if(pharmacy.isArrow_down()) {
+//            setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_down, Color.BLACK);
+//        } else {
+//            setBitmapFromVectorDrawable(holder.ivArrow,R.drawable.arrow_up,Color.BLACK);
+//        }
       //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
       //  holder.ivArrow.setImageDrawable(drawableCompat);
 
@@ -184,10 +186,18 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     public void swapData(List<Pharmacy> pharmacyList) {
         mPharmacyList=pharmacyList;
-        for (int i = 0; i < mPharmacyList.size(); i++) {
-            expandState.append(i, false);
+        if(oldexpandState==null) {
+            for (int i = 0; i < mPharmacyList.size(); i++) {
+                expandState.append(i, false);
 
+            }
+            oldexpandState=new SparseBooleanArray();
+            oldexpandState = expandState;
+        } else {
+          expandState = oldexpandState;
         }
+
+
         notifyDataSetChanged();
 
     }
@@ -196,6 +206,9 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     }
     @Override
     public void onClick(View view) {
+
+
+
         int position;
         ViewHolder vh;
         int id= view.getId();
@@ -204,43 +217,30 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
             case R.id.ivArrow:
                 vh= (ViewHolder) view.getTag();
                 position=vh.getAdapterPosition();
-                for(int i = 0;i<mPharmacyList.size();i++) {
-                    if(i==position) {
-                        Pharmacy pharmacy=mPharmacyList.get(position);
-                        mPharmacyList.get(position).setOptionsRow(!pharmacy.isOptionsRow());
-                        mPharmacyList.get(position).setArrow_down(!pharmacy.isArrow_down());
-                        continue;
-                    }
-                    mPharmacyList.get(i).setOptionsRow(false);
-                    mPharmacyList.get(i).setArrow_down(true);
-                }
+                Pharmacy pharma=mPharmacyList.get(position);
+                mPharmacyList.get(position).setArrow_down(!pharma.isArrow_down());
+            //    mPharmacyList.get(position).setOptionsRow(!pharma.isOptionsRow());
+              //  mPharmacyList.get(position).setArrow_down(!pharma.isArrow_down());
+//                for(int i = 0;i<mPharmacyList.size();i++) {
+//                    if(i==position) {
+//                        Pharmacy pharmacy=mPharmacyList.get(position);
+//                        mPharmacyList.get(position).setOptionsRow(!pharmacy.isOptionsRow());
+//                        mPharmacyList.get(position).setArrow_down(!pharmacy.isArrow_down());
+//                        continue;
+//                    }
+//                    mPharmacyList.get(i).setOptionsRow(false);
+//                    mPharmacyList.get(i).setArrow_down(true);
+//                }
 
                   //  Animation animation= AnimationUtils.loadAnimation(mContext,R.anim.rotate_animation);
-                    RotateAnimation rotate = new RotateAnimation(0, 180,
+                    RotateAnimation rotate = new RotateAnimation(0,vh.ivArrow.getRotation()+180,
                             Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
                             0.5f);
 
                     rotate.setDuration(200);
-
-                    rotate.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                            Util.LOGD(LOG_TAG,"onAnimationStart");
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Util.LOGD(LOG_TAG,"onAnimationEnd");
-                            notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-                            Util.LOGD(LOG_TAG,"onAnimationRepeat");
-                        }
-                    });
                     vh.ivArrow.startAnimation(rotate);
                     vh.viewOptionsRow.toggle();
+
 
                     break;
             case R.id.ivPhoneb:

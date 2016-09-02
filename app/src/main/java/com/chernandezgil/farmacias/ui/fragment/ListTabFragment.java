@@ -7,6 +7,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -221,7 +223,13 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
                 DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
                 null);
         if (rowsUpdated == 1) {
-            Snackbar.make(mRootView, snackMessage, Snackbar.LENGTH_SHORT).show();
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Snackbar.make(mRootView, snackMessage, Snackbar.LENGTH_SHORT).show();
+                }
+            },30);
+
         }
         Util.LOGD(LOG_TAG, "rows updates: " + rowsUpdated);
 //        for(int i =0; i<)

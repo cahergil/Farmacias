@@ -51,6 +51,7 @@ import com.google.android.gms.location.LocationServices;
 
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -89,12 +90,11 @@ public class MainActivity extends AllowMeActivity implements
     private static boolean mFromSettings;
     //  private static  boolean mActivityRestarted;
 
-    private static int GPS_FATEST_INTERVAL = 10 * 60 * 1000;
-    private static int GPS_INTERVAL = GPS_FATEST_INTERVAL;
-    //60 sec * 7 minutes
-    private static int FRAG_MAP_REFRESH_INTERVAL=60*7;
+    private static long GPS_FATEST_INTERVAL = TimeUnit.MINUTES.toMillis(10);
+    private static long GPS_INTERVAL = GPS_FATEST_INTERVAL;
+    private static long FRAG_MAP_REFRESH_INTERVAL=TimeUnit.MINUTES.toSeconds(7);
     private int option = 0;
-    int mElapsedTime;
+    long mElapsedTime;
     long mStartTime;
 
     static {
@@ -110,6 +110,7 @@ public class MainActivity extends AllowMeActivity implements
         Util.LOGD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ButterKnife.bind(this);
         mPreferencesManager = new AndroidPrefsManager(this);
         mMainActivityPresenter = new MainActivityPresenter(mPreferencesManager);
@@ -325,20 +326,6 @@ public class MainActivity extends AllowMeActivity implements
     }
 
 
-//    I've implemente ontouch event in map, there is no need for this now
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        Util.LOGD(LOG_TAG,"ondispatchTouchEvent");
-//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-//           MapTabFragment mapTabFragment =getMapTabFragment();
-//           if(mapTabFragment !=null) {
-//               mapTabFragment.handleDispatchTouchEvent(ev);
-//           }
-//        }
-//        return super.dispatchTouchEvent(ev);
-//    }
-
-
     @Override
     public void onBackPressed() {
 
@@ -363,11 +350,11 @@ public class MainActivity extends AllowMeActivity implements
             for(int i = 0;i<list.size();i++) {
                 Fragment tabs = list.get(i);
                 if (tabs instanceof TabLayoutFragment) {
-                    //  if(((TabLayoutFragment) tabs).getCurrentItem()==1) {
+
                     SparseArray<Fragment> registeredFragments = ((TabLayoutFragment) tabs).getFragments();
                     MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
                     return mapTabFragment;
-                    //  }
+
 //                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
 //                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
 //                    return mapTabFragment;
@@ -437,22 +424,7 @@ public class MainActivity extends AllowMeActivity implements
         } else {
             startLocationUpdates();
         }
-        //once gotten the trace can remove this
-        if (!AllowMe.isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            new AllowMe.Builder()
-                    .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    .setRationale("Esta app necesita este permision para funcionar")
-                    .setCallback(new AllowMeCallback() {
-                        @Override
-                        public void onPermissionResult(int requestCode, PermissionResultSet result) {
-                            if (result.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                                //... permission is granted, handle here
-                            }
-                        }
-                    }).request(2);
-        } else {
-            //... handle permission already granted
-        }
+
 
 
     }

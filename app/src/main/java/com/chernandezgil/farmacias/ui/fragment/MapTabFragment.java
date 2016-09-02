@@ -333,6 +333,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
     public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap,boolean flagFavorite) {
+        //me da un npe porque el pharmacyObjetMap es nulo: a ver si con esta linea se arregla
+        if(pharmacyObjectMap==null) {
+            return;
+        }
         MarkerOptions markerOption = new MarkerOptions().position(
                 new LatLng(pharmacyObjectMap.getLat(), pharmacyObjectMap.getLon())
         );

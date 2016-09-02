@@ -109,7 +109,8 @@
                 android:layout_weight="0.1"
                 android:alpha="0.38"
                 android:scaleType="fitStart"
-                app:srcCompat="@drawable/arrow_down" />
+                app:srcCompat="@drawable/arrow_down"
+                />
 
 
         </LinearLayout>
