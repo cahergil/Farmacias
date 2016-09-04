@@ -46,6 +46,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 
 
 import java.util.List;
@@ -130,7 +131,12 @@ public class MainActivity extends AllowMeActivity implements
             mCurrentFragment = savedInstanceState.getInt("current_fragment_key");
 
         }
-        ((MyApplication) getApplication()).getComponent().inject(this);
+       // ((MyApplication) getApplication()).getComponent().inject(this);
+        mGoogleApiClient=new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .build();
         mGoogleApiClient.registerConnectionCallbacks(this);
         mGoogleApiClient.registerConnectionFailedListener(this);
 
@@ -144,10 +150,7 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
-    private void setUpFlags(){
 
-
-    }
     private Handler createHandler() {
         return new Handler() {
             @Override
@@ -496,6 +499,7 @@ public class MainActivity extends AllowMeActivity implements
     protected void onDestroy() {
         Util.logD(LOG_TAG, "onDestroy");
         //   drawerLayout.removeDrawerListener(mDrawerListener);
+        mGoogleApiClient=null;
         mMainActivityPresenter.detachView();
         super.onDestroy();
     }
