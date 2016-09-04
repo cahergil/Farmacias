@@ -1,6 +1,5 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.location.Geocoder;
@@ -15,8 +14,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +59,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     private ListTabPresenter mPresenter;
     private ListTabAdapter mAdapter;
     private String mAddress;
-    private ArrayList<Pharmacy> mPharmacyList;
+    private List<Pharmacy> mPharmacyList;
     private Unbinder unbinder;
     private static final String LOG_TAG = ListTabFragment.class.getSimpleName();
     private static final String RECYCLER_STATE_KEY = "recycler_key";
@@ -141,9 +138,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             outState.putString("address_key", mAddress);
         }
         outState.putParcelable(RECYCLER_STATE_KEY, mRecyclerView.getLayoutManager().onSaveInstanceState());
-        if (mPharmacyList != null) {
-            outState.putParcelableArrayList(LIST_PHARMACY_KEY, mPharmacyList);
-        }
+//        if (mPharmacyList != null) {
+//            outState.putParcelableArrayList(LIST_PHARMACY_KEY, mPharmacyList);
+//        }
         if(mAdapter != null) {
 
             outState.putBooleanArray("state_key",mAdapter.getExpandStateArray());
@@ -164,6 +161,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
+        Util.logD(LOG_TAG,"showResults");
         mAdapter.setExpandStateArray(mSpandState,mRotation);
         if(mRotation){
             mRotation=false;
@@ -172,6 +170,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
         if (mLayoutManagerState != null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
         }
+        mPharmacyList=pharmacyList;
 
     }
 
@@ -199,7 +198,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
     @Override
     public void onClickGo(int position) {
-        Util.LOGD(LOG_TAG, "onClickGo");
+        Util.logD(LOG_TAG, "onClickGo");
         Pharmacy pharmacy = mPharmacyList.get(position);
         Util.startGoogleDirections(getActivity(),
                 new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
@@ -240,7 +239,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             },30);
 
         }
-        Util.LOGD(LOG_TAG, "rows updates: " + rowsUpdated);
+        Util.logD(LOG_TAG, "rows updates: " + rowsUpdated);
 //        for(int i =0; i<)
 //        ListTabAdapter.ViewHolder holder=mRecyclerView.findViewHolderForAdapterPosition(position);
 //        vh.isRecyclable()

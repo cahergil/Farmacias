@@ -123,9 +123,16 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onStartLoader() {
-        Util.LOGD(LOG_TAG,"onStartLoader");
+        Util.logD(LOG_TAG,"onStartLoader");
         mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
-        mLoaderManager.getLoader(FARMACIAS_LOADER).forceLoad();
+//        mLoaderManager.getLoader(FARMACIAS_LOADER).forceLoad();
+//        Loader<Cursor> loader= mLoaderManager.getLoader(FARMACIAS_LOADER);
+//
+//        if(loader!=null) {
+//            if(loader.isStarted()) loader.forceLoad();
+//        } else {
+//            mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
+//        }
     }
 
     @Override
@@ -170,11 +177,11 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
 
             if(c.equals(pharmacy)) {
-                Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+                Util.logD(LOG_TAG,"key:"+key+",object:"+c.toString());
                 return key;
             }
         }
-        Util.LOGD(LOG_TAG,"count"+count);
+        Util.logD(LOG_TAG,"count"+count);
         return null;
     }
     @Override
@@ -223,7 +230,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         }
 
         if (addresses == null || addresses.size() == 0) {
-            Util.LOGD(LOG_TAG, "no address found");
+            Util.logD(LOG_TAG, "no address found");
             return null;
         } else {
             Address address = addresses.get(0);
@@ -237,7 +244,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                     stringBuilder.append(Constants.COMMA);
                 }
             }
-            Util.LOGD(LOG_TAG, "address found");
+            Util.logD(LOG_TAG, "address found");
             return stringBuilder.toString();
         }
 
@@ -298,7 +305,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     private void bindView(Cursor data) {
 
-        Util.LOGD(LOG_TAG,"onBindView");
+        Util.logD(LOG_TAG,"onBindView");
         mFarmaciasList = new ArrayList<>();
         mFirstSortedPharmacy = null;
         if (data.isClosed()) return;
@@ -419,12 +426,12 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             Map.Entry mEntry = (Map.Entry) iter.next();
             Marker key = (Marker) mEntry.getKey();
             PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
-            Util.LOGD(LOG_TAG,"key:"+key+",object:"+c.toString());
+            Util.logD(LOG_TAG,"key:"+key+",object:"+c.toString());
 //            if(c.equals(pharmacy)) {
 //                return key;
 //            }
         }
-        Util.LOGD(LOG_TAG,"count"+count);
+        Util.logD(LOG_TAG,"count"+count);
     }
     private PharmacyObjectMap getUserLocationMarker() {
         PharmacyObjectMap userLocation = new PharmacyObjectMap();
@@ -521,15 +528,21 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Util.LOGD(LOG_TAG,"onLoadFinished");
+        Util.logD(LOG_TAG,"onLoadFinished");
         if (loader.getId() == FARMACIAS_LOADER) {
             //delay of 50 milliseconds, waiting to mapready <-not sure if this still apply
-           new Thread() {
-                @Override
-                public void run() {
-                    bindView(data);
-                }
-            }.start();
+           new Handler().postDelayed(new Runnable() {
+               @Override
+               public void run() {
+                   new Thread() {
+                       @Override
+                       public void run() {
+                           bindView(data);
+                       }
+                   }.start();
+
+               }
+           },150);
 
 
         }

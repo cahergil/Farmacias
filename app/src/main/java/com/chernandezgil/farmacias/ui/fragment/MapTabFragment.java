@@ -55,9 +55,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -152,7 +150,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTm= new TimeMeasure(LOG_TAG);
-        Util.LOGD(LOG_TAG, "onCreate:"+this.toString());
+        Util.logD(LOG_TAG, "onCreate:"+this.toString());
       //  mTm.log("onCreate:"+this.toString());
         Bundle bundle=getArguments();
         if(bundle!=null) {
@@ -176,7 +174,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.LOGD(LOG_TAG, "onCreateView:"+this.toString());
+        Util.logD(LOG_TAG, "onCreateView:"+this.toString());
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
         unbinder=ButterKnife.bind(this,view);
         setUpBotomSheet();
@@ -252,27 +250,27 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public void onStart() {
-        Util.LOGD(LOG_TAG, "onStart:"+this.toString());
+        Util.logD(LOG_TAG, "onStart:"+this.toString());
         super.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Util.LOGD(LOG_TAG, "onResume:"+this.toString());
+        Util.logD(LOG_TAG, "onResume:"+this.toString());
 
     }
 
     @Override
     public void onStop() {
-        Util.LOGD(LOG_TAG, "onStop");
+        Util.logD(LOG_TAG, "onStop");
         super.onStop();
     }
     //this callback executes after onstart
     @SuppressWarnings("ResourceType")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Util.LOGD(LOG_TAG, "onMapsReady");
+        Util.logD(LOG_TAG, "onMapsReady");
         //mTm.log("onMapsReady:"+this.toString());
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -309,7 +307,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                         while(cu==null) {
                             count++;
                             cu= mMapTabPresenter.getCameraUpdate();
-                            Util.LOGD(LOG_TAG,"count"+count);
+                            Util.logD(LOG_TAG,"count"+count);
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
@@ -333,6 +331,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
     public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap,boolean flagFavorite) {
+        //if(!isAdded()) return;
         //me da un npe porque el pharmacyObjetMap es nulo: a ver si con esta linea se arregla
         if(pharmacyObjectMap==null) {
             return;
@@ -420,10 +419,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
-        Util.LOGD(LOG_TAG,"preshowPharmacy");
+        Util.logD(LOG_TAG,"preshowPharmacy");
         if(mRotation) {
             if(lastClicked!=null) {
-                Util.LOGD(LOG_TAG,"firstsor");
+                Util.logD(LOG_TAG,"firstsor");
                 //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
                 addMarkerToMap(lastClicked,false);
                 firstSortedPharmacy=mLastMarkerClicked;
@@ -532,7 +531,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-              //  Util.LOGD(LOG_TAG,""+slideOffset);
+              //  Util.logD(LOG_TAG,""+slideOffset);
               //  fab.setAlpha(slideOffset);
 
             }
@@ -577,7 +576,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     Snackbar.make(mRootView,snackMessage,Snackbar.LENGTH_SHORT).show();
 
                 }
-                Util.LOGD(LOG_TAG,"rows updates: " + rowsUpdated);
+                Util.logD(LOG_TAG,"rows updates: " + rowsUpdated);
             }
 
 
@@ -667,7 +666,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onDestroy() {
-        Util.LOGD(LOG_TAG, "onDestroy");
+        Util.logD(LOG_TAG, "onDestroy");
         unbinder.unbind();
         super.onDestroy();
     }

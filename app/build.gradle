@@ -47,7 +47,7 @@ repositories {
 
 }
 dependencies {
-    def SUPPORT = "24.0.0"
+    def SUPPORT = "24.2.0"
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:$SUPPORT"
@@ -92,5 +92,5 @@ dependencies {
     //expandable linerlayout
  //   compile 'com.github.aakira:expandable-layout:1.5.1@aar'
 
-
+    compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
 }

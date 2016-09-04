@@ -33,7 +33,7 @@ import java.util.Locale;
  */
 public class Util {
 
-    public static void LOGD(final String tag, String message) {
+    public static void logD(final String tag, String message) {
         if (BuildConfig.DEBUG) {
             Log.d(tag, message);
         }

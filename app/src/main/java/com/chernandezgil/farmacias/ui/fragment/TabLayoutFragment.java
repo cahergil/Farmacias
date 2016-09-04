@@ -1,13 +1,9 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -20,26 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.aitorvs.android.allowme.AllowMe;
-import com.aitorvs.android.allowme.AllowMeCallback;
-import com.aitorvs.android.allowme.PermissionResultSet;
-import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
-import com.chernandezgil.farmacias.ui.adapter.ViewPagerAdapter;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.internal.Utils;
 
 /**
  * Created by Carlos on 06/08/2016.
@@ -56,12 +39,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
 
     private  Location mLocation;
-    private PagerAdapter pagerAdapter=null;
+    private Adapter pagerAdapter=null;
     private PreferencesManager mSharedPreferences;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Util.LOGD(LOG_TAG, "onCreate");
+        Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         mSharedPreferences=new AndroidPrefsManager(getContext());
         if(savedInstanceState==null) {
@@ -73,12 +56,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
            mLocation=savedInstanceState.getParcelable("location_key");
            mSharedPreferences.setCurrentItemTabLayout(savedInstanceState.getInt("current_item_key"));
         }
-        Util.LOGD(LOG_TAG,"****main thread?:"+(Looper.myLooper() == Looper.getMainLooper()));
+        Util.logD(LOG_TAG,"****main thread?:"+(Looper.myLooper() == Looper.getMainLooper()));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Util.LOGD(LOG_TAG, "onSaveInstanceState");
+        Util.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key",mLocation);
         outState.putInt("current_item_key",mViewPager.getCurrentItem());
@@ -89,7 +72,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.LOGD(LOG_TAG, "onCreateView");
+        Util.logD(LOG_TAG, "onCreateView");
         View view=inflater.inflate(R.layout.fragment_tablayout,container,false);
         ButterKnife.bind(this,view);
 
@@ -99,7 +82,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Util.LOGD(LOG_TAG, "onActivityCreated");
+        Util.logD(LOG_TAG, "onActivityCreated");
         setUpViewPager();
         setUpTabLayout();
         mViewPager.setCurrentItem(mSharedPreferences.getCurrentItemTabLayout());
@@ -114,24 +97,25 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onStart() {
         super.onStart();
-        Util.LOGD(LOG_TAG, "onStart");
+        Util.logD(LOG_TAG, "onStart");
     }
 
     @Override
     public void onPause() {
-        Util.LOGD(LOG_TAG, "onPause");
+        Util.logD(LOG_TAG, "onPause");
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Util.LOGD(LOG_TAG, "onStop");
+        Util.logD(LOG_TAG, "onStop");
 
         super.onStop();
     }
 
     private void setUpViewPager(){
-        pagerAdapter=new Adapter(getActivity(),mLocation,getChildFragmentManager());
+        pagerAdapter=new Adapter(mLocation,getChildFragmentManager());
+
         mViewPager.setAdapter(pagerAdapter);
 
 
@@ -160,25 +144,32 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
 
-
     public SparseArray<Fragment> getFragments(){
-        return Adapter.registeredFragments;
+        return pagerAdapter.getRegisteredFragment();
     }
     //to remember: https://code.google.com/p/android/issues/detail?id=69586
     public static class Adapter extends FragmentPagerAdapter {
-        public static SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+        public SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
         Location location;
 
 
         private Context context;
-        public Adapter(Context context,Location location,FragmentManager fm) {
+        public Adapter(Location location,FragmentManager fm) {
 
             super(fm);
-            this.context=context;
+
             this.location=location;
 
         }
 
+        public SparseArray<Fragment> getRegisteredFragment() {
+            SparseArray<Fragment> copy =new SparseArray<>();
+            for(int i =0;i<registeredFragments.size();i++) {
+                copy.put(0,registeredFragments.get(i));
+            }
+            return copy;
+
+        }
 
 
         @Override
@@ -224,21 +215,22 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return context.getString(R.string.tlf_tab_list_string);
+                    //context.getString(R.string.tlf_tab_list_string)
+                    return "Lista";
                 case 1:
-                    return context.getString(R.string.tlf_tab_map_string);
+                    //context.getString(R.string.tlf_tab_map_string)
+                    return "Mapa";
                 default: return null;
 
             }
         }
-        public Fragment getRegisteredFragment(int position) {
-            return registeredFragments.get(position);
-        }
+
+
     }
 
     @Override
     public void onDestroy() {
-        Util.LOGD(LOG_TAG, "onDestroy");
+        Util.logD(LOG_TAG, "onDestroy");
         super.onDestroy();
     }
 }

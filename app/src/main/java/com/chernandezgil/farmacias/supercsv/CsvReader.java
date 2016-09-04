@@ -68,7 +68,7 @@ public class CsvReader {
             }
             return listaFarmacias;
         } catch (Exception e) {
-            Util.LOGD(LOG_TAG,"error:" + e.getMessage());
+            Util.logD(LOG_TAG,"error:" + e.getMessage());
             return null;
         } finally {
             if (beanReader != null) {

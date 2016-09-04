@@ -72,7 +72,12 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     @Override
     public void onStartLoader() {
         mView.showLoading();
-        mLoaderManager.restartLoader(FARMACIAS_LOADER,null,this);
+//        Loader<Cursor> loader= mLoaderManager.getLoader(FARMACIAS_LOADER);
+//        if(loader!=null) {
+//            if(loader.isStarted()) loader.forceLoad();
+//        } else {
+            mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
+    //    }
 
     }
 
@@ -89,7 +94,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
         }
 
         if (addresses == null || addresses.size() == 0) {
-            Util.LOGD(LOG_TAG, "no address found");
+            Util.logD(LOG_TAG, "no address found");
             mView.setAddress(null);
         } else {
             Address address = addresses.get(0);
@@ -103,7 +108,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                     stringBuilder.append(Constants.COMMA);
                 }
             }
-            Util.LOGD(LOG_TAG, "address found");
+            Util.logD(LOG_TAG, "address found");
 
             mView.setAddress(stringBuilder.toString());
         }
@@ -111,9 +116,11 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     private void bindView(Cursor data) {
+        Util.logD(LOG_TAG,"bindView");
         mFarmaciasList=new ArrayList<>();
 
         if (data.isClosed()) return;
+
         if (data.moveToFirst()) {
             do {
 
@@ -215,6 +222,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Util.logD(LOG_TAG,"onLoadFinished List");
         if (loader.getId() == FARMACIAS_LOADER) {
             new Thread() {
                 @Override

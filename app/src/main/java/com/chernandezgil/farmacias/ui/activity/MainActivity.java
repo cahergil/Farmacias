@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -23,7 +22,6 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 
 import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
@@ -88,6 +86,7 @@ public class MainActivity extends AllowMeActivity implements
     private TabLayoutFragment mtabFragment;
     private static boolean mRotation;
     private static boolean mFromSettings;
+    private static boolean mFlag;
     //  private static  boolean mActivityRestarted;
 
     private static long GPS_FATEST_INTERVAL = TimeUnit.MINUTES.toMillis(10);
@@ -101,13 +100,13 @@ public class MainActivity extends AllowMeActivity implements
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private static boolean firsRun=true;
+    private static boolean firsRun;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.LOGD(LOG_TAG, "onCreate");
+        Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -122,7 +121,7 @@ public class MainActivity extends AllowMeActivity implements
         if (savedInstanceState == null) {
 
             checkGooglePlayServicesAvailability();
-            Stetho.initializeWithDefaults(this);
+   //         Stetho.initializeWithDefaults(this);
 
 
         } else {
@@ -139,12 +138,16 @@ public class MainActivity extends AllowMeActivity implements
         setupNavigationDrawerContent(navigationView);
 
         startCounter();
+        firsRun=true;
 
 
 
     }
 
+    private void setUpFlags(){
 
+
+    }
     private Handler createHandler() {
         return new Handler() {
             @Override
@@ -158,7 +161,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Util.LOGD(LOG_TAG, "onSaveInstanceState");
+        Util.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("location_key", mLocation);
         outState.putInt("current_fragment_key", mCurrentFragment);
@@ -168,15 +171,16 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onRestart() {
         super.onRestart();
-        Util.LOGD(LOG_TAG, "onStart");
+        Util.logD(LOG_TAG, "onStart");
     }
 
     @Override
     protected void onStart() {
-        Util.LOGD(LOG_TAG, "onStart");
+        Util.logD(LOG_TAG, "onStart");
         super.onStart();
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
+            mFlag = true;
         }
 
 
@@ -185,13 +189,13 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Util.LOGD(LOG_TAG, "onResume");
+        Util.logD(LOG_TAG, "onResume");
 
     }
 
     @Override
     protected void onPause() {
-        Util.LOGD(LOG_TAG, "onPause");
+        Util.logD(LOG_TAG, "onPause");
         super.onPause();
 
         if(mGoogleApiClient.isConnected()) {
@@ -204,7 +208,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onStop() {
-        Util.LOGD(LOG_TAG, "onStop");
+        Util.logD(LOG_TAG, "onStop");
 //        don't know why but disconnecting causes onConnected be called twice
 //        if(mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.disconnect();
@@ -215,7 +219,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Util.LOGD(LOG_TAG, "onCreateOptionsMeu");
+        Util.logD(LOG_TAG, "onCreateOptionsMeu");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -293,7 +297,7 @@ public class MainActivity extends AllowMeActivity implements
 
 
     private void setFragment(int position) {
-        Util.LOGD(LOG_TAG, "setFragment");
+        Util.logD(LOG_TAG, "setFragment");
         FragmentManager fragmentManager;
 
         switch (position) {
@@ -309,7 +313,7 @@ public class MainActivity extends AllowMeActivity implements
                             .commit();
 
                 } catch (IllegalStateException ignored) {
-
+                    Util.logD(LOG_TAG,"IllegalStateException:"+ignored.getMessage());
                 }
 
                 break;
@@ -329,14 +333,18 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     public void onBackPressed() {
 
-        Util.LOGD(LOG_TAG, "onBackPressed");
-        MapTabFragment mapTabFragment = getMapTabFragment();
+        Util.logD(LOG_TAG, "onBackPressed");
+        int currentItem = getCurrentFragmentInTab();
+        if(currentItem != 1) super.onBackPressed();
+        MapTabFragment mapTabFragment=getMapTabFragment();
         if (mapTabFragment != null) {
+
             if (!mapTabFragment.collapseBottomSheet()) {
                 super.onBackPressed();
             } else {
                 return;
             }
+
         }
 
         super.onBackPressed();
@@ -355,6 +363,22 @@ public class MainActivity extends AllowMeActivity implements
                     MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
                     return mapTabFragment;
 
+                }
+            }
+
+        }
+        return null;
+    }
+
+    private int getCurrentFragmentInTab(){
+        List<Fragment> list = getSupportFragmentManager().getFragments();
+        if (list != null && list.size() > 0) {
+            for(int i = 0;i<list.size();i++) {
+                Fragment tabs = list.get(i);
+                if (tabs instanceof TabLayoutFragment) {
+
+                   return ((TabLayoutFragment) tabs).getCurrentItem();
+
 //                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
 //                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
 //                    return mapTabFragment;
@@ -363,7 +387,7 @@ public class MainActivity extends AllowMeActivity implements
             }
 
         }
-        return null;
+        return 0;
     }
 
     private void checkGooglePlayServicesAvailability() {
@@ -404,7 +428,7 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        Util.LOGD(LOG_TAG, "onConnected");
+        Util.logD(LOG_TAG, "onConnected");
         createLocationRequest();
 
         if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -436,25 +460,27 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Util.LOGD(LOG_TAG, "onLocationChanged");
+        Util.logD(LOG_TAG, "onLocationChanged");
         mLocation = location;
         //prevent loading content. Only when fresh start or when location updates
         mElapsedTime = (int) (System.currentTimeMillis() - mStartTime) / 1000;
-        if (!mRotation ) {
-            if(firsRun) {
-                mHandler.sendEmptyMessage(0);
-                firsRun=false;
-            } else if (mFromSettings) {
-                mHandler.sendEmptyMessage(0);
-                mFromSettings=false;
-            }else if(mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
-                mHandler.sendEmptyMessage(0);
-                startCounter();
+        if(mFlag) {
+            mFlag = false;
+            if (!mRotation) {
+                if (firsRun) {
+                    mHandler.sendEmptyMessage(0);
+                    firsRun = false;
+                } else if (mFromSettings) {
+                    mHandler.sendEmptyMessage(0);
+                    mFromSettings = false;
+                } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
+                    mHandler.sendEmptyMessage(0);
+                    startCounter();
+                }
+            } else {
+                mRotation = false;
             }
-        } else {
-            mRotation = false;
         }
-
 
     }
 
@@ -468,7 +494,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onDestroy() {
-        Util.LOGD(LOG_TAG, "onDestroy");
+        Util.logD(LOG_TAG, "onDestroy");
         //   drawerLayout.removeDrawerListener(mDrawerListener);
         mMainActivityPresenter.detachView();
         super.onDestroy();
@@ -476,7 +502,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     public void onClickMap(MotionEvent event) {
-        Util.LOGD(LOG_TAG, "onClickMap");
+        Util.logD(LOG_TAG, "onClickMap");
         MapTabFragment mapTabFragment = getMapTabFragment();
         if (mapTabFragment != null) {
             mapTabFragment.handleDispatchTouchEvent(event);

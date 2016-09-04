@@ -1,11 +1,7 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
-import android.animation.LayoutTransition;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
@@ -13,16 +9,10 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
@@ -31,10 +21,8 @@ import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.expandable.ExpandableLayoutListener;
 import com.chernandezgil.farmacias.expandable.ExpandableLinearLayout;
 import com.chernandezgil.farmacias.model.Pharmacy;
-import com.google.common.collect.ObjectArrays;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,7 +51,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Util.LOGD(LOG_TAG,"onCreateViewHolder");
+        Util.logD(LOG_TAG,"onCreateViewHolder");
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
         ViewHolder viewHolder=new ViewHolder(view);
 
@@ -79,7 +67,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Util.LOGD(LOG_TAG,"onBindViewHolder, position"+position);
+        Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
         Pharmacy pharmacy=mPharmacyList.get(position);
         if(expandState[position]) {
             if(mRotationArray[position]) {
@@ -103,14 +91,14 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
             @Override
             public void onPreOpen() {
-                Util.LOGD(LOG_TAG,"**********************************on Preopen");
+                Util.logD(LOG_TAG,"**********************************on Preopen");
                 expandState[position]=true;
 
             }
 
             @Override
             public void onPreClose() {
-                Util.LOGD(LOG_TAG,"**********************************on PreClose");
+                Util.logD(LOG_TAG,"**********************************on PreClose");
                 expandState[position]= false;
             }
 

@@ -53,6 +53,6 @@ public class DownloadFarmacias extends IntentService {
         vector.toArray(contentValues);
         Uri uri= DbContract.FarmaciasEntity.CONTENT_URI;
         int inserted=getContentResolver().bulkInsert(uri,contentValues);
-        Util.LOGD(LOG_TAG,String.format("successfully inserted %d registers in farmacias",inserted));
+        Util.logD(LOG_TAG,String.format("successfully inserted %d registers in farmacias",inserted));
     }
 }
