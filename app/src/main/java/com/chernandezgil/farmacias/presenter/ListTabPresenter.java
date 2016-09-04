@@ -141,7 +141,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                         farmacia.getLocality(),
                         farmacia.getProvince());
                 farmacia.setAddressFormatted(addressFormatted);
-                farmacia.setArrow_down(true);
+
 
                 boolean favorite;
                 int j=data.getInt(data.getColumnIndex(DbContract.FarmaciasEntity.FAVORITE));

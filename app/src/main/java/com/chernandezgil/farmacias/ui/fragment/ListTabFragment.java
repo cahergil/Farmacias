@@ -15,6 +15,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +69,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     private static final String LIST_PHARMACY_KEY = "pharmacyList_key";
     private Parcelable mLayoutManagerState;
     private UpdateFavorite mCallback;
+    private boolean[] mSpandState;
+    private boolean mRotation;
 
     @Override
     public void onAttach(Context context) {
@@ -90,6 +94,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
             }
         } else {
+            mRotation=true;
             mLocation = savedInstanceState.getParcelable("location_key");
             mAddress = savedInstanceState.getString("address_key");
         }
@@ -116,6 +121,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             if (savedInstanceState.containsKey(LIST_PHARMACY_KEY)) {
                 mPharmacyList = savedInstanceState.getParcelableArrayList(LIST_PHARMACY_KEY);
             }
+            if(savedInstanceState.containsKey("state_key")) {
+                mSpandState = savedInstanceState.getBooleanArray("state_key");
+            }
 
         }
         mPresenter.onStartLoader();
@@ -136,6 +144,11 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
         if (mPharmacyList != null) {
             outState.putParcelableArrayList(LIST_PHARMACY_KEY, mPharmacyList);
         }
+        if(mAdapter != null) {
+
+            outState.putBooleanArray("state_key",mAdapter.getExpandStateArray());
+
+        }
     }
 
 
@@ -151,19 +164,15 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
-        //    mPharmacyList= (ArrayList<Pharmacy>) mAdapter.getPharmaList();
-        //copy the state of the adapter to the results of Loader
-        if (mPharmacyList != null) {
-            for (int i = 0; i < mPharmacyList.size(); i++) {
-                pharmacyList.get(i).setArrow_down(mPharmacyList.get(i).isArrow_down());
-                pharmacyList.get(i).setOptionsRow(mPharmacyList.get(i).isOptionsRow());
-            }
+        mAdapter.setExpandStateArray(mSpandState,mRotation);
+        if(mRotation){
+            mRotation=false;
         }
         mAdapter.swapData(pharmacyList);
         if (mLayoutManagerState != null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
         }
-        mPharmacyList = (ArrayList<Pharmacy>) pharmacyList;
+
     }
 
     @Override
