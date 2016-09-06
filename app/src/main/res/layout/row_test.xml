@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="350dp"
+    android:layout_margin="10dp"
+    card_view:cardCornerRadius="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/thumbnail_profile"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            tools:src="@android:drawable/sym_def_app_icon" />
+
+        <TextView
+            android:id="@+id/likes_product"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_alignBottom="@id/thumbnail_profile"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            tools:text="123" />
+
+        <ImageView
+            android:id="@+id/likes_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_alignBottom="@id/thumbnail_profile"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/likes_product"
+            android:src="@android:drawable/sym_action_chat" />
+
+        <TextView
+            android:id="@+id/created_by"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_toLeftOf="@id/likes_logo"
+            android:layout_toRightOf="@id/thumbnail_profile"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="Created by Christoph van Ochten" />
+
+        <TextView
+            android:id="@+id/time_ago"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/created_by"
+            android:layout_toLeftOf="@id/likes_logo"
+            android:layout_toRightOf="@id/thumbnail_profile"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:textSize="10sp"
+            tools:text="1 month ago" />
+
+        <TextView
+            android:id="@+id/name_product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textSize="18sp"
+            tools:text="Barcelona Chair" />
+
+        <TextView
+            android:id="@+id/brand_product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/name_product"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textSize="24sp"
+            tools:text="Mies van der Rohe" />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_above="@id/brand_product"
+            android:layout_below="@+id/thumbnail_profile"
+            android:layout_centerHorizontal="true"
+            android:scaleType="centerCrop"
+            tools:src="@android:drawable/sym_def_app_icon" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

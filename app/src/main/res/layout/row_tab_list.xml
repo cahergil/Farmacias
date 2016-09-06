@@ -127,13 +127,13 @@
             android:orientation="vertical"
             custom:ael_duration="200"
             custom:ael_expanded="false"
+            custom:ael_size="52"
             >
 
             <LinearLayout
 
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
 

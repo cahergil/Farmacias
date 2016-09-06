@@ -33,7 +33,6 @@ import com.chernandezgil.farmacias.view.ListTabContract;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -152,6 +151,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     private void setUpRecyclerView() {
         mAdapter = new ListTabAdapter(getActivity(), this);
 
+
         //     mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
         SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
         mRecyclerView.setAdapter(animatorAdapter);
@@ -223,7 +223,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             favorite = 1;
         }
 
-        Uri uri = DbContract.FarmaciasEntity.buildFarmaciasUri(phone);
+        Uri uri = DbContract.FarmaciasEntity.buildFarmaciasUriByPhone(phone);
         ContentValues contentValues = new ContentValues();
         contentValues.put(DbContract.FarmaciasEntity.FAVORITE, favorite);
 

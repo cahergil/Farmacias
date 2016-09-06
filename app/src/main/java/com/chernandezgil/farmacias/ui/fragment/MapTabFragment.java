@@ -326,6 +326,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+
     //this is method to help us add a Marker to the map
     //BitmapDescriptorFactory.defaultMarker()
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
@@ -420,6 +421,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
         Util.logD(LOG_TAG,"preshowPharmacy");
+
+        //if there has been a rotation
         if(mRotation) {
             if(lastClicked!=null) {
                 Util.logD(LOG_TAG,"firstsor");
@@ -565,7 +568,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     snackMessage="Pharmacy added to favorites";
                     favorite=1;
                 }
-                Uri uri= DbContract.FarmaciasEntity.buildFarmaciasUri(phone);
+                Uri uri= DbContract.FarmaciasEntity.buildFarmaciasUriByPhone(phone);
                 ContentValues contentValues=new ContentValues();
                 contentValues.put(DbContract.FarmaciasEntity.FAVORITE,favorite);
 

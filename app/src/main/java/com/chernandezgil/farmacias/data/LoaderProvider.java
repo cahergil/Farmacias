@@ -19,7 +19,7 @@ public class LoaderProvider  {
     public LoaderProvider(Context context){
         mContext=context;
     }
-    public Loader<Cursor> getPharmaciesNearby(){
+    public Loader<Cursor> getPharmacies(){
 
         return new CursorLoader(mContext,
                 DbContract.FarmaciasEntity.CONTENT_URI,
@@ -27,5 +27,15 @@ public class LoaderProvider  {
                 null,
                 null,
                 null) ;
+    }
+
+    public  Loader<Cursor> getPharmaciesByName(String name) {
+        return new CursorLoader(mContext,
+                DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),
+                null,
+                DbContract.FarmaciasEntity.NAME + " like ?",
+                new String[]{"%"+ name + "%"},
+                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+                );
     }
 }

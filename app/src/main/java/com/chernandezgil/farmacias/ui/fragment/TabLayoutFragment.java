@@ -165,7 +165,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public SparseArray<Fragment> getRegisteredFragment() {
             SparseArray<Fragment> copy =new SparseArray<>();
             for(int i =0;i<registeredFragments.size();i++) {
-                copy.put(0,registeredFragments.get(i));
+                copy.put(i,registeredFragments.get(i));
             }
             return copy;
 

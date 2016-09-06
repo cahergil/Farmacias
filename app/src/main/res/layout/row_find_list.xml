@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="16dp">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        tools:text="Farmacia Carlos La puente"
+        android:textColor="@color/black"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="16sp"
+        />
+    <TextView
+        android:id="@+id/locality"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_below="@+id/name"
+        android:paddingRight="36dp"
+        android:paddingEnd="36dp"
+        android:maxLines="1"
+        android:gravity="center_vertical"
+        android:ellipsize="end"
+        android:textSize="14sp"
+
+        tools:text="Villanueva de la serena"
+        />
+    <TextView
+        android:id="@+id/plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/locality"
+        android:layout_alignTop="@+id/locality"
+        android:gravity="center_vertical"
+        android:text="MÁS"
+        android:textColor="@color/blue_mobile_web"
+
+        />
+
+    <include layout="@layout/options_layout"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/locality"
+
+        />
+
+</RelativeLayout>

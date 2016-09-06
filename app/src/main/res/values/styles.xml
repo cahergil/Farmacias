@@ -22,4 +22,31 @@
     <style name="NavigationViewTheme" parent="AppTheme">
         <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Body2</item>
     </style>
+
+    <style name="ImageViewOptions">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:tint">@color/bottom_sheet_icons</item>
+
+    </style>
+
+    <style name="TextViewOptionsRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginLeft">24dp</item>
+        <item name="android:layout_marginRight">24dp</item>
+
+    </style>
+    <style name="VerticalSparator">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:background">@android:color/black</item>
+        <item name="android:alpha">0.12</item>
+
+    </style>
 </resources>

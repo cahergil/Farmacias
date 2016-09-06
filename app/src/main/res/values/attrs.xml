@@ -13,6 +13,7 @@
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
+        <attr name="ael_size" format="integer"></attr>
         <attr name="ael_interpolator" format="enum">
             <enum name="accelerateDecelerate" value="0" />
             <enum name="accelerate" value="1" />

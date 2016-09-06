@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.LoaderManager;
-
 import android.support.v4.content.Loader;
-
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -72,12 +70,9 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     @Override
     public void onStartLoader() {
         mView.showLoading();
-//        Loader<Cursor> loader= mLoaderManager.getLoader(FARMACIAS_LOADER);
-//        if(loader!=null) {
-//            if(loader.isStarted()) loader.forceLoad();
-//        } else {
+
             mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
-    //    }
+
 
     }
 
@@ -174,7 +169,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                 } else {
                     mView.showNoResults();
                 }
-            } // This is your code
+            }
         });
 
 
@@ -215,7 +210,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == FARMACIAS_LOADER) {
-            return mLoaderProvider.getPharmaciesNearby();
+            return mLoaderProvider.getPharmacies();
         }
         return null;
     }

@@ -27,19 +27,17 @@ import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
 import com.aitorvs.android.allowme.AllowMeCallback;
 import com.aitorvs.android.allowme.PermissionResultSet;
-import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.customwidget.TouchableWrapper;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
-import com.chernandezgil.farmacias.ui.fragment.FragmentFind;
+import com.chernandezgil.farmacias.ui.fragment.FindFragment;
 import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
-import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,6 +47,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -83,7 +82,7 @@ public class MainActivity extends AllowMeActivity implements
     private MainActivityPresenter mMainActivityPresenter;
     private PreferencesManager mPreferencesManager;
     private int mCurrentFragment = 0;
-    private Handler mHandler;
+    private HandlerLauncher mHandler;
     private TabLayoutFragment mtabFragment;
     private static boolean mRotation;
     private static boolean mFromSettings;
@@ -115,7 +114,8 @@ public class MainActivity extends AllowMeActivity implements
         mPreferencesManager = new AndroidPrefsManager(this);
         mMainActivityPresenter = new MainActivityPresenter(mPreferencesManager);
         mMainActivityPresenter.setView(this);
-        mHandler = createHandler();
+        //mHandler = createHandler();
+        mHandler = getHandler();
         setUpToolBar();
 
 
@@ -150,17 +150,36 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+    private static class HandlerLauncher extends Handler {
+        private final WeakReference<MainActivity> mainActivityWeakReference;
 
-    private Handler createHandler() {
-        return new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                if (mCurrentFragment == 0) {
-                    setFragment(mCurrentFragment);
-                }
-            }
-        };
+        HandlerLauncher(MainActivity mainActivity) {
+            mainActivityWeakReference = new WeakReference<MainActivity>(mainActivity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity mainActivity=mainActivityWeakReference.get();
+//            if (mainActivity.mCurrentFragment == 0) {
+//                mainActivity.setFragment(mainActivity.mCurrentFragment);
+//            }
+            mainActivity.setFragment(1);
+        }
     }
+    private HandlerLauncher getHandler(){
+        return new HandlerLauncher(this);
+    }
+
+//    private Handler createHandler() {
+//
+//        return new Handler() {
+//            @Override
+//            public void handleMessage(Message msg) {
+//                if (mCurrentFragment == 0) {
+//                    setFragment(mCurrentFragment);
+//                }
+//            }
+//        };
+//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -322,7 +341,7 @@ public class MainActivity extends AllowMeActivity implements
                 break;
             case 1:
                 fragmentManager = getSupportFragmentManager();
-                FragmentFind starredFragment = new FragmentFind();
+                FindFragment starredFragment = new FindFragment();
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment, starredFragment)
                         .commit();

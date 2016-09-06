@@ -67,6 +67,7 @@ public class ExpandableLinearLayout extends LinearLayout implements ExpandableLa
     private boolean isArranged = false;
     private boolean isCalculatedSize = false;
     private boolean isAnimating = false;
+    private int size;
     /**
      * view size of children
      **/
@@ -103,11 +104,14 @@ public class ExpandableLinearLayout extends LinearLayout implements ExpandableLa
         defaultExpanded = a.getBoolean(R.styleable.ExpandableLayout_ael_expanded, DEFAULT_EXPANDED);
         defaultChildIndex = a.getInteger(R.styleable.ExpandableLayout_ael_defaultChildIndex,
                 Integer.MAX_VALUE);
+        size = a.getInteger(R.styleable.ExpandableLayout_ael_size,0);
+
         final int interpolatorType = a.getInteger(R.styleable.ExpandableLayout_ael_interpolator,
                 Utils.LINEAR_INTERPOLATOR);
-        String layout_height=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_height");
-        String layout_margin=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_margin");
-        mDefaultLayoutSize=getPixels(layout_height)+getPixels(layout_margin);
+        //String layout_height=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_height");
+        //String layout_margin=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_margin");
+        //mDefaultLayoutSize=getPixels(layout_height)+getPixels(layout_margin);
+        mDefaultLayoutSize = size;
         a.recycle();
         interpolator = Utils.createInterpolator(interpolatorType);
         isExpanded = defaultExpanded;

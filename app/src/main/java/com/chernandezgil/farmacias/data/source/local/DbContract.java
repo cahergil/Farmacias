@@ -31,14 +31,16 @@ public class DbContract {
         public static final String HOURS="hours";
         public static final String FAVORITE="favorite";
 
-        public static Uri buildFarmaciasUri(long id){
+        public static Uri buildFarmaciasUriByPhone(long id){
 
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-        public static Uri buildFarmaciasUri(String id) {
+        public static Uri buildFarmaciasUriByPhone(String id) {
             return CONTENT_URI.buildUpon().appendPath(id).build();
         }
-
+        public static Uri buildFarmaciasUriByName(String name) {
+            return CONTENT_URI.buildUpon().appendPath(name).build();
+        }
 
     }
 
