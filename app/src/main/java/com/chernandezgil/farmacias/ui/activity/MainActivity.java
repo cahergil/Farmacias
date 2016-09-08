@@ -38,6 +38,7 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
+import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -122,7 +123,7 @@ public class MainActivity extends AllowMeActivity implements
         if (savedInstanceState == null) {
 
             checkGooglePlayServicesAvailability();
-   //         Stetho.initializeWithDefaults(this);
+            Stetho.initializeWithDefaults(this);
 
 
         } else {
@@ -193,16 +194,19 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onRestart() {
         super.onRestart();
-        Util.logD(LOG_TAG, "onStart");
+        Util.logD(LOG_TAG, "onRestart");
     }
 
     @Override
     protected void onStart() {
-        Util.logD(LOG_TAG, "onStart");
+        Util.logD(LOG_TAG, "onStart:"+this.toString());
         super.onStart();
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
+            //mGoogleApiClient.getConnectionResult()
+            Util.logD(LOG_TAG, "mGoogleApiClient.connect");
             mFlag = true;
+
         }
 
 
@@ -211,18 +215,19 @@ public class MainActivity extends AllowMeActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Util.logD(LOG_TAG, "onResume");
+        Util.logD(LOG_TAG, "onResume:" + this.toString());
 
     }
 
     @Override
     protected void onPause() {
-        Util.logD(LOG_TAG, "onPause");
+        Util.logD(LOG_TAG, "onPause:" + this.toString());
         super.onPause();
 
         if(mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
+            Util.logD(LOG_TAG, "mGoogleApiClient.disconnect");
         }
 
 
@@ -230,7 +235,7 @@ public class MainActivity extends AllowMeActivity implements
 
     @Override
     protected void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Util.logD(LOG_TAG, "onStop:" + this.toString());
 //        don't know why but disconnecting causes onConnected be called twice
 //        if(mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.disconnect();

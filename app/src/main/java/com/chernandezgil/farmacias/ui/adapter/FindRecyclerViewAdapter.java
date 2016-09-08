@@ -23,12 +23,12 @@ import butterknife.ButterKnife;
  * Created by Carlos on 05/09/2016.
  */
 
-public class FindAdapter extends RecyclerView.Adapter<FindAdapter.MyViewHolder> implements View.OnClickListener{
+public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerViewAdapter.MyViewHolder> implements View.OnClickListener{
 
     private List<Pharmacy> mList;
     private Context mContext;
 
-    public FindAdapter(Context context) {
+    public FindRecyclerViewAdapter(Context context) {
 
         mContext = context;
     }

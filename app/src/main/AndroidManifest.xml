@@ -29,6 +29,7 @@
             android:value="@string/places_api_key" />
 
 
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
@@ -36,9 +37,10 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
         <activity
             android:name=".ui.activity.SettingsActivity"
@@ -59,6 +61,13 @@
             android:authorities="@string/content_authority"
             android:exported="false"
             android:syncable="true" />
+        <!-- Search provider -->
+        <provider
+            android:name="com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider"
+            android:authorities="com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider"
+            android:exported="true"
+            android:syncable="true" />
+
     </application>
 
 </manifest>

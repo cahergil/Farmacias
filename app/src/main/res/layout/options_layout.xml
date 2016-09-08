@@ -31,8 +31,7 @@
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp">
+       >
 
         <ImageView
 

@@ -15,6 +15,11 @@ import com.chernandezgil.farmacias.data.source.local.DbContract;
 public class LoaderProvider  {
 
     private Context mContext;
+    private String[] projectionSuggestion = new String[]{DbContract.FarmaciasEntity._ID,
+            DbContract.FarmaciasEntity.NAME,
+            DbContract.FarmaciasEntity.ADDRESS,
+            DbContract.FarmaciasEntity.LOCALITY,
+            DbContract.FarmaciasEntity.PROVINCE};
 
     public LoaderProvider(Context context){
         mContext=context;
@@ -38,4 +43,15 @@ public class LoaderProvider  {
                 DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
                 );
     }
+
+
+//    public  Loader<Cursor> getPharmaciesByName(String name) {
+//        return new CursorLoader(mContext,
+//                DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),
+//                projectionSuggestion,
+//                DbContract.FarmaciasEntity.NAME + " like ?",
+//                new String[]{"%"+ name + "%"},
+//                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+//        );
+//    }
 }

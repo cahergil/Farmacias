@@ -142,9 +142,10 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
             Util.logD(LOG_TAG, "onCreateLoader");
             if (args != null) {
                 return mLoaderProvider.getPharmaciesByName(args.getString("new_text"));
-            } else {
-                return  mLoaderProvider.getPharmacies();
             }
+//            } else {
+//                return  mLoaderProvider.getPharmacies();
+//            }
         }
 
         return null;
