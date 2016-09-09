@@ -11,10 +11,12 @@ public class DbContract {
     public static final String CONTENT_AUTHORITY = "com.chernandezgil.farmacias";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_FARMACIAS="farmacias";
+    public static final String PATH_QUICK_SEARCH ="quick_search";
 
     public static final class FarmaciasEntity implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FARMACIAS).build();
+        public static final Uri CONTENT_URI_2 =BASE_CONTENT_URI.buildUpon().appendPath(PATH_QUICK_SEARCH).build();
         public static final String CONTENT_TYPE =
                 "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_FARMACIAS;
         public static final String CONTENT_ITEM_TYPE =
@@ -40,6 +42,9 @@ public class DbContract {
         }
         public static Uri buildFarmaciasUriByName(String name) {
             return CONTENT_URI.buildUpon().appendPath(name).build();
+        }
+        public static Uri buildFarmaciasUriByNameQuickSearch(String name) {
+            return CONTENT_URI_2.buildUpon().appendPath(name).build();
         }
 
     }

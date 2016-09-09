@@ -4,6 +4,7 @@ import android.content.Context;
 
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
@@ -44,7 +45,16 @@ public class LoaderProvider  {
                 );
     }
 
-
+    public Loader<Cursor> getPharmaciesByNameQuickSearch(String name) {
+        Uri uri =  DbContract.FarmaciasEntity.buildFarmaciasUriByNameQuickSearch(name);
+        return new CursorLoader(mContext,
+                uri,
+                null,
+                DbContract.FarmaciasEntity.NAME + " like ?",
+                new String[]{"%"+ name + "%"},
+                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+        );
+    }
 //    public  Loader<Cursor> getPharmaciesByName(String name) {
 //        return new CursorLoader(mContext,
 //                DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),

@@ -223,4 +223,11 @@ public class Util {
         return color;
     }
 
+    public static boolean isEmptyRequest(String[] selectionArgs) {
+        if (selectionArgs[0].replaceAll("\\%", "").equals("")) {
+            return true;
+        }
+        return false;
+    }
+
     }

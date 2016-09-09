@@ -11,6 +11,7 @@ import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.view.FindContract;
 
 import java.util.ArrayList;
@@ -26,10 +27,12 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     private FindContract.View mView;
     private LoaderManager mLoaderManager;
     private LoaderProvider mLoaderProvider;
-    private static final int LOADER =3;
+    private static final int LOADER_RESULT =3;
+    private static final int LOADER_QUICK_SEARCH = 4;
     private Handler mainHandler;
     private List<Pharmacy> mList;
     boolean flag=true;
+    private List<SuggestionsBean> mListQuickSearch;
 
     public FindPresenter(LoaderManager loaderManager, LoaderProvider loaderProvider) {
         mLoaderManager = loaderManager;
@@ -52,22 +55,30 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     public void onStartLoader() {
         Util.logD(LOG_TAG,"onStartLoader");
         mView.showLoading();
-//        Loader<Cursor> loader= mLoaderManager.getLoader(LOADER);
+//        Loader<Cursor> loader= mLoaderManager.getLoader(LOADER_RESULT);
 //        if(loader!=null) {
 //            if(loader.isStarted()) loader.forceLoad();
 //        } else {
-            mLoaderManager.restartLoader(LOADER, null, this);
+            mLoaderManager.restartLoader(LOADER_RESULT, null, this);
 //        }
     }
 
     @Override
     public void onRestartLoader(String newText) {
         mView.showLoading();
-        final Bundle bundle = new Bundle();
-        bundle.putString("new_text",newText);
-        mLoaderManager.restartLoader(LOADER,bundle,this);
+        mLoaderManager.restartLoader(LOADER_RESULT,createBundle(newText),this);
     }
 
+    @Override
+    public void onStartLoaderQuickSearch(String newText) {
+        mLoaderManager.restartLoader(LOADER_QUICK_SEARCH,createBundle(newText),this);
+    }
+
+    private Bundle createBundle(String newText) {
+        final Bundle bundle = new Bundle();
+        bundle.putString("new_text",newText);
+        return bundle;
+    }
 
     private void bindView(Cursor data) {
         Util.logD(LOG_TAG,"bindView");
@@ -133,19 +144,52 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
         });
     }
 
+    private void bindViewQuickSearch(Cursor data) {
+        if (data.isClosed()) return;
+        mListQuickSearch = new ArrayList<>();
 
+        if (data.moveToFirst()) {
+            do {
+
+                SuggestionsBean suggestionsBean = new SuggestionsBean();
+                suggestionsBean.setImageId(data.getInt(0));
+                suggestionsBean.setName(data.getString(1));
+                mListQuickSearch.add(suggestionsBean);
+            } while (data.moveToNext());
+        }
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+               // mView.hideLoading();
+                if(mListQuickSearch !=null && mListQuickSearch.size()>0) {
+                  //  mView.hideNoResults();
+                    mView.showResultsQuickSearch(mListQuickSearch);
+                } else {
+                    mView.showNoResultsQuickSearch();
+                }
+            }
+        });
+
+    }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
 
-        if (id == LOADER) {
-            Util.logD(LOG_TAG, "onCreateLoader");
+        if (id == LOADER_RESULT) {
+            Util.logD(LOG_TAG, "onCreateLoader:LOADER_RESULT");
             if (args != null) {
                 return mLoaderProvider.getPharmaciesByName(args.getString("new_text"));
             }
 //            } else {
 //                return  mLoaderProvider.getPharmacies();
 //            }
+        }
+        if (id == LOADER_QUICK_SEARCH) {
+            Util.logD(LOG_TAG, "onCreateLoader:LOADER_QUICK_SEARCH");
+            if (args !=null) {
+                return mLoaderProvider.getPharmaciesByNameQuickSearch(args.getString("new_text"));
+            }
         }
 
         return null;
@@ -154,8 +198,11 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Util.logD(LOG_TAG,"onLoadFinished");
-        if(loader.getId() == LOADER) {
+        if(loader.getId() == LOADER_RESULT) {
             bindView(data);
+        }
+        if(loader.getId() == LOADER_QUICK_SEARCH) {
+            bindViewQuickSearch(data);
         }
     }
 

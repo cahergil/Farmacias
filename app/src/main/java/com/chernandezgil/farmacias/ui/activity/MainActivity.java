@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -170,17 +171,7 @@ public class MainActivity extends AllowMeActivity implements
         return new HandlerLauncher(this);
     }
 
-//    private Handler createHandler() {
-//
-//        return new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                if (mCurrentFragment == 0) {
-//                    setFragment(mCurrentFragment);
-//                }
-//            }
-//        };
-//    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -226,10 +217,10 @@ public class MainActivity extends AllowMeActivity implements
 
         if(mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
-            mGoogleApiClient.disconnect();
+        //    mGoogleApiClient.disconnect();
             Util.logD(LOG_TAG, "mGoogleApiClient.disconnect");
         }
-
+        mGoogleApiClient.disconnect();
 
     }
 

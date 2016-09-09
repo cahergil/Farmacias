@@ -32,4 +32,5 @@
     <color name="bottom_sheet_icons">@color/colorPrimary</color>
     <color name="bottom_sheet_text">@color/black</color>
     <color name="fav_color">@color/blue_mobile_web</color>
+    <color name="suggestions_row">#6D6D6D</color>
 </resources>

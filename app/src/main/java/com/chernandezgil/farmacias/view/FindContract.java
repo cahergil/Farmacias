@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.view;
 import android.location.Location;
 
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.model.SuggestionsBean;
 
 import java.util.List;
 
@@ -14,9 +15,13 @@ public interface FindContract {
     public interface View {
         public void showResults(List<Pharmacy> pharmacyList);
         public void showNoResults();
+        public void showResultsQuickSearch(List<SuggestionsBean> list);
+        public void showNoResultsQuickSearch();
         public void hideNoResults();;
         public void showLoading();
         public void hideLoading();
+        public void hideQuickSearchRecyclerView();
+
 
     }
     public interface Presenter<V> {
@@ -28,6 +33,7 @@ public interface FindContract {
 
         public void onStartLoader();
         public void onRestartLoader(String newText);
+        public void onStartLoaderQuickSearch(String text);
 
 
 
