@@ -1,13 +1,15 @@
 package com.chernandezgil.farmacias.presenter;
 
-import android.app.LoaderManager;
-import android.content.Loader;
+
+
+
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 
 import com.chernandezgil.farmacias.Utilities.Util;
@@ -33,9 +35,6 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     private static final int LOADER_RESULT =3;
     private static final int LOADER_QUICK_SEARCH = 4;
     private Handler mainHandler;
-    private List<Pharmacy> mList;
-    boolean flag=true;
-    private List<SuggestionsBean> mListQuickSearch;
     private Location mLocation;
 
     public FindPresenter(Location location, LoaderManager loaderManager, LoaderProvider loaderProvider) {
@@ -83,7 +82,7 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     }
 
     @Override
-    public void onStartLoaderQuickSearch(String newText) {
+    public void onRestartLoaderQuickSearch(String newText) {
         mLoaderManager.restartLoader(LOADER_QUICK_SEARCH,createBundle(newText),this);
     }
 
@@ -93,119 +92,7 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
         return bundle;
     }
 
-    private void bindView(Cursor data) {
-        Util.logD(LOG_TAG,"bindView");
-        mList =new ArrayList<>();
 
-        if (data.isClosed()) return;
-
-//        Util.logD(LOG_TAG,"pre_position:"+data.getPosition());
-//        data.moveToPosition(-1);
-//        Util.logD(LOG_TAG,"post_position:"+data.getPosition());
-////        if(data.isLast()) {
-////            while(data.moveToPrevious()) {
-////                //do nothing
-////            }
-////        }
-//        Util.logD(LOG_TAG,"count:"+data.getCount());
-        if(data.moveToFirst()) {
-        Util.logD(LOG_TAG,"moveToFirst:");
-            do {
-                try {
-                    handleCursor(data);
-                }catch (Exception ignored){}
-            } while (data.moveToNext());
-        }
-
-
-
-
-
-
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mView.hideLoading();
-                if(mList !=null && mList.size()>0) {
-                    mView.hideNoResults();
-                    mView.showResults(mList);
-                } else {
-                    mView.showNoResults();
-                }
-            }
-        });
-    }
-
-    private void handleCursor(Cursor data){
-        Util.logD(LOG_TAG,"cursor position:"+data.getPosition());
-        Pharmacy farmacia = new Pharmacy();
-        farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
-        farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
-        farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
-        farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
-        farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
-        String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
-        farmacia.setPhone(phone);
-        farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
-        double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
-        double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
-        double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
-        farmacia.setLat(latDest);
-        farmacia.setLon(lonDest);
-        farmacia.setDistance(distance / 1000);
-
-        String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
-        farmacia.setHours(hours);
-        farmacia.setOpen(Util.isPharmacyOpen(hours));
-        String addressFormatted = Util.formatAddress(farmacia.getAddress(),
-                farmacia.getPostal_code(),
-                farmacia.getLocality(),
-                farmacia.getProvince());
-        farmacia.setAddressFormatted(addressFormatted);
-
-
-        boolean favorite;
-        int j = data.getInt(data.getColumnIndex(DbContract.FarmaciasEntity.FAVORITE));
-        if (j == 0) {
-            favorite = false;
-        } else {
-            favorite = true;
-        }
-
-        farmacia.setFavorite(favorite);
-        mList.add(farmacia);
-    }
-
-    private void bindViewQuickSearch(Cursor data) {
-        Util.logD(LOG_TAG,"bindViewQuickSearch");
-        if(data == null) return;
-        if (data.isClosed()) return;
-        mListQuickSearch = new ArrayList<>();
-
-        if (data.moveToFirst()) {
-            do {
-
-                SuggestionsBean suggestionsBean = new SuggestionsBean();
-                suggestionsBean.setImageId(data.getInt(0));
-                suggestionsBean.setName(data.getString(1));
-                mListQuickSearch.add(suggestionsBean);
-            } while (data.moveToNext());
-        }
-
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-               // mView.hideLoading();
-                if(mListQuickSearch !=null && mListQuickSearch.size()>0) {
-                  //  mView.hideNoResults();
-                    mView.showResultsQuickSearch(mListQuickSearch);
-                } else {
-                    mView.showNoResultsQuickSearch();
-                }
-            }
-        });
-
-    }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
@@ -213,15 +100,15 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
         if (id == LOADER_RESULT) {
             Util.logD(LOG_TAG, "onCreateLoader:LOADER_RESULT");
             if (args != null) {
-                return mLoaderProvider.getPharmaciesByName1(args.getString("new_text"));
+                return mLoaderProvider.getPharmaciesByName(args.getString("new_text"));
             } else {
-                return  mLoaderProvider.getPharmacies1();
+                return  mLoaderProvider.getPharmacies();
             }
         }
         if (id == LOADER_QUICK_SEARCH) {
             Util.logD(LOG_TAG, "onCreateLoader:LOADER_QUICK_SEARCH");
             if (args !=null) {
-                return mLoaderProvider.getPharmaciesByNameQuickSearch1(args.getString("new_text"));
+                return mLoaderProvider.getPharmaciesByNameQuickSearch(args.getString("new_text"));
             }
         }
 
@@ -237,16 +124,14 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
             Util.logD(LOG_TAG,"onLoadFinished_LOADER_RESULT");
             Util.logD(LOG_TAG,data.toString());
 
-//            if(data.moveToFirst()) {
-//
-//            }
-     //       new Thread() {
-     //           @Override
-     //           public void run() {
-                //    bindView(data);
 
-     //           }
-     //       }.start();
+            new Thread() {
+                @Override
+                public void run() {
+                    bindView(data);
+
+                }
+            }.start();
         }
         if(loader.getId() == LOADER_QUICK_SEARCH) {
             Util.logD(LOG_TAG,"onLoadFinished_LOADER_QUICK_SEARCH");
@@ -259,6 +144,107 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
             }.start();
 
         }
+    }
+    private void bindView(Cursor data) {
+        if(data == null) return;
+        if (data.isClosed()) return;
+
+        final List<Pharmacy> list= transformSearchCursor(data);
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mView.hideLoading();
+                if(list !=null && list.size()>0) {
+                    mView.hideNoResults();
+                    mView.showResults(list);
+                } else {
+                    mView.showNoResults();
+                }
+            }
+        });
+    }
+
+    private List<Pharmacy> transformSearchCursor(Cursor data){
+        List<Pharmacy> list = new ArrayList<Pharmacy>(data.getCount());
+        if(data.moveToFirst()) {
+            do {
+                Pharmacy farmacia = new Pharmacy();
+                farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
+                farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
+                farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
+                farmacia.setProvince(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PROVINCE)));
+                farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
+                String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
+                farmacia.setPhone(phone);
+                farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
+                double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
+                double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
+                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                farmacia.setLat(latDest);
+                farmacia.setLon(lonDest);
+                farmacia.setDistance(distance / 1000);
+
+                String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
+                farmacia.setHours(hours);
+                farmacia.setOpen(Util.isPharmacyOpen(hours));
+                String addressFormatted = Util.formatAddress(farmacia.getAddress(),
+                        farmacia.getPostal_code(),
+                        farmacia.getLocality(),
+                        farmacia.getProvince());
+                farmacia.setAddressFormatted(addressFormatted);
+
+
+                boolean favorite;
+                int j = data.getInt(data.getColumnIndex(DbContract.FarmaciasEntity.FAVORITE));
+                if (j == 0) {
+                    favorite = false;
+                } else {
+                    favorite = true;
+                }
+
+                farmacia.setFavorite(favorite);
+                list.add(farmacia);
+            } while (data.moveToNext());
+        }
+        return list;
+
+    }
+
+    private void bindViewQuickSearch(Cursor data) {
+        Util.logD(LOG_TAG,"bindViewQuickSearch");
+        if(data == null) return;
+        if (data.isClosed()) return;
+
+        final List<SuggestionsBean> list = transformQuickSearchCursor(data);
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+
+                if(list !=null && list.size()>0) {
+
+                    mView.showResultsQuickSearch(list);
+                } else {
+                    mView.showNoResultsQuickSearch();
+                }
+            }
+        });
+
+    }
+
+    private List<SuggestionsBean> transformQuickSearchCursor(Cursor data) {
+        List<SuggestionsBean> list = new ArrayList<>(data.getCount());
+        if (data.moveToFirst()) {
+            do {
+
+                SuggestionsBean suggestionsBean = new SuggestionsBean();
+                suggestionsBean.setImageId(data.getInt(0));
+                suggestionsBean.setName(data.getString(1));
+                list.add(suggestionsBean);
+            } while (data.moveToNext());
+        }
+        return list;
     }
 
     @Override

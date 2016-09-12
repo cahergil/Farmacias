@@ -1,8 +1,8 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.app.LoaderManager;
+
+
 import android.content.Context;
-import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,12 +48,10 @@ import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
 import com.chernandezgil.farmacias.ui.adapter.FindSuggestionsAdapter;
 import com.chernandezgil.farmacias.view.FindContract;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.linearlistview.LinearListView;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,7 +59,6 @@ import butterknife.Unbinder;
 import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 
 
@@ -78,8 +76,7 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     TextView mEmptyView;
-    @BindView(R.id.list)
-    LinearListView mFrankySardo;
+
 
     //Activity UI elements
     private RecyclerView mQuickSearchRecyclerView;
@@ -118,7 +115,8 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
 
         }
         LoaderProvider loaderProvider = new LoaderProvider(getContext());
-        LoaderManager loaderManager = getActivity().getLoaderManager();
+        LoaderManager loaderManager = getLoaderManager();
+       // loaderManager.enableDebugLogging(true);
         mPresenter = new FindPresenter(mLocation,loaderManager, loaderProvider);
 
         setHasOptionsMenu(true);
@@ -195,7 +193,7 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
         switch (id) {
             case R.id.action_search:
 
-                mPresenter.onStartLoaderQuickSearch("");
+                mPresenter.onRestartLoaderQuickSearch("");
                 initializeSearchCardView();
                 return true;
 
@@ -242,28 +240,23 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
         mSearchCardView = (CardView) getActivity().findViewById(R.id.card_search);
         mViewSearch =(RelativeLayout)getActivity().findViewById(R.id.view_search);
         mImageSearchBack = (ImageView) getActivity().findViewById(R.id.image_search_back);
-//        mSearchEditor.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-////                mPresenter.onStartLoaderQuickSearch(mSearchEditor.getText().toString());
-////                if(mSearchEditor.getText().length()>0) {
-////                    mClearSearch.setVisibility(View.VISIBLE);
-////                } else {
-////                    mClearSearch.setVisibility(View.INVISIBLE);
-////                }
-//                startQuickSearch(mSearchEditor.getText().toString());
-//            }
-//        });
+        mSearchEditor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                startQuickSearch(mSearchEditor.getText().toString());
+            }
+        });
         //https://kotlin.link/articles/RxAndroid-and-Kotlin-Part-1.html
 //        Subscription editorAterTextChangeEvent = RxTextView.afterTextChangeEvents(mSearchEditor)
 //                .debounce(100, TimeUnit.MILLISECONDS)
@@ -302,7 +295,7 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
 
     }
     private void startQuickSearch(String s){
-        mPresenter.onStartLoaderQuickSearch(s);
+        mPresenter.onRestartLoaderQuickSearch(s);
         mFindQuickSearchAdapter.setmSearchString(s);
         if(s.length()>0) {
             mClearSearch.setVisibility(View.VISIBLE);
@@ -359,7 +352,7 @@ public class FindFragment extends Fragment implements FindContract.View,FindQuic
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
 
-        //       mAdapter.swapData(pharmacyList);
+              mAdapter.swapData(pharmacyList);
 
 //            if(!mRotation) {
 //

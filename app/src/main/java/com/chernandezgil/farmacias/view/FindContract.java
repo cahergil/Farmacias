@@ -36,7 +36,7 @@ public interface FindContract {
         public void onInitLoader();
         public void onRestartLoader(String newText);
         public void onInitLoaderQuickSearch();
-        public void onStartLoaderQuickSearch(String text);
+        public void onRestartLoaderQuickSearch(String text);
 
 
 
