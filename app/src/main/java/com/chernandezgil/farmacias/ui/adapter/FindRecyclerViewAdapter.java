@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.expandable.ExpandableLayoutListener;
-import com.chernandezgil.farmacias.expandable.ExpandableLinearLayout;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list,parent,false);
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list1,parent,false);
         MyViewHolder holder = new MyViewHolder(view);
         holder.tvPlus.setOnClickListener(this);
         return holder;
@@ -42,40 +40,10 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-            holder.optionsRow.setListener(new ExpandableLayoutListener() {
-                @Override
-                public void onAnimationStart() {
 
-                }
-
-                @Override
-                public void onAnimationEnd() {
-
-                }
-
-                @Override
-                public void onPreOpen() {
-
-                }
-
-                @Override
-                public void onPreClose() {
-
-                }
-
-                @Override
-                public void onOpened() {
-
-                }
-
-                @Override
-                public void onClosed() {
-
-                }
-            });
             Pharmacy pharmacy = mList.get(position);
             holder.tvName.setText(pharmacy.getName());
-            String locality = pharmacy.getLocality() + Constants.COMMA
+            String locality = mContext.getString(R.string.fca_format_localidad)+pharmacy.getLocality() + Constants.COMMA
                 + Constants.SPACE
                 + pharmacy.getPostal_code()
                 + Constants.SPACE
@@ -83,8 +51,9 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             holder.tvLocality.setText(locality);
             holder.tvPlus.setTag(holder);
 
-            holder.tvAdress.setText(pharmacy.getAddress());
-            holder.tvTxtPhone.setText(pharmacy.getPhoneFormatted());
+            holder.tvAdress.setText(mContext.getString(R.string.fca_format_direccion,pharmacy.getAddress()));
+            holder.tvDistance.setText(mContext.getString(R.string.format_distancia,pharmacy.getDistance()));
+            holder.tvTxtPhone.setText(mContext.getString(R.string.fca_format_telefono,pharmacy.getAddress()));
     }
 
 
@@ -107,9 +76,6 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         int id = view.getId();
         switch (id) {
         case R.id.plus:
-            MyViewHolder holder= (MyViewHolder) view.getTag();
-
-            holder.optionsRow.toggle();
 
 
         break;
@@ -123,20 +89,20 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         TextView tvName;
         @BindView(R.id.locality)
         TextView tvLocality;
-        @BindView(R.id.plus)
-        TextView tvPlus;
-        @BindView(R.id.optionsRow)
-        ExpandableLinearLayout optionsRow;
-
-        @BindView(R.id.txtPhone)
-        TextView tvTxtPhone;
         @BindView(R.id.address)
         TextView tvAdress;
+        @BindView(R.id.distance)
+        TextView tvDistance;
+        @BindView(R.id.plus)
+        TextView tvPlus;
+        @BindView(R.id.txtPhone)
+        TextView tvTxtPhone;
+
 
         public MyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
-            optionsRow.collapse();
+
         }
     }
 }

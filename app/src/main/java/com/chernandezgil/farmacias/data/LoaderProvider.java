@@ -32,7 +32,16 @@ public class LoaderProvider  {
                 null,
                 null,
                 null,
-                null) ;
+                DbContract.FarmaciasEntity.LOCALITY) ;
+    }
+    public android.content.Loader<Cursor> getPharmacies1(){
+
+        return new android.content.CursorLoader(mContext,
+                DbContract.FarmaciasEntity.CONTENT_URI,
+                null,
+                null,
+                null,
+                DbContract.FarmaciasEntity.LOCALITY + " ASC LIMIT 50") ;
     }
 
     public  Loader<Cursor> getPharmaciesByName(String name) {
@@ -45,9 +54,28 @@ public class LoaderProvider  {
                 );
     }
 
+    public  android.content.Loader<Cursor> getPharmaciesByName1(String name) {
+        return new android.content.CursorLoader(mContext,
+                DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),
+                null,
+                DbContract.FarmaciasEntity.NAME + " like ?",
+                new String[]{"%"+ name + "%"},
+                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+        );
+    }
     public Loader<Cursor> getPharmaciesByNameQuickSearch(String name) {
         Uri uri =  DbContract.FarmaciasEntity.buildFarmaciasUriByNameQuickSearch(name);
         return new CursorLoader(mContext,
+                uri,
+                null,
+                DbContract.FarmaciasEntity.NAME + " like ?",
+                new String[]{"%"+ name + "%"},
+                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+        );
+    }
+    public android.content.Loader<Cursor> getPharmaciesByNameQuickSearch1(String name) {
+        Uri uri =  DbContract.FarmaciasEntity.buildFarmaciasUriByNameQuickSearch(name);
+        return new android.content.CursorLoader(mContext,
                 uri,
                 null,
                 DbContract.FarmaciasEntity.NAME + " like ?",

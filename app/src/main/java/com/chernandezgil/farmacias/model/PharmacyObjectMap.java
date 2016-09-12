@@ -109,6 +109,10 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
         if (o == null || getClass() != o.getClass()) return false;
         return super.equals(o);
 //        if (!super.equals(o)) return false;
+//        PharmacyObjectMap that = (PharmacyObjectMap) o;
+//
+//        if (!getDistance().equals(that.getDistance())) return false;
+//        return getOrder().equals(that.getOrder());
 //
 //
 //

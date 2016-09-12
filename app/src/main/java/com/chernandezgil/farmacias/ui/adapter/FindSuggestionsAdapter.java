@@ -44,15 +44,15 @@ public class FindSuggestionsAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         MyViewHolder vh = (MyViewHolder) view.getTag();
         vh.tvName.setText(cursor.getString(COL_NAME));
-        String address = cursor.getString(COL_ADDRESS)
-                + Constants.COMMA
-                + Constants.SPACE
-                + cursor.getString(COL_LOCALITY)
-                + Constants.COMMA
-                + Constants.SPACE
-                + cursor.getString(COL_PROVINCE);
-
-        vh.tvAddress.setText(address);
+//        String address = cursor.getString(COL_ADDRESS)
+//                + Constants.COMMA
+//                + Constants.SPACE
+//                + cursor.getString(COL_LOCALITY)
+//                + Constants.COMMA
+//                + Constants.SPACE
+//                + cursor.getString(COL_PROVINCE);
+//
+//        vh.tvAddress.setText(address);
 //        Pharmacy pharmacy = mList.get(position);
 //        holder.tvName.setText(pharmacy.getName());
 //        String address = pharmacy.getAddress() + Constants.COMMA

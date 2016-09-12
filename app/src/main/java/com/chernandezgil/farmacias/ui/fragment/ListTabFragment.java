@@ -82,6 +82,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Util.logD(LOG_TAG, "onCreate");
         Bundle bundle = getArguments();
 
         if (savedInstanceState == null) {
@@ -105,6 +106,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_list, container, false);
+        Util.logD(LOG_TAG, "onCreateView");
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
         mPresenter.setView(this);
@@ -271,6 +273,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
     @Override
     public void onDestroy() {
+        Util.logD(LOG_TAG, "onDestroy");
         unbinder.unbind();
         super.onDestroy();
     }

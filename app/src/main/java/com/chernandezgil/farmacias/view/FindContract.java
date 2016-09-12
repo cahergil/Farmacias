@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.view;
 
+import android.database.Cursor;
 import android.location.Location;
 
 import com.chernandezgil.farmacias.model.Pharmacy;
@@ -23,6 +24,7 @@ public interface FindContract {
         public void hideQuickSearchRecyclerView();
 
 
+
     }
     public interface Presenter<V> {
 
@@ -31,8 +33,9 @@ public interface FindContract {
 
         void detachView();
 
-        public void onStartLoader();
+        public void onInitLoader();
         public void onRestartLoader(String newText);
+        public void onInitLoaderQuickSearch();
         public void onStartLoaderQuickSearch(String text);
 
 

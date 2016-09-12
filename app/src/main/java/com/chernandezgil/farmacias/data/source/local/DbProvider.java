@@ -9,11 +9,12 @@ import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.ui.adapter.QuickSearchAdapter;
+import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 
 /**
  * Created by Carlos on 09/07/2016.
@@ -75,7 +76,7 @@ public class DbProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Cursor retCursor;
+        Cursor retCursor=null;
         final int match = mUriMatcher.match(uri);
         switch (match) {
 
@@ -101,25 +102,22 @@ public class DbProvider extends ContentProvider {
 
                 break;
             case QUICK_SEARCH:
+
+
+
                 Uri uri1 = RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath(SearchManager.SUGGEST_URI_PATH_QUERY).build();
-                //               retCursor = getContext().getContentResolver().query(uri1,new String[]{"query"},"query" + " like ?",
-                //                       selectionArgs,sortOrder);
-//                if (selectionArgs[0].replaceAll("\\%","").equals("")) {
-//                    retCursor = getContext().getContentResolver().query(uri1, new String[]{"suggest_text_1"}, null,
-//                            null, sortOrder);
-//                } else {
-//                    retCursor = getContext().getContentResolver().query(uri1, new String[]{"suggest_text_1"}, "suggest_text_1" + " like ?",
-//                            selectionArgs, sortOrder);
-//                }
 
                 Cursor recentSearch = getContext().getContentResolver().query(uri1, new String[]{SearchManager.SUGGEST_COLUMN_QUERY}, SearchManager.SUGGEST_COLUMN_QUERY + " like ?",
                         selectionArgs, sortOrder);
+
                 if (Util.isEmptyRequest(selectionArgs)) {
                     if(recentSearch.getCount()>0) {
-                        retCursor = createMatrixCursor(recentSearch, RECENT_SEARCH_ORIGIN);;
+                        retCursor = createMatrixCursor(recentSearch, RECENT_SEARCH_ORIGIN);
+
                     } else {
                         retCursor = null;
                     }
+                    recentSearch.close();
                 } else {
                     Cursor searchDatabase = mDbHelper.getReadableDatabase().query(
                             DbContract.FarmaciasEntity.TABLE_NAME,
@@ -131,17 +129,22 @@ public class DbProvider extends ContentProvider {
                             sortOrder);
 
                     MatrixCursor matrixCursorA = createMatrixCursor(searchDatabase,DATABASE_SEARCH_ORIGIN);
+
+                    MatrixCursor  matrixCursorB=null;
+
                     if(recentSearch.getCount()>0) {
-                        MatrixCursor  matrixCursorB = createMatrixCursor(recentSearch,RECENT_SEARCH_ORIGIN);
-                        MergeCursor mergeCursor =new MergeCursor(new Cursor[]{matrixCursorB,matrixCursorA});
-                        retCursor =mergeCursor;
+                        matrixCursorB = createMatrixCursor(recentSearch,RECENT_SEARCH_ORIGIN);
+                        retCursor =new MergeCursor(new Cursor[]{matrixCursorB,matrixCursorA});
+                        matrixCursorB.close();
+                        matrixCursorA.close();
                     } else {
                         retCursor = matrixCursorA;
                     }
+                    searchDatabase.close();
+                    recentSearch.close();
 
 
 
-                    Util.logD("log", "log");
                 }
                 break;
 
@@ -150,27 +153,30 @@ public class DbProvider extends ContentProvider {
         }
 
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return retCursor;
+
     }
 
-    private MatrixCursor createMatrixCursor(Cursor recentSearch, int cursorOrigin) {
-        MatrixCursor matrixCursor = new MatrixCursor(suggestionsColumnNames, recentSearch.getCount());
+    private MatrixCursor createMatrixCursor(Cursor cursor, int cursorOrigin) {
+        MatrixCursor matrixCursor = new MatrixCursor(suggestionsColumnNames, cursor.getCount());
         MatrixCursor.RowBuilder builder;
-        if (recentSearch.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
                 builder = matrixCursor.newRow();
                 if (cursorOrigin == RECENT_SEARCH_ORIGIN) {
 
-                    builder.add(QuickSearchAdapter.HISTORY_ROW);
-                    builder.add(recentSearch.getString(recentSearch.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY)));
+                    builder.add(FindQuickSearchAdapter.HISTORY_ROW);
+                    builder.add(cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY)));
 
                 } else {
 
-                    builder.add(QuickSearchAdapter.DATABASE_ROW);
-                    builder.add(recentSearch.getString(recentSearch.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
+                    builder.add(FindQuickSearchAdapter.DATABASE_ROW);
+                    builder.add(cursor.getString(cursor.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
                 }
-            } while (recentSearch.moveToNext());
+            } while (cursor.moveToNext());
         }
+        cursor.close();
         return matrixCursor;
     }
 

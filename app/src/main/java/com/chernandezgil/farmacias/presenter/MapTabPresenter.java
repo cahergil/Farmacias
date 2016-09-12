@@ -123,7 +123,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onStartLoader() {
-        Util.logD(LOG_TAG, "onStartLoader");
+        Util.logD(LOG_TAG, "onInitLoader");
         mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
 //        mLoaderManager.getLoader(FARMACIAS_LOADER).forceLoad();
 //        Loader<Cursor> loader= mLoaderManager.getLoader(FARMACIAS_LOADER);
@@ -310,10 +310,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
                 PharmacyObjectMap farmacia = new PharmacyObjectMap();
 
-                double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
-                double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
-                //float dist=calculateDistance(latDest,lonDest,mLocation);
-                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+
                 farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
                 farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
                 farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
@@ -322,6 +319,10 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
                 farmacia.setPhone(phone);
                 farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
+                double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
+                double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
+                //float dist=calculateDistance(latDest,lonDest,mLocation);
+                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance);

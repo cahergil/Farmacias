@@ -28,6 +28,28 @@
         <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Body2</item>
     </style>
 
+    <style name="Separator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/black</item>
+        <item name="android:alpha">0.12</item>
+    </style>
+    <style name="SeparatorColor">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+    <style name="Widget.TimeRow" parent="android:Widget">
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <style name="ImageViewOptions">
         <item name="android:layout_width">36dp</item>
         <item name="android:layout_height">36dp</item>
@@ -38,10 +60,11 @@
 
     <style name="TextViewOptionsRow">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_height">30dp</item>
         <item name="android:maxLines">1</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:ellipsize">end</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">16sp</item>
 
 
     </style>

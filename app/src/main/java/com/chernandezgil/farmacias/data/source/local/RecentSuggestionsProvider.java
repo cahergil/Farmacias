@@ -42,9 +42,9 @@ public class RecentSuggestionsProvider extends android.content.SearchRecentSugge
                 }
                 else
                 {
-                    Cursor c = super.query(uri, projection, selection, selectionArgs, sortOrder);
-                    Util.logD("log","log");
-                    return c;
+                    return super.query(uri, projection, selection, selectionArgs, sortOrder);
+
+
                 }
 
 

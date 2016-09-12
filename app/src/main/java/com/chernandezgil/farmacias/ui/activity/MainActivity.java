@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -28,6 +29,7 @@ import com.aitorvs.android.allowme.AllowMe;
 import com.aitorvs.android.allowme.AllowMeActivity;
 import com.aitorvs.android.allowme.AllowMeCallback;
 import com.aitorvs.android.allowme.PermissionResultSet;
+import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.customwidget.TouchableWrapper;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
@@ -119,7 +121,7 @@ public class MainActivity extends AllowMeActivity implements
         //mHandler = createHandler();
         mHandler = getHandler();
         setUpToolBar();
-
+       // enableStrictModeForDebug();
 
         if (savedInstanceState == null) {
 
@@ -152,6 +154,23 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+    private void enableStrictModeForDebug() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build());
+        }
+    }
+
     private static class HandlerLauncher extends Handler {
         private final WeakReference<MainActivity> mainActivityWeakReference;
 
@@ -161,10 +180,10 @@ public class MainActivity extends AllowMeActivity implements
         @Override
         public void handleMessage(Message msg) {
             MainActivity mainActivity=mainActivityWeakReference.get();
-//            if (mainActivity.mCurrentFragment == 0) {
-//                mainActivity.setFragment(mainActivity.mCurrentFragment);
-//            }
-            mainActivity.setFragment(1);
+            if (mainActivity.mCurrentFragment == 0) {
+                mainActivity.setFragment(mainActivity.mCurrentFragment);
+            }
+           // mainActivity.setFragment(1);
         }
     }
     private HandlerLauncher getHandler(){
@@ -193,6 +212,7 @@ public class MainActivity extends AllowMeActivity implements
         Util.logD(LOG_TAG, "onStart:"+this.toString());
         super.onStart();
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
+
             mGoogleApiClient.connect();
             //mGoogleApiClient.getConnectionResult()
             Util.logD(LOG_TAG, "mGoogleApiClient.connect");
@@ -336,10 +356,13 @@ public class MainActivity extends AllowMeActivity implements
 
                 break;
             case 1:
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("location_key", mLocation);
                 fragmentManager = getSupportFragmentManager();
-                FindFragment starredFragment = new FindFragment();
+                FindFragment findFragment = new FindFragment();
+                findFragment.setArguments(bundle);
                 fragmentManager.beginTransaction()
-                        .replace(R.id.fragment, starredFragment)
+                        .replace(R.id.fragment, findFragment)
                         .commit();
 
 

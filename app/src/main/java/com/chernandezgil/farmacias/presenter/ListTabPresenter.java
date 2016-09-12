@@ -38,7 +38,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     private Geocoder mGeocoder;
     private Location mLocation;
     private List<Pharmacy> mFarmaciasList;
-    private int FARMACIAS_LOADER=1;
+    private int FARMACIAS_LOADER=2;
     Handler mainHandler;
 
     private PreferencesManager preferencesManager;
@@ -209,7 +209,9 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
         if (id == FARMACIAS_LOADER) {
+            Util.logD(LOG_TAG, "onCreateLoader List");
             return mLoaderProvider.getPharmacies();
         }
         return null;

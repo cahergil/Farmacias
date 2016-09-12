@@ -2,8 +2,12 @@ package com.chernandezgil.farmacias.ui.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,19 +25,31 @@ import butterknife.ButterKnife;
 /**
  * Created by Carlos on 08/09/2016.
  */
-public class QuickSearchAdapter extends RecyclerView.Adapter<QuickSearchAdapter.ViewHolder> implements View.OnClickListener {
+public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearchAdapter.ViewHolder> implements View.OnClickListener {
     private List<SuggestionsBean> mList;
     private  Context mContext;
-    private Drawable lupa;
-    private Drawable history;
+    private Drawable mLupa;
+    private Drawable mHistory;
+    private int mColorSpan;
     public static final int HISTORY_ROW = 0;
     public static final int DATABASE_ROW = 1;
     public final OnClickHandler mCallback;
+    private String mSearchString;
 
-    public QuickSearchAdapter(Context context, OnClickHandler callback){
+    public String getmSearchString() {
+        return mSearchString;
+    }
+
+    public void setmSearchString(String mSearchString) {
+        this.mSearchString = mSearchString;
+    }
+
+    public FindQuickSearchAdapter(Context context, OnClickHandler callback){
         mContext = context;
-        lupa = AppCompatResources.getDrawable(mContext,R.drawable.ic_lupa_suggestions);
-        history = AppCompatResources.getDrawable(mContext,R.drawable.ic_history);
+
+        mLupa = ContextCompat.getDrawable(mContext,R.drawable.ic_lupa_suggestions);
+        mHistory = ContextCompat.getDrawable(mContext,R.drawable.ic_history);
+        mColorSpan = ContextCompat.getColor(mContext,R.color.blue_mobile_web);
         mCallback = callback;
 
     }
@@ -47,9 +63,19 @@ public class QuickSearchAdapter extends RecyclerView.Adapter<QuickSearchAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        SuggestionsBean suggestionsBean = mList.get(position);
+        holder.ivIcon.setImageDrawable(suggestionsBean.getImageId()==0? mHistory : mLupa);
+        String name = suggestionsBean.getName();
+        int startIndex = name.toLowerCase().indexOf(mSearchString.toLowerCase());
 
-        holder.ivIcon.setImageDrawable(mList.get(position).getImageId()==0?history:lupa);
-        holder.tvText.setText(mList.get(position).getName());
+        if(startIndex !=-1) {
+            SpannableString spannableName = new SpannableString(name);
+            ForegroundColorSpan span = new ForegroundColorSpan(mColorSpan);
+            spannableName.setSpan(span, startIndex,startIndex + mSearchString.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            holder.tvText.setText(spannableName);
+        } else {
+            holder.tvText.setText(name);
+        }
     }
 
     @Override
@@ -72,12 +98,12 @@ public class QuickSearchAdapter extends RecyclerView.Adapter<QuickSearchAdapter.
     public static interface OnClickHandler {
         public  void onClickSuggestions(String a);
     }
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+     static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.imageView)
         ImageView ivIcon;
         @BindView(R.id.textView)
         TextView tvText;
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
         }
