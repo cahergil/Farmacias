@@ -43,6 +43,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     private boolean[] expandState;
     //to handle Loader loading again
     private boolean[] oldexpandState;
+    int counter=0;
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
         mClickHandler=clickHandler;
@@ -192,6 +193,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     }
     @Override
     public int getItemCount() {
+        Util.logD(LOG_TAG,"getItemCount:"+(counter++));
         if (mPharmacyList == null) return 0;
         return mPharmacyList.size();
     }

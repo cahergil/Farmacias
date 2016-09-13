@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
+import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import butterknife.ButterKnife;
  */
 
 public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerViewAdapter.MyViewHolder> implements View.OnClickListener{
-
+    private static final String LOG_TAG = FindRecyclerViewAdapter.class.getSimpleName();
     private List<Pharmacy> mList;
     private Context mContext;
 
@@ -32,6 +33,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Util.logD(LOG_TAG,"onCreateViewHolder");
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list1,parent,false);
         MyViewHolder holder = new MyViewHolder(view);
         holder.tvPlus.setOnClickListener(this);
@@ -40,7 +42,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-
+            Util.logD(LOG_TAG,"onBindViewHolder:position"+position);
             Pharmacy pharmacy = mList.get(position);
             holder.tvName.setText(pharmacy.getName());
             String locality = mContext.getString(R.string.fca_format_localidad)+pharmacy.getLocality() + Constants.COMMA
@@ -59,11 +61,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public int getItemCount() {
+        Util.logD(LOG_TAG,"getItemCount:");
         if(mList == null) return 0;
         return mList.size();
     }
 
     public void swapData(List<Pharmacy> incommingList) {
+
         mList = incommingList;
         if(mList == null) {
             mList = new ArrayList<>();

@@ -90,7 +90,7 @@ dependencies {
 
     //recylerview animatino
     compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
-
+    compile 'jp.wasabeef:recyclerview-animators:2.2.4'
     //guava for collections
     compile 'com.google.guava:guava:19.0'
 

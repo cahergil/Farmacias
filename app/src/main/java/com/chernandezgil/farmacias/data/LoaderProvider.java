@@ -63,7 +63,7 @@ public class LoaderProvider  {
     public  Loader<Cursor> getPharmaciesByName(String name) {
         return new CursorLoader(mContext,
                 DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),
-                projectionSuggestion,
+                null,
                 DbContract.FarmaciasEntity.NAME + " like ?",
                 new String[]{"%"+ name + "%"},
                 DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"

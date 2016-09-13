@@ -3,7 +3,7 @@ package com.chernandezgil.farmacias.ui.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.content.res.AppCompatResources;
+
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
  * Created by Carlos on 08/09/2016.
  */
 public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearchAdapter.ViewHolder> implements View.OnClickListener {
+    private static final String LOG_TAG = FindQuickSearchAdapter.class.getSimpleName();
     private List<SuggestionsBean> mList;
     private  Context mContext;
     private Drawable mLupa;
@@ -35,6 +37,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
     public static final int DATABASE_ROW = 1;
     public final OnClickHandler mCallback;
     private String mSearchString;
+    int count=0;
 
     public String getmSearchString() {
         return mSearchString;
@@ -55,6 +58,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Util.logD(LOG_TAG,"onCreateViewHolderQuickSearch");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_suggestions_bean,parent,false);
         ViewHolder holder = new ViewHolder(view);
         holder.tvText.setOnClickListener(this);
@@ -63,6 +67,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Util.logD(LOG_TAG,"onBindViewHolderQuickSearch:position"+position);
         SuggestionsBean suggestionsBean = mList.get(position);
         holder.ivIcon.setImageDrawable(suggestionsBean.getImageId()==0? mHistory : mLupa);
         String name = suggestionsBean.getName();
@@ -80,6 +85,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
 
     @Override
     public int getItemCount() {
+        Util.logD(LOG_TAG,"getItemCountQuickSearch:"+count++);
         if(mList == null) return 0;
         return mList.size();
     }
@@ -87,6 +93,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
     public void swapData(List<SuggestionsBean> newList) {
         mList = newList;
         notifyDataSetChanged();
+
     }
 
     @Override

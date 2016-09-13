@@ -78,7 +78,7 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
 
     @Override
     public void onInitLoaderQuickSearch() {
-        mLoaderManager.restartLoader(LOADER_QUICK_SEARCH,null,this);
+        mLoaderManager.initLoader(LOADER_QUICK_SEARCH,null,this);
     }
 
     @Override
@@ -109,6 +109,8 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
             Util.logD(LOG_TAG, "onCreateLoader:LOADER_QUICK_SEARCH");
             if (args !=null) {
                 return mLoaderProvider.getPharmaciesByNameQuickSearch(args.getString("new_text"));
+            } else {
+                return mLoaderProvider.getPharmaciesByNameQuickSearch("");
             }
         }
 
@@ -123,7 +125,6 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
         if(loader.getId() == LOADER_RESULT) {
             Util.logD(LOG_TAG,"onLoadFinished_LOADER_RESULT");
             Util.logD(LOG_TAG,data.toString());
-
 
             new Thread() {
                 @Override

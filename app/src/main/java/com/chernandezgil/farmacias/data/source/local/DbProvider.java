@@ -113,11 +113,11 @@ public class DbProvider extends ContentProvider {
                 if (Util.isEmptyRequest(selectionArgs)) {
                     if(recentSearch.getCount()>0) {
                         retCursor = createMatrixCursor(recentSearch, RECENT_SEARCH_ORIGIN);
-
+                        recentSearch.close();
                     } else {
-                        retCursor = null;
+                        retCursor = recentSearch;
                     }
-                    recentSearch.close();
+
                 } else {
                     Cursor searchDatabase = mDbHelper.getReadableDatabase().query(
                             DbContract.FarmaciasEntity.TABLE_NAME,
