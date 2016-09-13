@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Context;
 import android.database.MatrixCursor;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
@@ -10,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,9 +24,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -55,6 +60,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+
+import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
+import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -73,7 +81,8 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     TextView mEmptyView;
-
+    @BindView(R.id.frame)
+    FrameLayout mRootLayout;
 
     //Activity UI elements
     private RecyclerView mQuickSearchRecyclerView;
@@ -95,6 +104,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     private CompositeSubscription mCompositeSubscription;
 
     private String mQuickSearchText;
+    private Drawable mDimDrawable;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,6 +140,9 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         View view = inflater.inflate(R.layout.fragment_find, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
+        getDimDrawable();
+        unDimScren();
+
         mPresenter.setView(this);
 
 
@@ -142,24 +155,27 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         super.onActivityCreated(savedInstanceState);
         initializeSearchUiWidgets();
         if (savedInstanceState == null) {
+            //LoaderManager retains the cursor of the last result
             mPresenter.onInitLoader();
         } else {
-            String searchText = Constants.EMPTY_STRING;
 
             mCardOnScreen = savedInstanceState.getBoolean("card_on_screen_key");
+            String searchText = savedInstanceState.getString("last_search_editor_key");
             if (mCardOnScreen) {
-                //on rotation the edittext retain its value, but don't know why when I try to access
-                //its value here to use it in mFindQuickSearchAdapter.setmSearchString(mSearchEditor.getText()
-                // .toString returns ""),
-                //the value
-                searchText = savedInstanceState.getString("last_search_editor_key", Constants.EMPTY_STRING);
+                int quickSearchRecyclerViewVisibility=savedInstanceState.getInt("quickSearchRecyclerViewState");
                 mPresenter.onInitLoader();
                 mSearchCardView.setVisibility(View.VISIBLE);
                 int options = mSearchEditor.getImeOptions();
                 mSearchEditor.setImeOptions(options | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                if (savedInstanceState.getInt("recyclerview_state") == View.VISIBLE) {
+                //if quickSearchRecyclerView was visible before rotation, that means that the user
+                //was searching-> restore state of searching
+                if (quickSearchRecyclerViewVisibility == View.VISIBLE) {
                     mQuickSearchRecyclerView.setVisibility(View.VISIBLE);
-                    mFindQuickSearchAdapter.setmSearchString(mSearchEditor.getText().toString());
+                    mFindQuickSearchAdapter.setmSearchString(searchText);
+                    if(searchText.length()>0) {
+                        showClearSearchIcon();
+                    }
+                    //LoaderManager retains the state of the cursor of the last search
                     mPresenter.onInitLoaderQuickSearch();
 
                 }
@@ -212,7 +228,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         outState.putParcelable("location_key", mLocation);
         outState.putString("last_search_editor_key", mSearchEditor.getText().toString());
         outState.putBoolean("card_on_screen_key", mCardOnScreen);
-        outState.putInt("recyclerview_state", mQuickSearchRecyclerView.getVisibility());
+        outState.putInt("quickSearchRecyclerViewState", mQuickSearchRecyclerView.getVisibility());
         //0 visible; 8 gone; 4 invisible
 
     }
@@ -235,14 +251,16 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
                     Util.logD(LOG_TAG, "edit_text has focus");
-
-                   // showQuickSearchRecyclerView();
+                    mRecyclerView.setVisibility(View.GONE);
+                    showQuickSearchRecyclerView();
+                    dimScreen();
 
                 } else {
 
                     Util.logD(LOG_TAG, "edit_text lost focus");
-
+                    mRecyclerView.setVisibility(View.VISIBLE);
                     hideQuickSearchRecyclerView();
+                    unDimScren();
                 }
             }
         });
@@ -263,10 +281,15 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String text = mSearchEditor.getText().toString();
+              //  String text = mSearchEditor.getText().toString();
+                  String text =  editable.toString();
 
                 if (mQuickSearchText != null && mQuickSearchText.equals(text)) {
-                    startQuickSearch(text);
+                    //after having selected a suggestion:
+                    //set text of suggestions in SearchEditor -> gets the focus again
+                    //use get the data again to be ready for the next time we click on searchEditor
+                    startQuickSearch(text,false);
+                    return;
                 }
                 if (!mCardOnScreen) return;
                 if (mRotation) {
@@ -276,7 +299,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
                     return;
                 }
 
-                startQuickSearch(text);
+                startQuickSearch(text,true);
             }
         });
         //https://kotlin.link/articles/RxAndroid-and-Kotlin-Part-1.html
@@ -319,15 +342,36 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
 
     }
 
-    private void startQuickSearch(String s) {
+    private void getDimDrawable(){
+        mDimDrawable =ContextCompat.getDrawable(getContext(),R.drawable.dim_drawable);
+    }
+    private void dimScreen(){
+        mRootLayout.setForeground(mDimDrawable);
+        mRootLayout.getForeground().setAlpha(180);
+    }
+    private void unDimScren() {
+        mRootLayout.setForeground(null);
+        //mRootLayout.getForeground().setAlpha(0);
+    }
+    private void showClearSearchIcon() {
+        mClearSearch.setVisibility(View.VISIBLE);
+    }
+    private void hideClearSearchIcon() {
+        mClearSearch.setVisibility(View.INVISIBLE);
+    }
+    private void startQuickSearch(String s,boolean flagShowQuickSearchRecyclerView) {
         Util.logD(LOG_TAG, "startQuickSearch");
-        showQuickSearchRecyclerView();
+
+        if(flagShowQuickSearchRecyclerView) {
+            showQuickSearchRecyclerView();
+
+        }
         mPresenter.onRestartLoaderQuickSearch(s);
         mFindQuickSearchAdapter.setmSearchString(s);
         if (s.length() > 0) {
-            mClearSearch.setVisibility(View.VISIBLE);
+            showClearSearchIcon();
         } else {
-            mClearSearch.setVisibility(View.INVISIBLE);
+            hideClearSearchIcon();
         }
 
     }
@@ -365,30 +409,17 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     private void setUpRecyclerView() {
 
         mAdapter = new FindRecyclerViewAdapter(getContext());
-//        SlideInBottomAnimationAdapter slideAdapter = new SlideInBottomAnimationAdapter(mAdapter);
-//        slideAdapter.setDuration(200);
-//        slideAdapter.setInterpolator(new DecelerateInterpolator());
-        mRecyclerView.setAdapter(mAdapter);
+        SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
+        mRecyclerView.setAdapter(slideAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
-      //  SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
-      //  mRecyclerView.setAdapter(animatorAdapter);
     }
 
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Util.logD(LOG_TAG, "showResults");
         mAdapter.swapData(pharmacyList);
-
-//            if(!mRotation) {
-//
-//                if (mQuickSearchRecyclerView.getVisibility() == View.VISIBLE) {
-//                    mQuickSearchRecyclerView.setVisibility(View.GONE);
-//                }
-//            } else {
-//                mRotation = false;
-//            }
 
 
     }
@@ -487,7 +518,8 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
      //   mSearchEditor.clearFocus();
         //Note: When a View clears focus the framework is trying to give focus to the first focusable View from the top. Hence, if this View is the first from the top that can take focus, then all callbacks related to clearing focus will be invoked after which the framework will give focus to this view.
         //the solution is make another element focusable and request its focus, in this case I chose mRecyclerview
-        mRecyclerView.requestFocus();
+    //    mRecyclerView.requestFocus();
+        mRootLayout.requestFocus();
     }
 
     private void getSoftKeyboardState() {
