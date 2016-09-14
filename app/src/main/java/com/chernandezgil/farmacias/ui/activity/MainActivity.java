@@ -118,7 +118,7 @@ public class MainActivity extends AllowMeActivity implements
         mPreferencesManager = new AndroidPrefsManager(this);
         mMainActivityPresenter = new MainActivityPresenter(mPreferencesManager);
         mMainActivityPresenter.setView(this);
-        //mHandler = createHandler();
+
         mHandler = getHandler();
         setUpToolBar();
        // enableStrictModeForDebug();
@@ -135,18 +135,10 @@ public class MainActivity extends AllowMeActivity implements
             mCurrentFragment = savedInstanceState.getInt("current_fragment_key");
 
         }
-       // ((MyApplication) getApplication()).getComponent().inject(this);
-        mGoogleApiClient=new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();
-        mGoogleApiClient.registerConnectionCallbacks(this);
-        mGoogleApiClient.registerConnectionFailedListener(this);
 
 
+        buildGoogleApiClient();
         setupNavigationDrawerContent(navigationView);
-
         startCounter();
         firsRun=true;
 
@@ -154,6 +146,14 @@ public class MainActivity extends AllowMeActivity implements
 
     }
 
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient=new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        createLocationRequest();
+    }
     private void enableStrictModeForDebug() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -295,7 +295,6 @@ public class MainActivity extends AllowMeActivity implements
 
 
     private void setupNavigationDrawerContent(NavigationView navigationView) {
-//        drawerLayout.addDrawerListener(mDrawerListener);
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -420,10 +419,6 @@ public class MainActivity extends AllowMeActivity implements
 
                    return ((TabLayoutFragment) tabs).getCurrentItem();
 
-//                MapTabFragment mapTabFragment = (MapTabFragment) tabs.getChildFragmentManager().findFragmentByTag("fragment:0");
-//                if(mapTabFragment !=null && ((TabLayoutFragment)tabs).getCurrentItem()==0) {
-//                    return mapTabFragment;
-//                }
                 }
             }
 
@@ -435,7 +430,7 @@ public class MainActivity extends AllowMeActivity implements
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         Integer resultCode = googleAPI.isGooglePlayServicesAvailable(this);
         if (resultCode == ConnectionResult.SUCCESS) {
-            //Do what you want
+
         } else {
             if (googleAPI.isUserResolvableError(resultCode)) {
                 googleAPI.getErrorDialog(this, resultCode,
@@ -470,7 +465,7 @@ public class MainActivity extends AllowMeActivity implements
     public void onConnected(@Nullable Bundle bundle) {
 
         Util.logD(LOG_TAG, "onConnected");
-        createLocationRequest();
+
 
         if (!AllowMe.isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
             new AllowMe.Builder()

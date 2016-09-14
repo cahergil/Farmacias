@@ -125,14 +125,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     public void onStartLoader() {
         Util.logD(LOG_TAG, "onInitLoader");
         mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
-//        mLoaderManager.getLoader(FARMACIAS_LOADER).forceLoad();
-//        Loader<Cursor> loader= mLoaderManager.getLoader(FARMACIAS_LOADER);
-//
-//        if(loader!=null) {
-//            if(loader.isStarted()) loader.forceLoad();
-//        } else {
-//            mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
-//        }
+
     }
 
     @Override

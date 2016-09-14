@@ -24,8 +24,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -62,7 +60,6 @@ import butterknife.Unbinder;
 
 
 import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
-import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
@@ -140,9 +137,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         View view = inflater.inflate(R.layout.fragment_find, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
-        getDimDrawable();
-        unDimScren();
-
+        setDimDrawable();
         mPresenter.setView(this);
 
 
@@ -342,7 +337,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
 
     }
 
-    private void getDimDrawable(){
+    private void setDimDrawable(){
         mDimDrawable =ContextCompat.getDrawable(getContext(),R.drawable.dim_drawable);
     }
     private void dimScreen(){
@@ -350,6 +345,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         mRootLayout.getForeground().setAlpha(180);
     }
     private void unDimScren() {
+        //this way the vertical separators in locality, adress etc are shown
         mRootLayout.setForeground(null);
         //mRootLayout.getForeground().setAlpha(0);
     }
