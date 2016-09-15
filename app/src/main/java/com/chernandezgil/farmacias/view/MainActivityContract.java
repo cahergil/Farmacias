@@ -14,6 +14,7 @@ public interface MainActivityContract {
         void setView(V view);
 
         void detachView();
+        void onStart();
 
 
     }

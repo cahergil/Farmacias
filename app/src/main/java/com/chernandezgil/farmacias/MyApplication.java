@@ -19,20 +19,20 @@ public class MyApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-  //      LeakCanary.install(this);
+        LeakCanary.install(this);
           this.context=getApplicationContext();
-          mMapComponent= DaggerMainComponent.builder()
-                    .mainModule(new MainModule())
-                    .applicationModule(new ApplicationModule(this))
-                    .build();
+//          mMapComponent= DaggerMainComponent.builder()
+//                    .mainModule(new MainModule())
+//                    .applicationModule(new ApplicationModule(this))
+//                    .build();
 
 
     }
     public static Context getContext(){
         return context;
     }
-    public MainComponent getComponent(){
-        return mMapComponent;
-    }
+//    public MainComponent getComponent(){
+//        return mMapComponent;
+//    }
 }
 

@@ -43,7 +43,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     private boolean[] expandState;
     //to handle Loader loading again
     private boolean[] oldexpandState;
-    int counter=0;
+
     public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
         mContext=context;
         mClickHandler=clickHandler;
@@ -52,7 +52,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Util.logD(LOG_TAG,"onCreateViewHolder");
+      //  Util.logD(LOG_TAG,"onCreateViewHolder");
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
         ViewHolder viewHolder=new ViewHolder(view);
 
@@ -68,7 +68,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
+      //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
         Pharmacy pharmacy=mPharmacyList.get(position);
         if(expandState[position]) {
             if(mRotationArray[position]) {
@@ -193,7 +193,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
     }
     @Override
     public int getItemCount() {
-        Util.logD(LOG_TAG,"getItemCount:"+(counter++));
+
         if (mPharmacyList == null) return 0;
         return mPharmacyList.size();
     }

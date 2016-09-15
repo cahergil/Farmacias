@@ -2,6 +2,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
@@ -19,17 +20,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.ListTabPresenter;
-import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
+import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.lang.reflect.Field;
@@ -43,7 +47,8 @@ import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 /**
  * Created by Carlos on 06/08/2016.
  */
-public class ListTabFragment extends Fragment implements ListTabContract.View, ListTabAdapter.ListTabAdapterOnClickHandler {
+public class ListTabFragment extends Fragment implements ListTabContract.View,
+        ListTabAdapter.ListTabAdapterOnClickHandler,SharedPreferences.OnSharedPreferenceChangeListener {
 
     @BindView(R.id.pharmaciesRecyclerView)
     RecyclerView mRecyclerView;
@@ -67,6 +72,10 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
     private UpdateFavorite mCallback;
     private boolean[] mSpandState;
     private boolean mRotation;
+    private PreferencesManager mPreferencesManager;
+    private SnackBarWrapper mSnackBar;
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -96,8 +105,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             mAddress = savedInstanceState.getString("address_key");
         }
         LoaderProvider loaderProvider = new LoaderProvider(getActivity());
-        PreferencesManager preferencesManager = new AndroidPrefsManager(getActivity());
-        mPresenter = new ListTabPresenter(mLocation, loaderProvider, getLoaderManager(), new Geocoder(getActivity()), preferencesManager);
+        mPreferencesManager = new PreferencesManagerImp(getActivity());
+        mPresenter = new ListTabPresenter(mLocation, loaderProvider, getLoaderManager(), new Geocoder(getActivity()), mPreferencesManager);
 
 
     }
@@ -149,6 +158,18 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPreferencesManager.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+    }
+
+    @Override
+    public void onPause() {
+        mPreferencesManager.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
 
     private void setUpRecyclerView() {
         mAdapter = new ListTabAdapter(getActivity(), this);
@@ -242,11 +263,71 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
 
         }
         Util.logD(LOG_TAG, "rows updates: " + rowsUpdated);
-//        for(int i =0; i<)
-//        ListTabAdapter.ViewHolder holder=mRecyclerView.findViewHolderForAdapterPosition(position);
-//        vh.isRecyclable()
+
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if(key == mPreferencesManager.getLocationKey()) {
+            //update location variable
+            mLocation = mPreferencesManager.getLocation();
+            mSnackBar = new SnackBarWrapper(getActivity());
+            mSnackBar.addCallback(createSnackbarCallback());
+            mSnackBar.show();
+
+        }
+    }
+    private SnackbarCallback createSnackbarCallback() {
+        return new SnackbarCallback() {
+            @Override
+            public void onSnackbarActionPressed(Snackbar snackbar) {
+                Toast.makeText(getActivity(),"Presionado action",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSnackbarSwiped(Snackbar snackbar) {
+                //showToast("Swiped");
+            }
+
+            @Override
+            public void onSnackbarTimedOut(Snackbar snackbar) {
+               // showToast("Timed out");
+            }
+        };
+    }
+
+//    private static class ToastThread extends Thread {
+//        private boolean mRunning = false;
+//        private Toast toast;
+//        public ToastThread(Toast toast) {
+//            this.toast = toast;
+//        }
+//
+//
+//        Handler handler= new Handler(Looper.getMainLooper());
+//        @Override
+//        public void run() {
+//            int count =0;
+//            while (count<10) {
+//                count++;
+//               // SystemClock.sleep(1000);
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        toast.show();
+//                    }
+//                });
+//
+//
+//            }
+//        }
+//
+//        public void close() {
+//            mRunning = false;
+//        }
+//
+//    }
     public interface UpdateFavorite {
         public void onUpdateFavorite(String phone,boolean fromListMap);
     }
@@ -270,6 +351,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View, L
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public void onDestroy() {

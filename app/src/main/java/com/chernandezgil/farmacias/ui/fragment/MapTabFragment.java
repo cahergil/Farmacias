@@ -41,7 +41,7 @@ import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.presenter.MapTabPresenter;
-import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -159,7 +159,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         mLoaderProvider=new LoaderProvider(getActivity());
         mLoaderManager=getLoaderManager();
-        PreferencesManager preferencesManager=new AndroidPrefsManager(getActivity());
+        PreferencesManager preferencesManager=new PreferencesManagerImp(getActivity());
         mMapTabPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,preferencesManager);
         mMapTabPresenter.setLocation(mLocation);
         mAddress = mMapTabPresenter.onGetAddressFromLocation(mLocation);

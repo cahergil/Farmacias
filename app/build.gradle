@@ -49,6 +49,7 @@ repositories {
 
     maven { url "https://jitpack.io" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven {url "https://clojars.org/repo/"}
 
 }
 dependencies {
@@ -60,8 +61,11 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$SUPPORT"
     compile "com.android.support:design:$SUPPORT"
     compile "com.android.support:support-vector-drawable:$SUPPORT"
-    compile 'com.google.android.gms:play-services-places:9.2.0'
-    compile 'com.google.android.gms:play-services-location:9.2.0'
+  //  compile 'com.google.android.gms:play-services-places:9.2.0'
+  //  compile 'com.google.android.gms:play-services-location:9.2.0'
+    //compile 'com.google.android.gms:play-services-location:8.1.0'
+    compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.jakewharton:butterknife:8.1.0'
     apt 'com.jakewharton:butterknife-compiler:8.1.0'
     compile 'com.github.aitorvs:allowme:0.3.2'
@@ -90,6 +94,7 @@ dependencies {
 
     //recylerview animatino
     compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
+    //not used so far
     compile 'jp.wasabeef:recyclerview-animators:2.2.4'
     //guava for collections
     compile 'com.google.guava:guava:19.0'
@@ -97,9 +102,14 @@ dependencies {
     //expandable linerlayout
  //   compile 'com.github.aakira:expandable-layout:1.5.1@aar'
 
-    compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
+ //   compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
     // to implement rxjava with editText
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 
-    compile 'com.github.frankiesardo:linearlistview:1.0.1@aar'
+    //icepick
+    compile 'frankiesardo:icepick:3.2.0'
+    provided 'frankiesardo:icepick-processor:3.2.0'
+
+    compile 'com.github.andrewlord1990:snackbarbuilder:0.6.0'
 }

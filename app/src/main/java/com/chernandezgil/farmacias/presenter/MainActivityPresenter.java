@@ -1,9 +1,6 @@
 package com.chernandezgil.farmacias.presenter;
 
-import android.location.Geocoder;
-
 import com.chernandezgil.farmacias.data.source.MainActivityInteractor;
-import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MainActivityContract;
 
@@ -28,14 +25,20 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
         mMainActivityView =view;
         mMainActivityInteractor=new MainActivityInteractor(mPreferencesManager);
-        mMainActivityInteractor.loadDatabase();
+
     }
+
 
     @Override
     public void detachView() {
 
         mMainActivityView =null;
 
+    }
+
+    @Override
+    public void onStart() {
+        mMainActivityInteractor.loadDatabase();
     }
 
 

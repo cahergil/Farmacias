@@ -9,7 +9,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -18,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.ui.adapter.AndroidPrefsManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 
 import butterknife.BindView;
@@ -46,7 +45,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mSharedPreferences=new AndroidPrefsManager(getContext());
+        mSharedPreferences=new PreferencesManagerImp(getContext());
         if(savedInstanceState==null) {
             Bundle bundle=getArguments();
             if(bundle!=null) {
