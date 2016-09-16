@@ -1,28 +1,35 @@
 package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,21 +46,20 @@ import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
-import com.chernandezgil.farmacias.ui.fragment.TrackFragment;
+import com.chernandezgil.farmacias.ui.fragment.GPSTrackerFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.SupportErrorDialogFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
@@ -64,12 +70,12 @@ import icepick.State;
 
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener,TouchableWrapper.UpdateMapUserClick,
+        GoogleApiClient.OnConnectionFailedListener, TouchableWrapper.UpdateMapUserClick,
         ListTabFragment.UpdateFavorite
 {
-//,
-    //
 
+
+    private static final String DIALOG_ERROR = "dialog_error";
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -87,31 +93,13 @@ public class MainActivity extends AppCompatActivity implements
     private ActionBar actionBar;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final int REQUEST_RESOLVE_CONNECTION_ERROR = 1001;
+    private static final String GPS_FRAG = "gps_frag";
     private MainActivityPresenter mMainActivityPresenter;
-    private PreferencesManager mPreferencesManager;
-
-    private HandlerActivity mHandler;
     private TabLayoutFragment mtabFragment;
 
-    //static so that the value can be read in the onLocationChanged callback
-    // , else won't be read properly it value. There is no sense of activity in the callback
-    //http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
-    //Avoid performing transactions inside asynchronous callback methods.
-    private static boolean mConfChange;
-    private static boolean mFromSettings;
-
-
-
-//    private static long GPS_FATEST_INTERVAL = TimeUnit.MINUTES.toMillis(10);
-//    private static long GPS_INTERVAL = GPS_FATEST_INTERVAL;
-//    private static long FRAG_MAP_REFRESH_INTERVAL = TimeUnit.MINUTES.toSeconds(7);
-    private static long GPS_FATEST_INTERVAL = TimeUnit.SECONDS.toMillis(10);
-    private static long GPS_INTERVAL = GPS_FATEST_INTERVAL;
-    private static long FRAG_MAP_REFRESH_INTERVAL = TimeUnit.SECONDS.toSeconds(12);
+    private static boolean sFromSettings;
     private int option = 0;
-    private long mElapsedTime;
-    private long mStartTime;
-    private static boolean mColdStart;
     private static final String[] PERMS=
             {Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int REQUEST_PERMISSION = 61125;
@@ -119,17 +107,30 @@ public class MainActivity extends AppCompatActivity implements
     @State
     boolean isInPermission = false;
     @State
-    Location mLocation;
+    int mCurrentFragment =0;
     @State
-    int mCurrentFragment = 0;
+    boolean mResolvingConnectionError;
+
 
     private PreferencesManager mSharedPreferences;
     private Unbinder mUnbinder;
+    ;
 
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
+    private BroadcastReceiver onNotice = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            int  action = bundle.getInt(GPSTrackerFragment.ACTION);
+            if(action == 0) {
+                launchFragment(0);
+            }
+        }
+    };
 
 
     @Override
@@ -137,28 +138,20 @@ public class MainActivity extends AppCompatActivity implements
         Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(savedInstanceState==null) {
-            TrackFragment trackFragment = new TrackFragment();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().add(trackFragment, "frag").commit();
-        }
+
         mUnbinder=ButterKnife.bind(this);
-        mPreferencesManager = new PreferencesManagerImp(this);
-        mMainActivityPresenter = new MainActivityPresenter(mPreferencesManager);
+        mSharedPreferences = new PreferencesManagerImp(getApplicationContext());
+        mMainActivityPresenter = new MainActivityPresenter(mSharedPreferences);
         mMainActivityPresenter.setView(this);
         mMainActivityPresenter.onStart();
-        mSharedPreferences = new PreferencesManagerImp(this);
-        mHandler = getHandler();
         setUpToolBar();
+
         // enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
         if (savedInstanceState == null) {
 
          //   checkGooglePlayServicesAvailability();
         //    initilizeStetho();
-
-        } else {
-            mConfChange = true;
 
         }
         if (hasAllPermissions(getDesiredPermissions())) {
@@ -171,10 +164,6 @@ public class MainActivity extends AppCompatActivity implements
                             REQUEST_PERMISSION);
         }
         setupNavigationDrawerContent(navigationView);
-        startTimeCounter();
-        //remember MainActivity is in singleTop launch mode
-        mColdStart = true;
-
 
 
     }
@@ -190,23 +179,11 @@ public class MainActivity extends AppCompatActivity implements
                 .addConnectionCallbacks(this)
                 .addApi(LocationServices.API)
                 .build();
-        createLocationRequest();
-    }
-
-    private void unregisterLocationCallbacks() {
-        if(mGoogleApiClient!=null) {
-            mGoogleApiClient.unregisterConnectionCallbacks(this);
-            mGoogleApiClient.unregisterConnectionFailedListener(this);
-            Util.logD(LOG_TAG,"unregisterConnectionCallbacks");
-        }
 
     }
-    private void registerLocationCallbacks(){
 
-            mGoogleApiClient.registerConnectionCallbacks(this);
-            mGoogleApiClient.registerConnectionFailedListener(this);
 
-    }
+
     private void enableStrictModeForDebug() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -228,66 +205,17 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * used in HandlerActivity
      */
-    private int getCurrentFragment() {
+    public int getCurrentFragment() {
         return mCurrentFragment;
     }
-    /**
-     * used in HandlerActivity
-     * @return
-     */
-    private Location getCurrentLocation(){
-        return mLocation;
-    }
 
-    /**
-     * used in HandlerActivity
-     * @return
-     */
-    private PreferencesManager getSharedPreferencesManager(){
-        return mSharedPreferences;
-    }
-
-    //Avoid performing transactions inside asynchronous callback methods.
-    //http://www.androiddesignpatterns.com/2013/01/inner-class-handler-memory-leak.html
-    //in this case static and inner is not enought:
-    // don't forget to call   mHandler.removeCallbacksAndMessages(null);
-    // see: https://techblog.badoo.com/blog/2014/08/28/android-handler-memory-leaks/
-    private static class HandlerActivity extends Handler {
-        private final WeakReference<MainActivity> activityWeakReference;
-
-        HandlerActivity(MainActivity mainActivity) {
-            activityWeakReference = new WeakReference<MainActivity>(mainActivity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-
-            MainActivity activity = activityWeakReference.get();
-            activity.getSharedPreferencesManager().saveLocation(activity.getCurrentLocation());
-            switch (msg.what) {
-                case 1:
-                    if (activity.getCurrentFragment() == 0) {
-                        activity.setFragment(0);
-                    }
-                    break;
-                case 3:
-                    break;
-            }
-
-
-        }
-    }
-
-    private HandlerActivity getHandler() {
-        return new HandlerActivity(this);
-    }
 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Util.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-       // Icepick.saveInstanceState(this, outState);
+        Icepick.saveInstanceState(this, outState);
 
     }
 
@@ -296,38 +224,36 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         Util.logD(LOG_TAG, "onStart");
         super.onStart();
-        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
-
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected() && !mResolvingConnectionError) {
             mGoogleApiClient.connect();
             Util.logD(LOG_TAG, "mGoogleApiClient.connect()");
-
         }
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(GPSTrackerFragment.BROADCAST);
+        LocalBroadcastManager.getInstance(this).registerReceiver(onNotice,filter);
+    }
 
     @Override
     protected void onPause() {
         Util.logD(LOG_TAG, "onPause");
         super.onPause();
-        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
-        if (mGoogleApiClient!=null && mGoogleApiClient.isConnected()) {
-            TrackFragment trackFragment = getTrackFragment();
-            if(trackFragment!=null) {
-                trackFragment.stopTracking();
-
-            }
-
-            Util.logD(LOG_TAG, "stopLocationUpdates()");
-        }
-
-
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onNotice);
     }
+
 
     @Override
     protected void onStop() {
         Util.logD(LOG_TAG, "onStop");
-        mGoogleApiClient.disconnect();
+        if(mGoogleApiClient != null ) {
+            mGoogleApiClient.disconnect();
+            Util.logD(LOG_TAG, "mGoogleApiClient.disconnect()");
+        }
         super.onStop();
     }
 
@@ -347,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            mFromSettings = true;
+            sFromSettings = true;
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
@@ -398,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        setFragment(option);
+                        launchFragment(option);
                     }
                 }, 300);
                 mCurrentFragment = option;
@@ -408,18 +334,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void setFragment(int position) {
-        Util.logD(LOG_TAG, "setFragment");
+    private void launchFragment(int position) {
+        Util.logD(LOG_TAG, "launchFragment");
         FragmentManager fragmentManager;
 
         switch (position) {
             case 0:
                 try {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("location_key", mLocation);
+
                     fragmentManager = getSupportFragmentManager();
                     mtabFragment = new TabLayoutFragment();
-                    mtabFragment.setArguments(bundle);
                     FragmentTransaction ft = fragmentManager.beginTransaction();
                     ft.replace(R.id.fragment, mtabFragment)
                             .commit();
@@ -430,11 +354,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
             case 1:
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("location_key", mLocation);
+
                 fragmentManager = getSupportFragmentManager();
                 FindFragment findFragment = new FindFragment();
-                findFragment.setArguments(bundle);
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment, findFragment)
                         .commit();
@@ -445,107 +367,100 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void checkGooglePlayServicesAvailability() {
-        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-        Integer resultCode = googleAPI.isGooglePlayServicesAvailable(this);
-        if (resultCode == ConnectionResult.SUCCESS) {
-
-        } else {
-            if (googleAPI.isUserResolvableError(resultCode)) {
-                googleAPI.getErrorDialog(this, resultCode,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
 
 
-        }
-    }
+
+
 
     public GoogleApiClient getLocationApiClient() {
         return mGoogleApiClient;
     }
-    private void createLocationRequest() {
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                //min x secs x millisec
-                .setFastestInterval(10000)
-                .setInterval(10000);
-    }
 
-    @SuppressWarnings({"MissingPermission"})
-    public void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
 
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                mGoogleApiClient, this);
-    }
 
-    private TrackFragment getTrackFragment() {
-        return (TrackFragment) getSupportFragmentManager().findFragmentByTag("frag");
+    private GPSTrackerFragment getTrackFragment() {
+        return (GPSTrackerFragment) getSupportFragmentManager().findFragmentByTag(GPS_FRAG);
 
 
     }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-       TrackFragment trackFragment= getTrackFragment();
-        if(trackFragment!=null) {
-            trackFragment.startTracking();
-        }
         Util.logD(LOG_TAG, "onConnected");
+        GPSTrackerFragment trackerFragment = getTrackFragment();
+        if (trackerFragment == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(new GPSTrackerFragment(), GPS_FRAG)
+                    .commit();
+        } else {
+            trackerFragment.startTracking();
+        }
+
+
 
 
 
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        Util.logD(LOG_TAG, "onLocationChanged");
-//        mLocation = location;
-//        //prevent loading content. Only when fresh start or when location updates
-//        mElapsedTime = (int) (System.currentTimeMillis() - mStartTime) / 1000;
-//
-//        //on configuration changes not saving coordinates
-//        if (!mConfChange) {
-//            if (mColdStart) {
-//
-//      //          mHandler.sendMessage(createMessage(1));
-//                mColdStart = false;
-//            } else if (mFromSettings) { //we are in SingleTop mode-> firstRun=false
-//        //        mHandler.sendMessage(createMessage(1));
-//                mFromSettings = false;
-//            } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
-//          //      mHandler.sendMessage(createMessage(3));
-//                startTimeCounter();
-//            }
-//        } else {
-//            mConfChange = false;
-//        }
 
-
-    }
-
-    private Message createMessage(int what) {
-        Message message = new Message();
-        message.setTarget(mHandler);
-        message.what=what;
-        return message;
-    }
-    private void startTimeCounter() {
-        mStartTime = System.currentTimeMillis();
-    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        if (mResolvingConnectionError) {
+            return;
+        } else if (connectionResult.hasResolution()) {
+            try {
+                mResolvingConnectionError = true;
+                connectionResult.startResolutionForResult(this,REQUEST_RESOLVE_CONNECTION_ERROR);
+            } catch(IntentSender.SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // Show dialog using GoogleApiAvailability.getErrorDialog()
+            showErrorDialog(connectionResult.getErrorCode());
+            mResolvingConnectionError = true;
+        }
     }
 
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+    }
+
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed() {
+        mResolvingConnectionError = false;
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() { }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GoogleApiAvailability.getInstance().getErrorDialog(
+                    this.getActivity(), errorCode, REQUEST_RESOLVE_CONNECTION_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((MainActivity) getActivity()).onDialogDismissed();
+        }
+    }
 //
     @Override
     public void onClickMap(MotionEvent event) {
@@ -667,11 +582,7 @@ public class MainActivity extends AppCompatActivity implements
         isInPermission = false;
         if (requestCode == REQUEST_PERMISSION) {
             if (hasAllPermissions(getDesiredPermissions())) {
-                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
+                buildGoogleApiClient();
                 mGoogleApiClient.connect();
             } else {
               //  handlePermissionDenied();
@@ -680,13 +591,32 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == GPSTrackerFragment.REQUEST_CHECK_SETTINGS) {
+            if (resultCode == Activity.RESULT_CANCELED) {
+                finish();
+            } else {
+                GPSTrackerFragment tracker =getTrackFragment();
+                tracker.startTracking();
+            }
+        } else if( requestCode == REQUEST_RESOLVE_CONNECTION_ERROR) {
+            mResolvingConnectionError = false;
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!mGoogleApiClient.isConnecting() &&
+                        !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        }
+
+
+    }
+
+    @Override
     protected void onDestroy() {
         Util.logD(LOG_TAG, "onDestroy");
         mUnbinder.unbind();
-//        mGoogleApiClient = null;
-
-        mHandler.removeCallbacksAndMessages(null);
-//        mHandler = null;
         mMainActivityPresenter.detachView();
         super.onDestroy();
     }

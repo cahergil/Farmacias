@@ -37,7 +37,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     TabLayout mTabLayout;
 
 
-    private  Location mLocation;
+
     private Adapter pagerAdapter=null;
     private PreferencesManager mSharedPreferences;
 
@@ -45,24 +45,18 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mSharedPreferences=new PreferencesManagerImp(getContext());
-        if(savedInstanceState==null) {
-            Bundle bundle=getArguments();
-            if(bundle!=null) {
-                mLocation=bundle.getParcelable("location_key");
-            }
-        } else {
-           mLocation=savedInstanceState.getParcelable("location_key");
-           mSharedPreferences.setCurrentItemTabLayout(savedInstanceState.getInt("current_item_key"));
+        mSharedPreferences=new PreferencesManagerImp(getActivity().getApplicationContext());
+        if(savedInstanceState !=null) {
+            mSharedPreferences.setCurrentItemTabLayout(savedInstanceState.getInt("current_item_key"));
         }
-        Util.logD(LOG_TAG,"****main thread?:"+(Looper.myLooper() == Looper.getMainLooper()));
+
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Util.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key",mLocation);
         outState.putInt("current_item_key",mViewPager.getCurrentItem());
 
 
@@ -113,7 +107,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
     private void setUpViewPager(){
-        pagerAdapter=new Adapter(mLocation,getChildFragmentManager());
+        pagerAdapter=new Adapter(getContext(),getChildFragmentManager());
 
         mViewPager.setAdapter(pagerAdapter);
 
@@ -149,15 +143,13 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     //to remember: https://code.google.com/p/android/issues/detail?id=69586
     public static class Adapter extends FragmentPagerAdapter {
         public SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
-        Location location;
-
 
         private Context context;
-        public Adapter(Location location,FragmentManager fm) {
+        public Adapter(Context ctxt,FragmentManager fm) {
 
             super(fm);
 
-            this.location=location;
+            context = ctxt;
 
         }
 
@@ -173,18 +165,15 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
         @Override
         public Fragment getItem(int position) {
-            Bundle bundle=new Bundle();
-            bundle.putParcelable("location_key",location);
+
             switch (position) {
                 case 0:
-                    ListTabFragment listTabFragment=new ListTabFragment();
-                    listTabFragment.setArguments(bundle);
-                    return listTabFragment;
+                     return new ListTabFragment();
+
+
                 case 1:
 
-                    MapTabFragment mapTabFragment =new MapTabFragment();
-                    mapTabFragment.setArguments(bundle);
-                    return mapTabFragment;
+                     return new MapTabFragment();
 
                 default: return null;
 
@@ -214,11 +203,11 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    //context.getString(R.string.tlf_tab_list_string)
-                    return "Lista";
+                    return context.getString(R.string.tlf_tab_list_string);
+
                 case 1:
-                    //context.getString(R.string.tlf_tab_map_string)
-                    return "Mapa";
+                    return context.getString(R.string.tlf_tab_map_string);
+
                 default: return null;
 
             }

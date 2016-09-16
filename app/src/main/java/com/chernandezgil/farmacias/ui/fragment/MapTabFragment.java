@@ -2,6 +2,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -12,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
@@ -31,8 +31,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
@@ -44,6 +46,7 @@ import com.chernandezgil.farmacias.presenter.MapTabPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
+import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -66,7 +69,7 @@ import butterknife.Unbinder;
  * Created by Carlos on 10/07/2016.
  */
 public class MapTabFragment extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener,MapTabContract.View {
+        GoogleMap.OnMarkerClickListener,MapTabContract.View,SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
@@ -77,7 +80,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private BottomSheetBehavior mBottomSheetBehavior;
     private CustomSupporMapFragment mMapFragment;
     private boolean mRotation=false;
-    private MapTabPresenter mMapTabPresenter;
+    private MapTabPresenter mPresenter;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
     private String mAddress;
@@ -141,7 +144,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private int mBottomSheetState;
     private boolean mFromListTab;
     CustomSupporMapFragment mapFragment;
-
+    private PreferencesManager mSharedPreferences;
+    private SnackBarWrapper mSnackBar;
     public MapTabFragment() {
     }
 
@@ -150,21 +154,17 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTm= new TimeMeasure(LOG_TAG);
-        Util.logD(LOG_TAG, "onCreate:"+this.toString());
-      //  mTm.log("onCreate:"+this.toString());
-        Bundle bundle=getArguments();
-        if(bundle!=null) {
-            mLocation=bundle.getParcelable("location_key");
-        }
+        Util.logD(LOG_TAG, "onCreate");
+        mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
+        mLocation = mSharedPreferences.getLocation();
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
         mLoaderProvider=new LoaderProvider(getActivity());
         mLoaderManager=getLoaderManager();
-        PreferencesManager preferencesManager=new PreferencesManagerImp(getActivity());
-        mMapTabPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,preferencesManager);
-        mMapTabPresenter.setLocation(mLocation);
-        mAddress = mMapTabPresenter.onGetAddressFromLocation(mLocation);
-        mMapTabPresenter.onSetAddress(mAddress);
-        mMapTabPresenter.onStartLoader();
+        mPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,mSharedPreferences);
+        mPresenter.setLocation(mLocation);
+        mAddress = mPresenter.onGetAddressFromLocation(mLocation);
+        mPresenter.onSetAddress(mAddress);
+        mPresenter.onStartLoader();
 
 
 
@@ -174,7 +174,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreateView:"+this.toString());
+        Util.logD(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
         unbinder=ButterKnife.bind(this,view);
         setUpBotomSheet();
@@ -195,15 +195,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         if(savedInstanceState!=null){
             mRotation=true;
-            mLocation = savedInstanceState.getParcelable("location_key");
             mLastMarkerClicked=savedInstanceState.getParcelable("lastMarkerClicked_key");
-            mMapTabPresenter.onSetLastMarkerClick(mLastMarkerClicked);
+            mPresenter.onSetLastMarkerClick(mLastMarkerClicked);
             mBottomSheetState=savedInstanceState.getInt("bottom_sheet_state");
         }
 
-        mMapTabPresenter.setView(this);
+        mPresenter.setView(this);
         markerBitmap=Util.getBitmapFromVectorDrawable(getActivity(),R.drawable.hospital_pin_stroke);
-        mMapTabPresenter.onSetMarkerBitMap(markerBitmap);
+        mPresenter.onSetMarkerBitMap(markerBitmap);
         return view;
     }
 
@@ -250,15 +249,18 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public void onStart() {
-        Util.logD(LOG_TAG, "onStart:"+this.toString());
+        Util.logD(LOG_TAG, "onStart");
         super.onStart();
+        mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Util.logD(LOG_TAG, "onResume:"+this.toString());
 
+
+    @Override
+    public void onPause() {
+        Util.logD(LOG_TAG,"onPause");
+        mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
     }
 
     @Override
@@ -306,7 +308,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                         CustomCameraUpdate cu=null;
                         while(cu==null) {
                             count++;
-                            cu= mMapTabPresenter.getCameraUpdate();
+                            cu= mPresenter.getCameraUpdate();
                             Util.logD(LOG_TAG,"count"+count);
                             try {
                                 Thread.sleep(200);
@@ -347,7 +349,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
-            Bitmap bitmap= mMapTabPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
+            Bitmap bitmap= mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(pharmacyObjectMap.getName())
                     .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance()/1000));
@@ -358,7 +360,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         }
         Marker newMark = mMap.addMarker(markerOption);
         newMark.showInfoWindow();//only last infowindow shows up
-        mMapTabPresenter.onAddMarkerToHash(newMark, pharmacyObjectMap);
+        mPresenter.onAddMarkerToHash(newMark, pharmacyObjectMap);
 
     }
 
@@ -390,7 +392,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
     }
     private void handlePhoneCall(){
-        String uri="tel:" + mMapTabPresenter.onGetDestinationPhoneNumber();
+        String uri="tel:" + mPresenter.onGetDestinationPhoneNumber();
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(uri));
         startActivity(intent);
@@ -477,8 +479,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LatLng destinationLatLng= mMapTabPresenter.onGetDestinationLocale();
-                String destinationAddress= mMapTabPresenter.onGetDestinationAddress();
+                LatLng destinationLatLng= mPresenter.onGetDestinationLocale();
+                String destinationAddress= mPresenter.onGetDestinationAddress();
 
                 Util.startGoogleDirections(getActivity(),new LatLng(mLocation.getLatitude(),mLocation.getLatitude())
                         ,mAddress,
@@ -516,37 +518,19 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     private void setUpBotomSheet(){
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-
         //initially set hidden(in case there are no pharmacies around).Not working
         mBottomSheetBehavior.setHideable(true);
-//        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if(newState==BottomSheetBehavior.STATE_COLLAPSED) {
-                   // setStatusBarDim(false);
-                } else if(newState==BottomSheetBehavior.STATE_EXPANDED) {
-                   // setStatusBarDim(true);
 
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-              //  Util.logD(LOG_TAG,""+slideOffset);
-              //  fab.setAlpha(slideOffset);
-
-            }
-        });
     }
     public void updateClickedPhoneToPresenter(String phone,boolean fromListTab) {
         mFromListTab=fromListTab;
-        mMapTabPresenter.updateFavoriteFlag(phone);
+        mPresenter.updateFavoriteFlag(phone);
     }
 
     public void removeMarkerFromHashInPresenter(String phone) {
-        mMapTabPresenter.removeMarkerInHashFromList(phone);
+        mPresenter.removeMarkerInHashFromList(phone);
 
     }
     private void setUpIvFavorite(){
@@ -557,7 +541,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                 String phone=mLastMarkerClicked.getPhone();
                 updateClickedPhoneToPresenter(phone,false);
                 phone=phone.replaceAll(" ","");
-                mMapTabPresenter.removeMarkerInHashFromMap(mLastMarkerClicked);
+                mPresenter.removeMarkerInHashFromMap(mLastMarkerClicked);
 
                 int favorite;
                 String snackMessage;
@@ -587,7 +571,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public boolean onMarkerClick(Marker marker) {
-            HashMap hashMap= mMapTabPresenter.onGetHashMap();
+            HashMap hashMap= mPresenter.onGetHashMap();
             PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
             if(pharmacyObjectMap.getName().equals("userLocation")) {
                 return false;
@@ -605,7 +589,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
             llUper.setBackgroundColor(color);
 //            Marker marker=getKeyFromValue(pharmacy);
-//            HashMap hashMap= mMapTabPresenter.onGetHashMap();
+//            HashMap hashMap= mPresenter.onGetHashMap();
 //            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
             Drawable favDraResid=ContextCompat.getDrawable(getActivity(),pharmacy.isFavorite()?R.drawable.heart:R.drawable.heart_outline);
             ivFavorite.setImageDrawable(favDraResid);
@@ -629,7 +613,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             tvAdress.setText(pharmacy.getAddressFormatted());
             tvHours.setText(pharmacy.getHours());
             tvPhone.setText(pharmacy.getPhoneFormatted());
-            mMapTabPresenter.onSetLastMarkerClick(pharmacy);
+            mPresenter.onSetLastMarkerClick(pharmacy);
             mLastMarkerClicked=pharmacy;
 
             if( !isBottomSheetExpanded()) {
@@ -667,12 +651,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
 
-    @Override
-    public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
-        unbinder.unbind();
-        super.onDestroy();
-    }
+
 
 //    @SuppressWarnings("ResourceType")
 //    private void setStatusBarDim(boolean dim) {
@@ -688,6 +667,38 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //        a.recycle();
 //        return resId;
 //    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(mSharedPreferences.getLocationKey())) {
+            //update location variable
+            mLocation = mSharedPreferences.getLocation();
+            //get the new address
+            mPresenter.onGetAddressFromLocation(mLocation);
+            mSnackBar = new SnackBarWrapper(getActivity());
+            mSnackBar.addCallback(createSnackbarCallback());
+            mSnackBar.show();
+
+        }
+    }
+    private SnackbarCallback createSnackbarCallback() {
+        return new SnackbarCallback() {
+            @Override
+            public void onSnackbarActionPressed(Snackbar snackbar) {
+                Toast.makeText(getActivity(), "Presionado action", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSnackbarSwiped(Snackbar snackbar) {
+                //showToast("Swiped");
+            }
+
+            @Override
+            public void onSnackbarTimedOut(Snackbar snackbar) {
+                // showToast("Timed out");
+            }
+        };
+    }
     @Override
     public void onDetach() {
         super.onDetach();
@@ -702,6 +713,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        Util.logD(LOG_TAG, "onDestroy");
+        unbinder.unbind();
+        super.onDestroy();
     }
 
 }
