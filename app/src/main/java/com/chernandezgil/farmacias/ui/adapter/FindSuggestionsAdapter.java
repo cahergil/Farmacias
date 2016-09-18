@@ -62,7 +62,7 @@ public class FindSuggestionsAdapter extends CursorAdapter {
     }
 
 //    @Override
-//    public void onClick(View view) {
+//    public void onClickOptions(View view) {
 //        int id = view.getId();
 //        switch (id) {
 //        case R.id.plus:

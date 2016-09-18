@@ -1,8 +1,10 @@
 package com.chernandezgil.farmacias.view;
 
+import android.content.Intent;
 import android.location.Location;
 
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 
 import java.util.List;
 
@@ -15,8 +17,11 @@ public interface ListTabContract {
         public void showResults(List<Pharmacy> pharmacyList);
         public void showNoResults();
         public void showLoading();
+        public void showSnackBar(String message);
         public void hideLoading();
         public void setAddress(String address);
+        public void launchActivity(Intent intent);
+
     }
     public interface Presenter<V> {
 
@@ -27,6 +32,12 @@ public interface ListTabContract {
 
         public void onStartLoader();
         public void onGetAddressFromLocation(Location location);
+        public void setLocation(Location location);
+        public void handleClickGo(Pharmacy pharmacy,Location locatin, String address);
+        public void handleClickCall(String phone);
+        public void handleClickShare(Pharmacy pharmacy);
+        public void handleClickFavorite(Pharmacy pharmacy);
+        public void handleClickOptions(ListTabAdapter.MyViewHolder vh);
 
 
 

@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.presenter;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,6 +30,7 @@ import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
+import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.view.MapTabContract;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -65,9 +68,9 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     private HashMap mMarkersHashMap;
     private Location mLocation;
     private String mAddress;
-    private PharmacyObjectMap mLastClickMarker;
+    private PharmacyObjectMap mLastMarkerClicked;
     private PharmacyObjectMap mUserUbicationMarker;
-    List<PharmacyObjectMap> mFarmaciasList;
+    private List<PharmacyObjectMap> mFarmaciasList;
     private PharmacyObjectMap mFirstSortedPharmacy = null;
     private Bitmap markerBitmap;
     private CustomCameraUpdate mCameraUpdate;
@@ -75,7 +78,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     private int mRadio;
     private boolean mUserPressedFavorite;
     private String mPhoneUpdatedFavorite;
-    Handler mainHandler;
+    private Handler mainHandler;
 
     @Inject
     public MapTabPresenter(@NonNull LoaderProvider loaderProvider,
@@ -116,6 +119,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         mPhoneUpdatedFavorite = phone;
     }
 
+
     @Override
     public void detachView() {
         mView = null;
@@ -123,8 +127,73 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onStartLoader() {
-        Util.logD(LOG_TAG, "onInitLoader");
-        mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
+        Util.logD(LOG_TAG, "onStartLoader");
+        mLoaderManager.initLoader(FARMACIAS_LOADER, null, this);
+
+    }
+
+
+    @Override
+    public void handleClickGo() {
+        LatLng destinationLatLng = new LatLng(mLastMarkerClicked.getLat(), mLastMarkerClicked.getLon());
+        String destinationAddress = mLastMarkerClicked.getAddressFormatted();
+
+        Intent intent = Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())
+                , mAddress,
+                destinationLatLng
+                , destinationAddress);
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void handleClickCall() {
+        String uri = "tel:" + mLastMarkerClicked.getPhone();
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        mView.launchActivity(intent);
+
+    }
+
+    @Override
+    public void handleClickShare() {
+        //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
+        String name = mLastMarkerClicked.getName();
+        double distance = mLastMarkerClicked.getDistance() / 1000;
+        String address = mLastMarkerClicked.getAddressFormatted();
+        String phone = mLastMarkerClicked.getPhone();
+        Intent intent = Util.getShareIntent(name, distance, address, phone);
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void handleClickFavorite() {
+
+        String phone = mLastMarkerClicked.getPhone();
+        updateFavoriteFlag(phone);
+        phone = phone.replaceAll(" ", "");
+        //putting this line here is to assume that it will always change the favorite value in db
+        //else would be better perhaps to put after cha
+        removeMarkerInHashMapAndMapFromMapFragment(mLastMarkerClicked);
+
+        final String snackMessage = Util.changeFavoriteInDb(
+                mLastMarkerClicked.isFavorite(), phone);
+        //if no updated row
+        if (snackMessage == null) {
+            return;
+        }
+        // por el momento no lo pongo
+     //   mView.showSnackBar(snackMessage);
+
+
+    }
+
+    @Override
+    public void handleOnMarkerClick(Marker marker) {
+
+        PharmacyObjectMap pharmacy = (PharmacyObjectMap) mMarkersHashMap.get(marker);
+        if (!pharmacy.getName().equals(MapTabFragment.USER_LOCATION)) {
+            mView.showPharmacyInBottomSheet(pharmacy);
+        }
 
     }
 
@@ -135,46 +204,60 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     }
 
     @Override
-    public void removeMarkerInHashFromMap(PharmacyObjectMap pharmacy) {
-        //logHashMap();
+    public void removeMarkerInHashMapAndMapFromMapFragment(PharmacyObjectMap pharmacy) {
+        //for testing logHashMap();
+
+        //remove the marker from map
+        removeMarkerFromMap(pharmacy);
+        //remove marker from HashMap
+        removeMarkerFromHashMap(pharmacy);
+        //for testing logHashMap();
+
+    }
+
+    private void removeMarkerFromHashMap(PharmacyObjectMap pharmacy) {
+        mMarkersHashMap.values().remove(pharmacy);
+
+    }
+
+    private void removeMarkerFromMap(PharmacyObjectMap pharmacy) {
+
         Marker marker = getKeyFromValue(pharmacy);
         if (marker != null) {
             marker.remove();
         }
-        mMarkersHashMap.values().remove(pharmacy);
-
-        //logHashMap();
-
     }
 
     @Override
-    public void removeMarkerInHashFromList(String phone) {
+    public void removeMarkerInHashMapAndMapFromList(String phone) {
         PharmacyObjectMap pharmacy = new PharmacyObjectMap();
         pharmacy.setPhone(phone);
-        Marker marker = getKeyFromValue(pharmacy);
-        if (marker != null) {
-            marker.remove();
-        }
-        mMarkersHashMap.values().remove(pharmacy);
-
-        //   logHashMap();
+        removeMarkerInHashMapAndMapFromMapFragment(pharmacy);
     }
 
+
+    /**
+     * get a key(a Marker) knowing the value(PharmacyObjectMap)
+     *
+     * @param pharmacy
+     * @return
+     */
     private Marker getKeyFromValue(PharmacyObjectMap pharmacy) {
         Iterator<Map.Entry> iter = mMarkersHashMap.entrySet().iterator();
-        int count = 0;
+
         while (iter.hasNext()) {
-            count++;
+
             Map.Entry mEntry = (Map.Entry) iter.next();
             Marker key = (Marker) mEntry.getKey();
             PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
-
+            //objects are equal if they have the same phone number
             if (c.equals(pharmacy)) {
                 Util.logD(LOG_TAG, "key:" + key + ",object:" + c.toString());
+                //return what we want, the key of the HashMap
                 return key;
             }
         }
-        Util.logD(LOG_TAG, "count" + count);
+
         return null;
     }
 
@@ -190,23 +273,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onSetLastMarkerClick(PharmacyObjectMap pharmacyObjectMap) {
-        mLastClickMarker = pharmacyObjectMap;
-    }
-
-    @Override
-    public LatLng onGetDestinationLocale() {
-        return new LatLng(mLastClickMarker.getLat(), mLastClickMarker.getLon());
-
-    }
-
-    @Override
-    public String onGetDestinationAddress() {
-        return mLastClickMarker.getAddressFormatted();
-    }
-
-    @Override
-    public String onGetDestinationPhoneNumber() {
-        return mLastClickMarker.getPhone();
+        mLastMarkerClicked = pharmacyObjectMap;
     }
 
     @Override
@@ -239,7 +306,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 }
             }
             Util.logD(LOG_TAG, "address found");
-            return stringBuilder.toString();
+            mAddress = stringBuilder.toString();
+            return mAddress;
         }
 
 
@@ -345,6 +413,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         if (mUserPressedFavorite) {
             PharmacyObjectMap objComp = new PharmacyObjectMap();
             objComp.setPhone(mPhoneUpdatedFavorite);
+            //could have used this sentence  mFarmaciasList.indexOf() instead of guava
             if (mFarmaciasList.contains(objComp)) {
                 // mFarmaciasList.get
                 updatedPharmacy = Iterables.find(mFarmaciasList, new Predicate<PharmacyObjectMap>() {
@@ -359,8 +428,10 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mView.addMarkerToMap(updatedPharmacy, true);
-                        mView.refreshMap(updatedPharmacy);
+                        //add it again(now with the correct favorite  value
+                        // because the previous marker with that pharmacy has been deleted from the map(and from HashMap)
+                        mView.addMarkerToMap(updatedPharmacy);
+                        mView.refreshMapIfNecesary(updatedPharmacy);
                     } // This is your code
                 });
 
@@ -371,46 +442,32 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
             }
         }
-
-        for (int i = 0; i < mFarmaciasList.size(); i++) {
-            if (i == 0) {
-                mFirstSortedPharmacy = mFarmaciasList.get(i);
-            }
-
-            final int j = i;
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mView.addMarkerToMap(mFarmaciasList.get(j), false);
-                    if (j == mFarmaciasList.size() - 1) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < mFarmaciasList.size(); i++) {
+                    if (i == 0) {
+                        mFirstSortedPharmacy = mFarmaciasList.get(i);
+                    }
+                    mView.addMarkerToMap(mFarmaciasList.get(i));
+                    //we are in the last element, and have added it to the map
+                    //now need to add to maker as last one(so as it appears with info window over the rest
+                    if (i == mFarmaciasList.size() - 1) {
                         mUserUbicationMarker = getUserLocationMarker();
                         if (mFirstSortedPharmacy != null) {
-                            mView.addMarkerToMap(mUserUbicationMarker, false);
-                            mView.preShowPharmacyInBottomSheet(mFirstSortedPharmacy, mLastClickMarker);
+                            mView.addMarkerToMap(mUserUbicationMarker);
+                            //creo que el mLastMarkerClicked no hace falta, ya lo tiene el fragment
+                            //en rotacion lo guarda
+                            mView.preShowPharmacyInBottomSheet(mFirstSortedPharmacy, mLastMarkerClicked);
                         }
                         zoomAnimateLevelToFitMarkers(120);
 
                     }
                 }
-            });
 
 
-        }
-
-//        PharmacyObjectMap userLocation = getUserLocationMarker();
-//        mUserUbicationMarker = userLocation;
-//
-//        mainHandler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (mFirstSortedPharmacy != null) {
-//                    mView.addMarkerToMap(userLocation,false);
-//                    mView.preShowPharmacyInBottomSheet(mFirstSortedPharmacy, mLastClickMarker);
-//                }
-//
-//                zoomAnimateLevelToFitMarkers(120);
-//            } // This is your code
-//        });
+            }
+        });
 
 
     }

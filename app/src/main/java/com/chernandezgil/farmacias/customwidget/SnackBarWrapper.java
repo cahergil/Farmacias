@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias.Utilities;
+package com.chernandezgil.farmacias.customwidget;
 
 import android.app.Activity;
 import android.support.design.widget.Snackbar;
@@ -20,6 +20,7 @@ public class SnackBarWrapper {
         builder = new SnackbarBuilder(context)
                 .message("Nuevas localizacion detectada")
                 .duration(Snackbar.LENGTH_INDEFINITE)
+
                 .actionText("ACTUALIZAR");
 
 

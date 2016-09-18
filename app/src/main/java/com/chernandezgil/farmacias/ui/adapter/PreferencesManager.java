@@ -17,4 +17,5 @@ public interface PreferencesManager {
     public void setCurrentItemTabLayout(int currentItemTabLayout);
     public void saveLocation(Location location);
     public Location getLocation();
+    public int getRadio();
 }

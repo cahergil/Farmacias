@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.Utilities;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -8,8 +9,11 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,8 +23,10 @@ import android.util.Log;
 
 import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.BuildConfig;
+import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
+import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -142,21 +148,22 @@ public class Util {
 
     }
 
-    public static void startPhoneIntent(Context context,String telephone) {
+    public static Intent startPhoneIntent(Context context,String telephone) {
         String uri="tel:" + telephone;;
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(uri));
-        context.startActivity(intent);
+        return intent;
     }
 
-    public static void startShare(Context context,String name,double dist,String aformatted,String tel) {
-        String nombre="Farmacia:";
-        String distancia="distancia:";
-        String direccion="direccion:";
-        String telefono="tef:";
+    public static Intent getShareIntent(String name, double dist, String aformatted, String tel) {
+        Context context = MyApplication.getContext();
+        final String nombre="Farmacia:";
+        final String distancia="distancia:";
+        final String direccion="direccion:";
+        final String telefono="tef:";
 
         String textToShare=nombre +  name + Constants.CR
-                + distancia + context.getString(R.string.format_distance,dist/1000) + Constants.CR
+                + distancia + context.getString(R.string.format_distance,dist) + Constants.CR
                 + direccion + aformatted + Constants.CR
                 + telefono  + tel;
 
@@ -164,18 +171,20 @@ public class Util {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
         sendIntent.setType("text/plain");
-        context.startActivity(sendIntent);
+        return sendIntent;
+
     }
-    public static void startGoogleDirections(Context context, LatLng sourceLatLng,
-                                             String sourceAddress,
-                                             LatLng destinationLatLng,
-                                             String destinationAddress){
+    public static Intent getGoodleDirectionsIntent(LatLng sourceLatLng,
+                                                   String sourceAddress,
+                                                   LatLng destinationLatLng,
+                                                   String destinationAddress){
+
         String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
                 sourceLatLng.latitude,sourceLatLng.longitude , sourceAddress,
                 destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-        context.startActivity(intent);
+        return intent;
     }
 
     public static Bitmap getBitmapFromVectorDrawable(Context context, @DrawableRes int drawableResId){
@@ -229,5 +238,35 @@ public class Util {
         }
         return false;
     }
+
+
+    public static String changeFavoriteInDb(boolean oldFavoriteValue,String phone) {
+        String snackMessage;
+        Context context = MyApplication.getContext();
+        if (oldFavoriteValue) {
+            snackMessage = context.getString(R.string.ltf_removed_from_favorite);
+
+        } else {
+            snackMessage = context.getString(R.string.ltf_added_to_favorite);
+
+        }
+        final boolean newFavoriteValue = !oldFavoriteValue;
+        Uri uri = DbContract.FarmaciasEntity.buildFarmaciasUriByPhone(phone);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DbContract.FarmaciasEntity.FAVORITE, newFavoriteValue);
+
+        int rowsUpdated = context.getContentResolver().update(uri, contentValues,
+                DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
+                null);
+
+        if (rowsUpdated == 1) {
+            Util.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);
+            return snackMessage;
+        }
+        return null;
+
+
+    }
+
 
     }

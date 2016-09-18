@@ -8,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.activity.MainActivity;
@@ -25,7 +22,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.util.concurrent.TimeUnit;
@@ -59,8 +55,9 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         createLocationRequest();
-        startTimeCounter();
+        mStartTime = System.currentTimeMillis();
         mFirstRun = true;
+        //if change to getActivity() I get memmory leak
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         requestLocationSettings();
     }
@@ -184,7 +181,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
             Util.logD(LOG_TAG, "locationSaved");
             mSharedPreferences.saveLocation(lastLocation);
-            startTimeCounter();
+            restartTimeCounter();
         }
     }
 
@@ -197,7 +194,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     }
 
-    private void startTimeCounter() {
+    public void restartTimeCounter() {
         mStartTime = System.currentTimeMillis();
     }
 

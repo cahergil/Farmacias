@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.preference.PreferenceManager;
 
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 
 /**
@@ -89,5 +90,10 @@ public class PreferencesManagerImp implements PreferencesManager {
         location.setLongitude(longitud);
         return location;
 
+    }
+
+    @Override
+    public int getRadio() {
+        return mPrefs.getInt(context.getString(R.string.seek_bar_key),2);
     }
 }

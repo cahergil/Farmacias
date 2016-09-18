@@ -1,14 +1,15 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.content.ContentValues;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +22,7 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -31,25 +33,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.SnackBarWrapper;
+import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.LoaderProvider;
-import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.presenter.MapTabPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
-import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -57,7 +57,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Locale;
 
 import butterknife.BindColor;
@@ -69,13 +68,15 @@ import butterknife.Unbinder;
  * Created by Carlos on 10/07/2016.
  */
 public class MapTabFragment extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener,MapTabContract.View,SharedPreferences.OnSharedPreferenceChangeListener {
+        GoogleMap.OnMarkerClickListener,GoogleMap.OnMapClickListener,MapTabContract.View {
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
     private GoogleMap mMap;
     private Location mLocation;
     TimeMeasure mTm;
+
+
 
     private BottomSheetBehavior mBottomSheetBehavior;
     private CustomSupporMapFragment mMapFragment;
@@ -143,12 +144,47 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private static final int STATE_EXPANDED=1;
     private int mBottomSheetState;
     private boolean mFromListTab;
-    CustomSupporMapFragment mapFragment;
+    private CustomSupporMapFragment mapFragment;
     private PreferencesManager mSharedPreferences;
     private SnackBarWrapper mSnackBar;
+    public static final String USER_LOCATION = "userLocation";
+
+
+    private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Util.logD(LOG_TAG,"onReceive");
+            //update location variable
+            mLocation = mSharedPreferences.getLocation();
+            //get the new address
+            mPresenter.onGetAddressFromLocation(mLocation);
+            //set location to presenter
+            mPresenter.setLocation(mLocation);
+            mMap.clear();
+            mPresenter.onStartLoader();
+            //mLastLocation lo va a poner de nuevo, deberia hacer lo mismo que cuando pulsa favoritos,
+            //bueno no exactamente lo mismo, por que si las coordenadas han variado mucho, el mClicklastlocation
+            //pudiera ahora no tener sentido
+        }
+    };
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        Projection projection = mMap.getProjection();
+        Point point=projection.toScreenLocation(latLng);
+
+        Rect rect=new Rect();
+        bottomSheet.getGlobalVisibleRect(rect);
+        if(!rect.contains(point.x,point.y)) {
+            Util.logD(LOG_TAG,"outside bottom sheet");
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
+
     public MapTabFragment() {
     }
 
+    
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -161,10 +197,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mLoaderProvider=new LoaderProvider(getActivity());
         mLoaderManager=getLoaderManager();
         mPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,mSharedPreferences);
+        mPresenter.setView(this);
         mPresenter.setLocation(mLocation);
         mAddress = mPresenter.onGetAddressFromLocation(mLocation);
-        mPresenter.onSetAddress(mAddress);
-        mPresenter.onStartLoader();
+
 
 
 
@@ -200,12 +236,29 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             mBottomSheetState=savedInstanceState.getInt("bottom_sheet_state");
         }
 
-        mPresenter.setView(this);
-        markerBitmap=Util.getBitmapFromVectorDrawable(getActivity(),R.drawable.hospital_pin_stroke);
+
+        markerBitmap=Util.getBitmapFromVectorDrawable(getActivity().getApplicationContext(),R.drawable.hospital_pin_stroke);
         mPresenter.onSetMarkerBitMap(markerBitmap);
+
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Util.logD(LOG_TAG,"onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+        //start the loader once the view is ready
+        mPresenter.onStartLoader();
+        //  setUserVisibleHint(true); setting it here doen't work
+        // I opted for setting this value in the instantiation of
+        //  the fragment in FragmentPagerAdapter. solution not valid after 24.0.0
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Util.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        super.setUserVisibleHint(isVisibleToUser);
+    }
 
 //    private Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
 //        Drawable drawable = AppCompatDrawableManager.get().getDrawable(context, drawableId);
@@ -251,21 +304,29 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void onStart() {
         Util.logD(LOG_TAG, "onStart");
         super.onStart();
-        mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+
     }
 
-
+    @Override
+    public void onResume() {
+        Util.logD(LOG_TAG,"onResume");
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ListTabFragment.NEW_LOCATION);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,filter);
+    }
 
     @Override
     public void onPause() {
         Util.logD(LOG_TAG,"onPause");
-        mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        super.onPause();
+         super.onPause();
+
     }
 
     @Override
     public void onStop() {
         Util.logD(LOG_TAG, "onStop");
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
         super.onStop();
     }
     //this callback executes after onstart
@@ -323,8 +384,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
             }
         });
-        //mapFragment.onResume();
-        setUserVisibleHint(true);
+
+        mMap.setOnMapClickListener(this);
 
     }
 
@@ -333,7 +394,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     //BitmapDescriptorFactory.defaultMarker()
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
-    public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap,boolean flagFavorite) {
+    public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap) {
         //if(!isAdded()) return;
         //me da un npe porque el pharmacyObjetMap es nulo: a ver si con esta linea se arregla
         if(pharmacyObjectMap==null) {
@@ -342,7 +403,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         MarkerOptions markerOption = new MarkerOptions().position(
                 new LatLng(pharmacyObjectMap.getLat(), pharmacyObjectMap.getLon())
         );
-        if(pharmacyObjectMap.getName().equals("userLocation")) {
+        if(pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Tu ubicación")
                     .snippet(Util.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
@@ -355,9 +416,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance()/1000));
         }
         markerOption.anchor(0.5f, 0.5f);
-        if(flagFavorite) {
 
-        }
         Marker newMark = mMap.addMarker(markerOption);
         newMark.showInfoWindow();//only last infowindow shows up
         mPresenter.onAddMarkerToHash(newMark, pharmacyObjectMap);
@@ -365,15 +424,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-    public void setUpTvPhone(){
 
-        tvPhone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handlePhoneCall();
-            }
-        });
-    }
     @Override
     public void moveCamera(CustomCameraUpdate cameraUpdate) {
         if(cameraUpdate.isNoResultsPosition()) {
@@ -391,12 +442,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         String message="Sin resultados. Radio de busqueda insuficiente";
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
     }
-    private void handlePhoneCall(){
-        String uri="tel:" + mPresenter.onGetDestinationPhoneNumber();
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse(uri));
-        startActivity(intent);
-    }
+
 
 
     @Override
@@ -408,59 +454,26 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
        return false;
     }
 
-    @Override
-    public void handleDispatchTouchEvent(MotionEvent event) {
-        if(isBottomSheetExpanded()){
-            Rect rect=new Rect();
-            bottomSheet.getGlobalVisibleRect(rect);
-            if(!rect.contains((int)event.getRawX(),(int)event.getRawY())){
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
-        }
-    }
-
-
-    @Override
-    public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
-        Util.logD(LOG_TAG,"preshowPharmacy");
-
-        //if there has been a rotation
-        if(mRotation) {
-            if(lastClicked!=null) {
-                Util.logD(LOG_TAG,"firstsor");
-                //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
-                addMarkerToMap(lastClicked,false);
-                firstSortedPharmacy=mLastMarkerClicked;
-                setStateBottomShett(mBottomSheetState);
-            }
-
-            mRotation=false;
-        } else {
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
-
-
-        showPharmacyInBottomSheet(firstSortedPharmacy);
-        //http://stackoverflow.com/questions/37822264/android-bottom-sheet-behavior-not-working-properly-views-not-show-on-first-run
-        mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
-        //a trick to show expanded, else doesn't show
-//        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//    @Override
+//    public void handleDispatchTouchEvent(MotionEvent event) {
+//        if(isBottomSheetExpanded()){
+//            Rect rect=new Rect();
+//            bottomSheet.getGlobalVisibleRect(rect);
+//            if(!rect.contains((int)event.getRawX(),(int)event.getRawY())){
+//                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//            }
+//        }
+//    }
 
 
 
-
-    }
 
     @Override
-    public void refreshMap(PharmacyObjectMap updatedPharmacy) {
-        if(mFromListTab) {
-            mFromListTab=false;
-            if(mLastMarkerClicked.getPhone().equals(updatedPharmacy.getPhone())) {
-                showPharmacyInBottomSheet(updatedPharmacy);
-            }
-            return;
+    public void refreshMapIfNecesary(PharmacyObjectMap updatedPharmacy) {
+        if(mLastMarkerClicked.getPhone().equals(updatedPharmacy.getPhone())) {
+            showPharmacyInBottomSheet(updatedPharmacy);
         }
-        showPharmacyInBottomSheet(updatedPharmacy);
+
     }
 
     @Override
@@ -468,25 +481,77 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void setStateBottomShett(int state) {
+    @Override
+    public void showSnackBar(String message) {
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT).show();
+            }
+        }, 30);
+    }
+    @Override
+    public void launchActivity(Intent intent) {
+        startActivity(intent);
+    }
+    private void setStateBottomSheet(int state) {
         if(state==STATE_COLLAPSED) {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
+
+    private void setUpBotomSheet(){
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        //initially set hidden(in case there are no pharmacies around).Not working
+        mBottomSheetBehavior.setHideable(true);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+
+    }
+    public void updateClickedPhoneToPresenter(String phone) {
+        mPresenter.updateFavoriteFlag(phone);
+
+
+    }
+
+    public void removeMarkerInPresenter(String phone) {
+        mPresenter.removeMarkerInHashMapAndMapFromList(phone);
+
+    }
+
+    private void setUpIvFavorite(){
+        ivFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mPresenter.handleClickFavorite();
+
+            }
+
+
+        });
+    }
     private void setUpIvGo(){
         ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LatLng destinationLatLng= mPresenter.onGetDestinationLocale();
-                String destinationAddress= mPresenter.onGetDestinationAddress();
+               mPresenter.handleClickGo();
 
-                Util.startGoogleDirections(getActivity(),new LatLng(mLocation.getLatitude(),mLocation.getLatitude())
-                        ,mAddress,
-                        destinationLatLng
-                        ,destinationAddress);
+            }
+        });
+    }
 
+    public void setUpTvPhone(){
+
+        tvPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mPresenter.handleClickCall();
             }
         });
     }
@@ -495,7 +560,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         ivCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handlePhoneCall();
+                mPresenter.handleClickCall();
+
             }
         });
 
@@ -505,86 +571,51 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
-                String name=mLastMarkerClicked.getName();
-                double dist=mLastMarkerClicked.getDistance()/1000;
-                String dir=mLastMarkerClicked.getAddressFormatted();
-                String tel=mLastMarkerClicked.getPhone();
-                Util.startShare(getActivity(),name,dist,dir,tel);
+                mPresenter.handleClickShare();
             }
         });
 
     }
 
-    private void setUpBotomSheet(){
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        //initially set hidden(in case there are no pharmacies around).Not working
-        mBottomSheetBehavior.setHideable(true);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-
-    }
-    public void updateClickedPhoneToPresenter(String phone,boolean fromListTab) {
-        mFromListTab=fromListTab;
-        mPresenter.updateFavoriteFlag(phone);
-    }
-
-    public void removeMarkerFromHashInPresenter(String phone) {
-        mPresenter.removeMarkerInHashFromList(phone);
-
-    }
-    private void setUpIvFavorite(){
-        ivFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String phone=mLastMarkerClicked.getPhone();
-                updateClickedPhoneToPresenter(phone,false);
-                phone=phone.replaceAll(" ","");
-                mPresenter.removeMarkerInHashFromMap(mLastMarkerClicked);
-
-                int favorite;
-                String snackMessage;
-                if(mLastMarkerClicked.isFavorite()) {
-                    snackMessage="Pharmacy deleted from favorites";
-                    favorite=0;
-                } else {
-                    snackMessage="Pharmacy added to favorites";
-                    favorite=1;
-                }
-                Uri uri= DbContract.FarmaciasEntity.buildFarmaciasUriByPhone(phone);
-                ContentValues contentValues=new ContentValues();
-                contentValues.put(DbContract.FarmaciasEntity.FAVORITE,favorite);
-
-                int rowsUpdated=getActivity().getContentResolver().update(uri,contentValues,
-                        DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
-                        null);
-                if(rowsUpdated==1) {
-                    Snackbar.make(mRootView,snackMessage,Snackbar.LENGTH_SHORT).show();
-
-                }
-                Util.logD(LOG_TAG,"rows updates: " + rowsUpdated);
-            }
-
-
-        });
-    }
     @Override
     public boolean onMarkerClick(Marker marker) {
-            HashMap hashMap= mPresenter.onGetHashMap();
-            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
-            if(pharmacyObjectMap.getName().equals("userLocation")) {
-                return false;
+
+            mPresenter.handleOnMarkerClick(marker);
+            if( !isBottomSheetExpanded()) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
-            showPharmacyInBottomSheet(pharmacyObjectMap);
-//            if( !isBottomSheetExpanded()) {
-//                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//            }
             return false;
     }
+    @Override
+    public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
+        Util.logD(LOG_TAG,"preshowPharmacy");
+
+        //if there has been a rotation
+        if(mRotation) {
+            if(lastClicked!=null) {
+                Util.logD(LOG_TAG,"firstsor");
+                //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
+                addMarkerToMap(lastClicked);
+                firstSortedPharmacy = lastClicked;
+                //firstSortedPharmacy=mLastMarkerClicked;
+                setStateBottomSheet(mBottomSheetState);
+            }
+
+            mRotation=false;
+         }
 
 
-    private void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy){
+        showPharmacyInBottomSheet(firstSortedPharmacy);
+        mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
+
+
+
+
+
+    }
+
+    @Override
+    public void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy){
 
             int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
             llUper.setBackgroundColor(color);
@@ -616,9 +647,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             mPresenter.onSetLastMarkerClick(pharmacy);
             mLastMarkerClicked=pharmacy;
 
-            if( !isBottomSheetExpanded()) {
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
 
 
 
@@ -668,37 +696,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //        return resId;
 //    }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(mSharedPreferences.getLocationKey())) {
-            //update location variable
-            mLocation = mSharedPreferences.getLocation();
-            //get the new address
-            mPresenter.onGetAddressFromLocation(mLocation);
-            mSnackBar = new SnackBarWrapper(getActivity());
-            mSnackBar.addCallback(createSnackbarCallback());
-            mSnackBar.show();
 
-        }
-    }
-    private SnackbarCallback createSnackbarCallback() {
-        return new SnackbarCallback() {
-            @Override
-            public void onSnackbarActionPressed(Snackbar snackbar) {
-                Toast.makeText(getActivity(), "Presionado action", Toast.LENGTH_LONG).show();
-            }
 
-            @Override
-            public void onSnackbarSwiped(Snackbar snackbar) {
-                //showToast("Swiped");
-            }
-
-            @Override
-            public void onSnackbarTimedOut(Snackbar snackbar) {
-                // showToast("Timed out");
-            }
-        };
-    }
     @Override
     public void onDetach() {
         super.onDetach();

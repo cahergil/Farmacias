@@ -18,7 +18,7 @@ public  class TouchableWrapper extends FrameLayout {
         super(context);
 
         try {
-            updateMapUserClick = (MainActivity) context;
+         //   updateMapUserClick = (MainActivity) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement UpdateMapUserClick");
         }

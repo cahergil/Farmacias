@@ -71,6 +71,7 @@ public class SettingsActivity extends PreferenceActivity implements  Preference.
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setResult(RESULT_OK);
                 NavUtils.navigateUpFromSameTask(SettingsActivity.this);
             }
         });

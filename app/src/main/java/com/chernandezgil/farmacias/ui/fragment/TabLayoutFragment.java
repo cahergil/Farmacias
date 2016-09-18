@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -94,6 +95,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
     @Override
+    public void onResume() {
+        Util.logD(LOG_TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
     public void onPause() {
         Util.logD(LOG_TAG, "onPause");
         super.onPause();
@@ -148,6 +155,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public Adapter(Context ctxt,FragmentManager fm) {
 
             super(fm);
+           // Util.logD(LOG_TAG,"Adapter");
 
             context = ctxt;
 
@@ -165,42 +173,45 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
         @Override
         public Fragment getItem(int position) {
-
+            //Util.logD(LOG_TAG,"getItem:"+position);
             switch (position) {
                 case 0:
                      return new ListTabFragment();
-
-
                 case 1:
-
                      return new MapTabFragment();
-
                 default: return null;
 
             }
+
 
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
+
+            //Util.logD(LOG_TAG,"instantiateItem:"+position);
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            fragment.setUserVisibleHint(true);
             registeredFragments.put(position, fragment);
             return fragment;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+            //Util.logD(LOG_TAG,"destroyItem:"+position);
             registeredFragments.remove(position);
             super.destroyItem(container, position, object);
         }
 
         @Override
         public int getCount() {
+            //Util.logD(LOG_TAG,"getCount");
             return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
+            //Util.logD(LOG_TAG,"getPageTitle:"+position);
             switch (position) {
                 case 0:
                     return context.getString(R.string.tlf_tab_list_string);

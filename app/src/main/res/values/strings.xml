@@ -36,6 +36,8 @@
     <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
     <!-- ListTabFragment -->
+    <string name="ltf_removed_from_favorite" translatable="true">Farmacia eliminada de favoritos</string>
+    <string name="ltf_added_to_favorite" translatable="true">Farmacia añadida a favoritos</string>
 
     <!-- TabLayoutFragment -->
     <string name="tlf_tab_list_string" translatable="true">Lista</string>

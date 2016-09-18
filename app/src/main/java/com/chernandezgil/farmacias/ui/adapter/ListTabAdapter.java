@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.ColorRes;
@@ -31,7 +32,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Carlos on 08/08/2016.
  */
-public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHolder> implements View.OnClickListener{
+public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHolder> {
 
     private List<Pharmacy> mPharmacyList;
     private Context mContext;
@@ -51,23 +52,15 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     }
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       //  Util.logD(LOG_TAG,"onCreateViewHolder");
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
-        ViewHolder viewHolder=new ViewHolder(view);
+        return new MyViewHolder(view);
 
-        viewHolder.ivArrow.setOnClickListener(this);
-        viewHolder.tvOpen.setOnClickListener(this);
-        viewHolder.ivPhone.setOnClickListener(this);
-        viewHolder.ivGo.setOnClickListener(this);
-        viewHolder.ivShare.setOnClickListener(this);
-        viewHolder.ivFavorite.setOnClickListener(this);
-
-        return  viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
       //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
         Pharmacy pharmacy=mPharmacyList.get(position);
         if(expandState[position]) {
@@ -78,7 +71,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
             }
         }
-
         holder.viewOptionsRow.setListener(new ExpandableLayoutListener() {
             @Override
             public void onAnimationStart() {
@@ -113,6 +105,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
             }
         });
+
+
+
+
         holder.tvName.setText(pharmacy.getName());
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
         holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()/1000));
@@ -147,12 +143,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
       //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
       //  holder.ivArrow.setImageDrawable(drawableCompat);
 
-        holder.ivArrow.setTag(holder);
-        holder.tvOpen.setTag(holder);
-        holder.ivPhone.setTag(holder);
-        holder.ivGo.setTag(position);
-        holder.ivShare.setTag(position);
-        holder.ivFavorite.setTag(position);
 
 
     }
@@ -218,106 +208,84 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.ViewHold
 
     }
 
-    public List<Pharmacy>  getPharmaList() {
-        return mPharmacyList;
-    }
-    @Override
-    public void onClick(View view) {
 
-        int position;
-        ViewHolder vh;
-        int id= view.getId();
-        switch (id) {
-            case R.id.tvOpen:
-            case R.id.ivArrow:
-                vh= (ViewHolder) view.getTag();
-//                ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(vh.ivArrow,"rotation",vh.ivArrow.getRotation()==180?0:180);
-//
-//                rotateAnim.setDuration(200);
-//                rotateAnim.start();
-//
-//                http://stackoverflow.com/questions/30209415/rotate-an-imagewith-animation
-//                float pivotX=(vh.ivArrow.getWidth()/2);
-//                float pivotY=(vh.ivArrow.getWidth()/2);
-//                vh.ivArrow.setPivotX(pivotX);
-//                vh.ivArrow.setPivotY(pivotY);
-                vh.ivArrow.animate().rotation(vh.ivArrow.getRotation()==180?0:180);
-
-                vh.viewOptionsRow.toggle();
-
-
-                break;
-            case R.id.ivPhoneb:
-                vh= (ViewHolder) view.getTag();
-                position=vh.getAdapterPosition();
-                Util.startPhoneIntent(mContext,mPharmacyList.get(position).getPhone());
-                break;
-            case R.id.ivGob:
-                position= (int) view.getTag();
-                mClickHandler.onClickGo(position);
-                break;
-            case R.id.ivShareb:
-                position=(int) view.getTag();
-                Pharmacy pharmacy=mPharmacyList.get(position);
-                String name=pharmacy.getName();
-                double dist=pharmacy.getDistance();
-                String dir=pharmacy.getAddressFormatted();
-                String tel=pharmacy.getPhone();
-                Util.startShare(mContext,name,dist,dir,tel);
-                break;
-            case R.id.ivFavoriteb:
-                position = (int) view.getTag();
-                mClickHandler.onClickFavorite(position);
-
-
-        }
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         @BindView(R.id.tvName)
-        TextView tvName;
+        public TextView tvName;
         @BindView(R.id.tvStreet)
-        TextView tvStreet;
+        public TextView tvStreet;
         @BindView(R.id.tvDistance)
-        TextView tvDistance;
+        public TextView tvDistance;
         @BindView(R.id.tvOpen)
-        TextView tvOpen;
-
+        public TextView tvOpen;
         @BindView(R.id.optionsRow)
-        ExpandableLinearLayout viewOptionsRow;
-
+        public ExpandableLinearLayout viewOptionsRow;
         @BindView(R.id.ivArrow)
-        ImageView ivArrow;
+        public ImageView ivArrow;
         @BindView(R.id.ivScheduleb)
-        ImageView ivClock;
+        public ImageView ivClock;
         @BindView(R.id.ivPhoneb)
-        ImageView ivPhone;
+        public ImageView ivPhone;
         @BindView(R.id.ivShareb)
-        ImageView ivShare;
+        public ImageView ivShare;
         @BindView(R.id.ivFavoriteb)
-        ImageView ivFavorite;
+        public ImageView ivFavorite;
         @BindView(R.id.ivGob)
-        ImageView ivGo;
+        public ImageView ivGo;
 
         @BindView(R.id.holderContainer)
-        CardView cardView;
+        public CardView cardView;
 
-        public ViewHolder(View v) {
+        public MyViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
 
-
+            viewOptionsRow.setOnClickListener(this);
+            ivArrow.setOnClickListener(this);
+            ivPhone.setOnClickListener(this);
+            ivShare.setOnClickListener(this);
+            ivFavorite.setOnClickListener(this);
+            ivGo.setOnClickListener(this);
             viewOptionsRow.collapse();
-
+            int position = getAdapterPosition();
 
         }
 
 
+        @Override
+        public void onClick(View view) {
+            int id= view.getId();
+            int position = getAdapterPosition();
+            switch (id) {
+                case R.id.tvOpen:
+                case R.id.ivArrow:
 
+                    mClickHandler.onClickOptions(this);
+
+
+                    break;
+                case R.id.ivPhoneb:
+                    mClickHandler.onClickPhone(mPharmacyList.get(position).getPhone());
+                    break;
+                case R.id.ivGob:
+                    mClickHandler.onClickGo(mPharmacyList.get(position));
+                    break;
+                case R.id.ivShareb:
+                    mClickHandler.onClickShare(mPharmacyList.get(position));
+                    break;
+                case R.id.ivFavoriteb:
+                    mClickHandler.onClickFavorite(mPharmacyList.get(position));
+                break;
+
+            }
+        }
     }
+
     public static interface ListTabAdapterOnClickHandler {
-        void onClickGo(int position);
-        void onClickFavorite(int position);
-        void onClick(ViewHolder vh);
+        void onClickGo(Pharmacy pharmacy);
+        void onClickFavorite(Pharmacy pharmacy);
+        void onClickOptions(MyViewHolder viewHolder);
+        void onClickPhone(String phone);
+        void onClickShare(Pharmacy pharmacy);
     }
 }

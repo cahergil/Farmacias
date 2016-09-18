@@ -1,10 +1,12 @@
 package com.chernandezgil.farmacias.presenter;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,9 +17,11 @@ import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
 import com.github.davidmoten.rx.Transformers;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,10 +47,10 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     private PreferencesManager preferencesManager;
     private int mRadio;
-    public ListTabPresenter(Location location, LoaderProvider loaderProvider, LoaderManager loadermanager,
+    public ListTabPresenter(LoaderProvider loaderProvider, LoaderManager loadermanager,
                             Geocoder geocoder,PreferencesManager preferencesManager
                             ) {
-        mLocation=location;
+
         mLoaderProvider=loaderProvider;
         mLoaderManager=loadermanager;
         mGeocoder=geocoder;
@@ -56,6 +60,8 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
 
     }
+
+
     @Override
     public void setView(ListTabContract.View view) {
         if (view == null) throw new IllegalArgumentException("You can't set a null view");
@@ -69,11 +75,14 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public void onStartLoader() {
+        Util.logD(LOG_TAG,"onStartLoader");
         mView.showLoading();
+        mLoaderManager.initLoader(FARMACIAS_LOADER, null, this);
+    }
 
-            mLoaderManager.restartLoader(FARMACIAS_LOADER, null, this);
-
-
+    @Override
+    public void setLocation(Location location) {
+        mLocation = location;
     }
 
     @Override
@@ -108,6 +117,50 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
             mView.setAddress(stringBuilder.toString());
         }
 
+    }
+
+    @Override
+    public void handleClickOptions(ListTabAdapter.MyViewHolder vh) {
+        vh.ivArrow.animate().rotation(vh.ivArrow.getRotation() == 180 ? 0 : 180);
+        vh.viewOptionsRow.toggle();
+    }
+
+    @Override
+    public void handleClickGo(Pharmacy pharmacy,Location locatin, String address) {
+        Intent intent=Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
+                address,
+                new LatLng(pharmacy.getLat(), pharmacy.getLon()),
+                pharmacy.getAddressFormatted()
+        );
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void handleClickCall(String phone) {
+        String uri = "tel:" + phone;
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        mView.launchActivity(intent);
+
+    }
+
+    @Override
+    public void handleClickShare(Pharmacy pharmacy) {
+        String name = pharmacy.getName();
+        double distance = pharmacy.getDistance() / 1000;
+        String address = pharmacy.getAddressFormatted();
+        String phone = pharmacy.getPhone();
+        Intent intent = Util.getShareIntent(name, distance, address, phone);
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void handleClickFavorite(Pharmacy pharmacy) {
+        final String snackMessage = Util.changeFavoriteInDb(pharmacy.isFavorite(), pharmacy.getPhone());
+        if (snackMessage == null) {
+            return;
+        }
+        mView.showSnackBar(snackMessage);
     }
 
     private void bindView(Cursor data) {

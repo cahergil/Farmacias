@@ -29,7 +29,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,9 +49,7 @@ import com.chernandezgil.farmacias.ui.fragment.GPSTrackerFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
 import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.SupportErrorDialogFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -70,10 +67,10 @@ import icepick.State;
 
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, TouchableWrapper.UpdateMapUserClick,
+        GoogleApiClient.OnConnectionFailedListener,
         ListTabFragment.UpdateFavorite
 {
-
+// TouchableWrapper.UpdateMapUserClick
 
     private static final String DIALOG_ERROR = "dialog_error";
     @BindView(R.id.navigation_drawer_layout)
@@ -94,11 +91,13 @@ public class MainActivity extends AppCompatActivity implements
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int REQUEST_RESOLVE_CONNECTION_ERROR = 1001;
+    private static final int REQUEST_CODE_SETTINGS = 2000;
     private static final String GPS_FRAG = "gps_frag";
     private MainActivityPresenter mMainActivityPresenter;
     private TabLayoutFragment mtabFragment;
 
-    private static boolean sFromSettings;
+
+
     private int option = 0;
     private static final String[] PERMS=
             {Manifest.permission.ACCESS_FINE_LOCATION};
@@ -121,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private BroadcastReceiver onNotice = new BroadcastReceiver() {
+    private BroadcastReceiver launcherBroadcast = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
@@ -131,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     };
+    private int mRadio;
+    private boolean mRadioChanged;
 
 
     @Override
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState == null) {
 
          //   checkGooglePlayServicesAvailability();
-        //    initilizeStetho();
+         //   initilizeStetho();
 
         }
         if (hasAllPermissions(getDesiredPermissions())) {
@@ -236,14 +237,19 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter(GPSTrackerFragment.BROADCAST);
-        LocalBroadcastManager.getInstance(this).registerReceiver(onNotice,filter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(launcherBroadcast,filter);
+        if(mRadioChanged) {
+            mRadioChanged = false;
+            launchFragment(0);
+            getTrackFragment().restartTimeCounter();
+        }
     }
 
     @Override
     protected void onPause() {
         Util.logD(LOG_TAG, "onPause");
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onNotice);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(launcherBroadcast);
     }
 
 
@@ -273,9 +279,9 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            sFromSettings = true;
+            mRadio = mSharedPreferences.getRadio();
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,REQUEST_CODE_SETTINGS);
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
@@ -462,14 +468,14 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 //
-    @Override
-    public void onClickMap(MotionEvent event) {
-        Util.logD(LOG_TAG, "onClickMap");
-        MapTabFragment mapTabFragment = getMapTabFragment();
-        if (mapTabFragment != null) {
-            mapTabFragment.handleDispatchTouchEvent(event);
-        }
-    }
+//    @Override
+//    public void onClickMap(MotionEvent event) {
+//        Util.logD(LOG_TAG, "onClickMap");
+//        MapTabFragment mapTabFragment = getMapTabFragment();
+//        if (mapTabFragment != null) {
+//            mapTabFragment.handleDispatchTouchEvent(event);
+//        }
+//    }
 
     /**
      * Comunicates ListTabFragment with MapTabFragment
@@ -481,8 +487,8 @@ public class MainActivity extends AppCompatActivity implements
     public void onUpdateFavorite(String phone, boolean flag) {
         MapTabFragment mapTabFragment = getMapTabFragment();
         if (mapTabFragment != null) {
-            mapTabFragment.updateClickedPhoneToPresenter(phone, true);
-            mapTabFragment.removeMarkerFromHashInPresenter(phone);
+            mapTabFragment.updateClickedPhoneToPresenter(phone);
+            mapTabFragment.removeMarkerInPresenter(phone);
         }
     }
 
@@ -606,6 +612,14 @@ public class MainActivity extends AppCompatActivity implements
                 if (!mGoogleApiClient.isConnecting() &&
                         !mGoogleApiClient.isConnected()) {
                     mGoogleApiClient.connect();
+                }
+            }
+        } else if( requestCode == REQUEST_CODE_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+
+                if(mRadio != mSharedPreferences.getRadio() && mCurrentFragment==0) {
+                    launchFragment(0);
+                    mRadioChanged =true;
                 }
             }
         }

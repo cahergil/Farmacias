@@ -1,11 +1,10 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,6 +12,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,10 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.SnackBarWrapper;
+import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
-import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.ListTabPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
@@ -62,20 +61,21 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     private Location mLocation;
     private ListTabPresenter mPresenter;
     private ListTabAdapter mAdapter;
+
     private String mAddress;
-    private List<Pharmacy> mPharmacyList;
+
     private Unbinder unbinder;
     private static final String LOG_TAG = ListTabFragment.class.getSimpleName();
     private static final String RECYCLER_STATE_KEY = "recycler_key";
-    private static final String LIST_PHARMACY_KEY = "pharmacyList_key";
     private static final String ADDRESS_KEY = "address_key";
     private static final String EXPANDABLE_STATE_KEY = "state_key";
+    public static final String NEW_LOCATION = "new_location";
     private Parcelable mLayoutManagerState;
     private UpdateFavorite mCallback;
     private boolean[] mSpandState;
     private boolean mRotation;
     private PreferencesManager mSharedPreferences;
-    private SnackBarWrapper mSnackBar;
+
 
 
     @Override
@@ -96,8 +96,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         LoaderProvider loaderProvider = new LoaderProvider(getActivity().getApplicationContext());
-        mPresenter = new ListTabPresenter(mLocation, loaderProvider, getLoaderManager(), new Geocoder(getActivity()), mSharedPreferences);
-
+        mPresenter = new ListTabPresenter(loaderProvider, getLoaderManager(), new Geocoder(getActivity()), mSharedPreferences);
+        mPresenter.setLocation(mLocation);
+        mPresenter.setView(this);
 
     }
 
@@ -108,7 +109,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         Util.logD(LOG_TAG, "onCreateView");
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
-        mPresenter.setView(this);
+
         if (savedInstanceState == null) {
             mPresenter.onGetAddressFromLocation(mLocation);
         } else {
@@ -116,9 +117,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             if (savedInstanceState.containsKey(RECYCLER_STATE_KEY)) {
                 mLayoutManagerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
             }
-            if (savedInstanceState.containsKey(LIST_PHARMACY_KEY)) {
-                mPharmacyList = savedInstanceState.getParcelableArrayList(LIST_PHARMACY_KEY);
-            }
+
             if (savedInstanceState.containsKey(EXPANDABLE_STATE_KEY)) {
                 mSpandState = savedInstanceState.getBooleanArray(EXPANDABLE_STATE_KEY);
             }
@@ -127,13 +126,26 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             }
 
         }
-        mPresenter.onStartLoader();
+
         //in both fragment, since map fragment could be the currentItem in TabLayout
-        setUserVisibleHint(true);
+
         return view;
     }
 
-
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Util.logD(LOG_TAG,"onViewCreated");
+        super.onViewCreated(view, savedInstanceState);
+        mPresenter.onStartLoader();
+      //  setUserVisibleHint(true); setting it here doen't work
+      // I opted for setting this value in the instantiation of
+      //  the fragment in FragmentPagerAdapter. solution not valid after 24.0.0
+    }
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        Util.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        super.setUserVisibleHint(isVisibleToUser);
+    }
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -150,27 +162,43 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onStart() {
+        Util.logD(LOG_TAG, "onStart");
         super.onStart();
         mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
     }
 
     @Override
+    public void onResume() {
+        Util.logD(LOG_TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
     public void onPause() {
-        Util.logD(LOG_TAG,"onPause");
+        Util.logD(LOG_TAG, "onPause");
         mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
 
+    @Override
+    public void onStop() {
+        Util.logD(LOG_TAG, "onStop");
+        super.onStop();
+    }
+
     private void setUpRecyclerView() {
-        mAdapter = new ListTabAdapter(getActivity().getApplicationContext(), this);
-        //     mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
+
+        mAdapter = new ListTabAdapter(getActivity(),this);
         SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
         mRecyclerView.setAdapter(animatorAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
     }
 
+    private ListTabAdapter getAdapter(){
+       return (ListTabAdapter)  mRecyclerView.getAdapter();
+    }
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Util.logD(LOG_TAG, "showResults");
@@ -182,7 +210,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         if (mLayoutManagerState != null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
         }
-        mPharmacyList = pharmacyList;
+
 
     }
 
@@ -207,65 +235,73 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         mAddress = address;
     }
 
-
     @Override
-    public void onClickGo(int position) {
-        Util.logD(LOG_TAG, "onClickGo");
-        Pharmacy pharmacy = mPharmacyList.get(position);
-        Util.startGoogleDirections(getActivity(),
-                new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
-                mAddress, new LatLng(pharmacy.getLat(), pharmacy.getLon()),
-                pharmacy.getAddressFormatted()
-        );
+    public void launchActivity(Intent intent) {
+        startActivity(intent);
     }
 
     @Override
-    public void onClickFavorite(int position) {
+    public void onClickGo(Pharmacy pharmacy) {
+        Util.logD(LOG_TAG, "onClickGo");
+
+        mPresenter.handleClickGo(pharmacy,mLocation,mAddress);
+
+
+    }
+
+    @Override
+    public void onClickFavorite(Pharmacy pharmacy) {
         //the phone number acts as primary key
-        Pharmacy pharmacy = mPharmacyList.get(position);
         String phone = pharmacy.getPhone();
         mCallback.onUpdateFavorite(phone, true);
-        int favorite;
-        String snackMessage;
-        if (pharmacy.isFavorite()) {
-            snackMessage = "Pharmacy deleted from favorites";
-            favorite = 0;
-        } else {
-            snackMessage = "Pharmacy added to favorites";
-            favorite = 1;
-        }
+        mPresenter.handleClickFavorite(pharmacy);
 
-        Uri uri = DbContract.FarmaciasEntity.buildFarmaciasUriByPhone(phone);
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DbContract.FarmaciasEntity.FAVORITE, favorite);
 
-        int rowsUpdated = getActivity().getContentResolver().update(uri, contentValues,
-                DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
-                null);
-        if (rowsUpdated == 1) {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Snackbar.make(mRootView, snackMessage, Snackbar.LENGTH_SHORT).show();
-                }
-            }, 30);
 
-        }
-        Util.logD(LOG_TAG, "rows updates: " + rowsUpdated);
+    }
 
+    @Override
+    public void onClickOptions(ListTabAdapter.MyViewHolder vh) {
+
+        mPresenter.handleClickOptions(vh);
+
+    }
+
+    @Override
+    public void onClickPhone(String phone) {
+        mPresenter.handleClickCall(phone);
+
+    }
+
+    @Override
+    public void onClickShare(Pharmacy pharmacy) {
+        mPresenter.handleClickShare(pharmacy);
+    }
+
+    @Override
+    public void showSnackBar(String message) {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT).show();
+            }
+        }, 30);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         if (key.equals(mSharedPreferences.getLocationKey())) {
-            //update location variable
-            mLocation = mSharedPreferences.getLocation();
-            //get the new address
-            mPresenter.onGetAddressFromLocation(mLocation);
-            mSnackBar = new SnackBarWrapper(getActivity());
-            mSnackBar.addCallback(createSnackbarCallback());
-            mSnackBar.show();
+            SnackBarWrapper snackBar;
+            //anado isAdded porque me dio este npe
+            // Process: com.chernandezgil.farmacias, PID: 8683
+            //java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference
+            if(isAdded()) {
+                snackBar = new SnackBarWrapper(getActivity());
+                snackBar.addCallback(createSnackbarCallback());
+                snackBar.show();
+            }
 
         }
     }
@@ -275,6 +311,15 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             @Override
             public void onSnackbarActionPressed(Snackbar snackbar) {
                 Toast.makeText(getActivity(), "Presionado action", Toast.LENGTH_LONG).show();
+                //update location variable
+                mLocation = mSharedPreferences.getLocation();
+                //get the new address
+                mPresenter.onGetAddressFromLocation(mLocation);
+                // set location in Presenter
+                mPresenter.setLocation(mLocation);
+                mPresenter.onStartLoader();
+                Intent intent = new Intent(NEW_LOCATION);
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
             }
 
             @Override
@@ -324,10 +369,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         public void onUpdateFavorite(String phone, boolean fromListMap);
     }
 
-    @Override
-    public void onClick(ListTabAdapter.ViewHolder vh) {
 
-    }
 
     @Override
     public void onDetach() {

@@ -14,16 +14,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 public class CustomSupporMapFragment extends SupportMapFragment {
     public View mOriginalContentView;
     public TouchableWrapper mTouchView;
-    @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        mOriginalContentView=super.onCreateView(layoutInflater, viewGroup, bundle);
-        mTouchView = new TouchableWrapper(getActivity());
-        mTouchView.addView(mOriginalContentView);
-        return mTouchView;
-    }
-
-    @Override
-    public View getView() {
-        return mOriginalContentView;
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
+//        mOriginalContentView=super.onCreateView(layoutInflater, viewGroup, bundle);
+//        mTouchView = new TouchableWrapper(getActivity());
+//        mTouchView.addView(mOriginalContentView);
+//        return mTouchView;
+//    }
+//
+//    @Override
+//    public View getView() {
+//        return mOriginalContentView;
+//    }
 }
