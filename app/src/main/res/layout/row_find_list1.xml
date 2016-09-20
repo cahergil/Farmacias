@@ -10,7 +10,7 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:layout_width="match_parent"
-
+    android:stateListAnimator="@animator/found_pharmacy"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="2dp">
 
@@ -111,7 +111,7 @@
 
 
         <include
-            layout="@layout/options_layout"
+            layout="@layout/layout_options"
             android:layout_marginTop="8dp"
             android:visibility="gone"
             android:layout_width="match_parent"

@@ -48,6 +48,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private int lastAnimatedPosition = -1;
     private static final int ANIMATED_ITEMS_COUNT = 10;
     private int mColorSpan;
+    private int mColorSpanData;
     private CustomItemAnimator mCustomItemAnimator;
 
     public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview,CustomItemAnimator customItemAnimator) {
@@ -95,7 +96,8 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 }
             });
         }
-        mColorSpan = ContextCompat.getColor(mContext, R.color.black);
+        mColorSpan =Util.modifyAlpha(ContextCompat.getColor(mContext,R.color.black),0.87f);
+        mColorSpanData = Util.modifyAlpha(ContextCompat.getColor(mContext,R.color.black),0.54f);
     }
 
     @Override
@@ -103,6 +105,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         //   Util.logD(LOG_TAG,"onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list1, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
+        holder.ivPhone.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -172,6 +175,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private void bindHolder(MyViewHolder holder, int position) {
 
         ForegroundColorSpan span = new ForegroundColorSpan(mColorSpan);
+        ForegroundColorSpan spanData = new ForegroundColorSpan(mColorSpanData);
         String sLocality = mContext.getString(R.string.fca_localidad) + Constants.SPACE;
         String sDireccion = mContext.getString(R.string.fca_direccion) + Constants.SPACE;
         String sPhone = mContext.getString(R.string.fca_telefono) + Constants.SPACE;
@@ -183,13 +187,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 + Constants.SPACE
                 + pharmacy.getProvince();
 
-        holder.tvLocality.setText(createSpannable(locality, sLocality, span));
+        holder.tvLocality.setText(createSpannable(locality, sLocality, span,spanData));
         holder.tvPlus.setTag(holder);
 
-        holder.tvAdress.setText(createSpannable(sDireccion + pharmacy.getAddress(), sDireccion, span));
+        holder.tvAdress.setText(createSpannable(sDireccion + pharmacy.getAddress(), sDireccion, span,spanData));
         holder.tvDistance.setText(createSpannable(mContext.getString(R.string.format_distancia, pharmacy.getDistance()),
-                mContext.getString(R.string.fca_distancia) + Constants.SPACE, span));
-        holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span));
+                mContext.getString(R.string.fca_distancia) + Constants.SPACE, span,spanData));
+        holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span,spanData));
         if (Build.VERSION.SDK_INT>Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;
             setExpanded(holder, isExpanded);
@@ -198,16 +202,17 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
     }
 
-    private SpannableString createSpannable(String string, String stringToSpan, ForegroundColorSpan span) {
+    private SpannableString createSpannable(String string, String stringToSpan,
+                                            ForegroundColorSpan span,ForegroundColorSpan span2) {
         SpannableString spannable = new SpannableString(string);
         spannable.setSpan(span, 0, stringToSpan.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        spannable.setSpan(span2,stringToSpan.length(),string.length()-1,Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         return spannable;
 
     }
 
     private void setExpanded(MyViewHolder holder, boolean isExpanded) {
         holder.itemView.setActivated(isExpanded);
-        //   holder.reply.setVisibility((isExpanded && allowComment) ? View.VISIBLE : View.GONE);
         holder.llOptionsRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivGo.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivPhone.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -236,7 +241,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
-            case R.id.plus:
+            case R.id.ivPhone:
 
 
                 break;

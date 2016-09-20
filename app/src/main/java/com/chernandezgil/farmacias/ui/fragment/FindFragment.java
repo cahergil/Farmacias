@@ -4,6 +4,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 import android.content.Context;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
@@ -16,6 +17,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -103,6 +105,8 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     private PreferencesManager mSharedPreferences;
     private String mQuickSearchText;
     private Drawable mDimDrawable;
+    private boolean isBackPressed=false; //half implemented functionality, only works on portrait
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -156,12 +160,18 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
                 int quickSearchRecyclerViewVisibility=savedInstanceState.getInt("quickSearchRecyclerViewState");
                 mPresenter.onInitLoader();
                 mSearchCardView.setVisibility(View.VISIBLE);
-                int options = mSearchEditor.getImeOptions();
-                mSearchEditor.setImeOptions(options | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+              //  int options = mSearchEditor.getImeOptions();
+             //   mSearchEditor.setImeOptions(options | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                mSearchEditor.setImeOptions(mSearchEditor.getImeOptions() | EditorInfo.IME_ACTION_SEARCH |
+                        EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN);
                 //if quickSearchRecyclerView was visible before rotation, that means that the user
                 //was searching-> restore state of searching
                 if (quickSearchRecyclerViewVisibility == View.VISIBLE) {
+                    Util.setLightStatusBar(mSearchCardView,getActivity());
                     mQuickSearchRecyclerView.setVisibility(View.VISIBLE);
+                    //don't know why always get the mSearchEditor.getText()=""
+                    //although in the view appears the characters.
+                    //for that reason save the last search string
                     mFindQuickSearchAdapter.setmSearchString(searchText);
                     if(searchText.length()>0) {
                         showClearSearchIcon();
@@ -198,9 +208,14 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         int id = item.getItemId();
         switch (id) {
             case R.id.action_search:
+               // isBackPressed = false;
                 mFindQuickSearchAdapter.setmSearchString(Constants.EMPTY_STRING);
-                mPresenter.onInitLoaderQuickSearch();
+                //with onInitLoaderQuickSearch if the user introduces a search string with cero results,
+                //and after closes the search. When opening again the Quick searach rv is going to show
+                //the previous results. This way always present the recent searches
+                mPresenter.onRestartLoaderQuickSearch("");
                 initializeSearchCardView();
+                Util.setLightStatusBar(mSearchCardView,getActivity());
 
                 return true;
 
@@ -225,7 +240,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     }
 
     private void initializeSearchCardView() {
-        SearchUtils.setUpAnimations(getContext(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
+        SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
         //if we haben removed the focus before this is necessary. If it is the first click not.
         requestFocusOnSearchEditor();
         mCardOnScreen = true;
@@ -236,6 +251,8 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         setUpQuickSearchRecyclerView();
 
         mSearchEditor = (EditText) getActivity().findViewById(R.id.edit_text_search);
+        mSearchEditor.setImeOptions(mSearchEditor.getImeOptions() | EditorInfo.IME_ACTION_SEARCH |
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN);
 
         mSearchEditor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -250,7 +267,16 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
 
                     Util.logD(LOG_TAG, "edit_text lost focus");
                     mRecyclerView.setVisibility(View.VISIBLE);
-                    hideQuickSearchRecyclerView();
+                    //napa, backpressed funciona cuando no esta rotada la pantalla, no se porque, da un OOM exception
+                    if(!mRotation) {
+                        if (isBackPressed) {
+                            isBackPressed = false;
+                        } else {
+                            hideQuickSearchRecyclerView();
+                        }
+                    } else {
+                        hideQuickSearchRecyclerView();
+                    }
                     unDimScren();
                 }
             }
@@ -311,15 +337,19 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         //    mCompositeSubscription.add(editorAterTextChangeEvent);
         mCompositeSubscription.add(editorActionEvent);
 
+
         mImageSearchBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SearchUtils.setUpAnimations(getContext(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
+                isBackPressed = true;
+                SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
                 //put this variable here, so that clearSearchEditor() doesn't execute another search
                 mCardOnScreen = false;
                 //delete current text so that in the next appearance don't show
                 clearSearchEditor();
                 clearFocusFromSearchEditor();
+
+
 
             }
         });

@@ -1,27 +1,37 @@
 package com.chernandezgil.farmacias.Utilities;
 
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.CheckResult;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
 import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.bettervectordrawable.utils.BitmapUtil;
@@ -30,6 +40,7 @@ import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
+import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -42,6 +53,7 @@ import java.util.Locale;
  */
 public class Util {
     static int screenHeight = 0;
+    static int oldStatusBarFlags;
     public static void logD(final String tag, String message) {
         if (BuildConfig.DEBUG) {
             Log.d(tag, message);
@@ -283,4 +295,102 @@ public class Util {
 
         return screenHeight;
     }
+
+    public static void setLightStatusBar(View view,Activity activity){
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                View decor = activity.getWindow().getDecorView();
+                oldStatusBarFlags = decor.getSystemUiVisibility();
+                int flags = view.getSystemUiVisibility();
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                view.setSystemUiVisibility(flags);
+               activity.getWindow().setStatusBarColor(Color.WHITE);
+            }
+
+
     }
+
+    //the view used in setting the light status bar needs to dissapear so that the changes takes effect.
+    public static void clearLightStatusBar(Activity activity) {
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decor = activity.getWindow().getDecorView();
+            decor.setSystemUiVisibility(oldStatusBarFlags);
+            Window window = activity.getWindow();
+            window.setStatusBarColor(ContextCompat.getColor(activity,R.color.colorPrimaryDark));
+
+
+        }
+    }
+
+    //works for changing only the colors of the icons in status bar, the view doesn't need to dissapear from screen
+    public static void clearNick(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = view.getSystemUiVisibility();
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            view.setSystemUiVisibility(flags);
+        }
+    }
+    //extracted from materials-intro, not working as expected
+    public static void anotherMethod(Activity activity,View someView){
+//        int systemUiVisibility =activity.getWindow().getDecorView().getSystemUiVisibility();
+//        int flagLightStatusBar = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+//        if (flag) {
+//            //Light background
+//            systemUiVisibility |= flagLightStatusBar;
+//        } else {
+//            //Dark background
+//            systemUiVisibility &= ~flagLightStatusBar;
+//        }
+//        activity.getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
+      //  someView.setSystemUiVisibility(0); not working
+      //  rootView.setSystemUiVisibility(rootView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR); not working
+//        View decorView = activity.getWindow().getDecorView();
+//        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
+//        decorView.setSystemUiVisibility(uiOptions);
+//        Window window = activity.getWindow();
+//        window.setStatusBarColor(ContextCompat.getColor(activity,R.color.colorPrimaryDark));
+//
+//// Calling setSystemUiVisibility() with a value of 0 clears
+//// all flags.
+//        decorView.setSystemUiVisibility(0);
+
+
+    }
+    /**
+     * For use in methods like Color.parseColor("")
+     * @param originalColor color, without alpha
+     * @param alpha         from 0.0 to 1.0
+     * @return
+     */
+    public static String addAlpha(String originalColor, double alpha) {
+        long alphaFixed = Math.round(alpha * 255);
+        String alphaHex = Long.toHexString(alphaFixed);
+        if (alphaHex.length() == 1) {
+            alphaHex = "0" + alphaHex;
+        }
+        originalColor = originalColor.replace("#", "#" + alphaHex);
+
+
+        return originalColor;
+    }
+
+    /**
+     * Set the alpha component of {@code color} to be {@code alpha}.
+     */
+    public static @CheckResult @ColorInt int modifyAlpha(@ColorInt int color,
+                                                        @IntRange(from = 0, to = 255) int alpha) {
+        return (color & 0x00ffffff) | (alpha << 24);
+    }
+
+    /**
+     * Set the alpha component of {@code color} to be {@code alpha}.
+     */
+    public static @CheckResult @ColorInt int modifyAlpha(@ColorInt int color,
+                                                         @FloatRange(from = 0f, to = 1f) float alpha) {
+        return modifyAlpha(color, (int) (255f * alpha));
+    }
+}
