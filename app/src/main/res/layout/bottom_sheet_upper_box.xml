@@ -9,8 +9,9 @@
     android:background="@color/colorPrimary">
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="66dp"
+        android:layout_height="80dp"
         android:layout_weight="1"
+        android:layout_gravity="center_vertical"
         android:gravity="center"
         android:background="@color/white"
         android:orientation="vertical">
@@ -30,15 +31,15 @@
         <TextView
             android:id="@+id/name"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:divider="?android:dividerHorizontal"
             android:gravity="center_vertical"
-            android:lines="1"
+            android:maxLines="2"
             android:ellipsize="end"
             android:showDividers="end"
-            tools:text="Carlos Hernández Gil"
+            tools:text="Carlos Hernández Gil adfdfadff"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
             android:textColor="@color/white"/>
@@ -63,7 +64,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-         android:orientation="vertical">
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
         <FrameLayout
             android:layout_width="65dp"
             android:layout_height="65dp"

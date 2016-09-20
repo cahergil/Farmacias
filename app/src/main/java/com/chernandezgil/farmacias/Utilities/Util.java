@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -20,6 +21,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.bettervectordrawable.utils.BitmapUtil;
 import com.chernandezgil.farmacias.BuildConfig;
@@ -38,7 +41,7 @@ import java.util.Locale;
  * Created by Carlos on 06/07/2016.
  */
 public class Util {
-
+    static int screenHeight = 0;
     public static void logD(final String tag, String message) {
         if (BuildConfig.DEBUG) {
             Log.d(tag, message);
@@ -268,5 +271,16 @@ public class Util {
 
     }
 
+    public static int getScreenHeight(Context c) {
 
+        if (screenHeight == 0) {
+            WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
+            Display display = wm.getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            screenHeight = size.y;
+        }
+
+        return screenHeight;
+    }
     }

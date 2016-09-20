@@ -29,8 +29,9 @@
     <color name="pharmacy_close">#ff736161</color>
     <color name="pharmacy_open">#ffd64646</color>
     <color name="pharmacy_open_list">@color/green_500</color>
-    <color name="bottom_sheet_icons">@color/colorPrimary</color>
+    <color name="bottom_sheet_icons">@color/gray600</color>
     <color name="bottom_sheet_text">@color/black</color>
     <color name="fav_color">@color/blue_mobile_web</color>
     <color name="suggestions_row">#6D6D6D</color>
+    <color name="color_options">#000000</color>
 </resources>

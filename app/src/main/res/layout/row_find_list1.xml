@@ -108,15 +108,12 @@
             android:paddingRight="36dp"
             tools:text="Teléfono: 924 84 19 97"
              />
-        <View
-            style="@style/Separator"
-            android:layout_below="@+id/txtPhone"
 
-            />
 
         <include
             layout="@layout/options_layout"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtPhone"

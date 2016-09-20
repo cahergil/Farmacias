@@ -6,9 +6,7 @@
     android:id="@+id/optionsRow"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:orientation="vertical">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,6 +15,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/ivPhone"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/phone" />
@@ -24,6 +23,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/ivGo"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/directions" />
@@ -31,6 +31,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/ivShare"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/share" />
@@ -38,6 +39,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/ivSchedule"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/clock" />
@@ -46,6 +48,7 @@
 
         <ImageView
             android:id="@+id/ivFavorite"
+            android:visibility="gone"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/heart" />
 

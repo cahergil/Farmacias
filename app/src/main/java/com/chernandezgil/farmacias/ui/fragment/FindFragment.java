@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Context;
 import android.database.MatrixCursor;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -45,8 +47,11 @@ import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.presenter.FindPresenter;
+import com.chernandezgil.farmacias.ui.adapter.CustomAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
+import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.view.FindContract;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
@@ -62,6 +67,8 @@ import butterknife.Unbinder;
 import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
+
+import static android.support.v7.recyclerview.R.styleable.RecyclerView;
 
 
 /**
@@ -94,12 +101,11 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     private SearchRecentSuggestions mRecentSearchSuggestions;
     private FindQuickSearchAdapter mFindQuickSearchAdapter;
     private RelativeLayout mViewSearch;
-
     private Location mLocation;
     private boolean mRotation;
     private boolean mCardOnScreen;
     private CompositeSubscription mCompositeSubscription;
-
+    private PreferencesManager mSharedPreferences;
     private String mQuickSearchText;
     private Drawable mDimDrawable;
 
@@ -107,16 +113,11 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Util.logD(LOG_TAG, "onCreate");
-        Bundle bundle = getArguments();
 
-        if (savedInstanceState == null) {
-            if (bundle != null) {
-                mLocation = bundle.getParcelable("location_key");
-            }
-        } else {
+        mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
+        mLocation = mSharedPreferences.getLocation();
+        if (savedInstanceState != null) {
             mRotation = true;
-            mLocation = savedInstanceState.getParcelable("location_key");
-
         }
         LoaderProvider loaderProvider = new LoaderProvider(getContext());
         LoaderManager loaderManager = getLoaderManager();
@@ -404,11 +405,15 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     }
     private void setUpRecyclerView() {
 
-        mAdapter = new FindRecyclerViewAdapter(getContext());
+        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView);
+        mRecyclerView.setItemAnimator(new CustomAnimator());
         SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
-        mRecyclerView.setAdapter(slideAdapter);
+
+        mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
+
+        Util.logD(LOG_TAG,"prueba");
 
     }
 

@@ -43,11 +43,16 @@
     <string name="tlf_tab_list_string" translatable="true">Lista</string>
     <string name="tlf_tab_map_string" translatable="true">Mapa</string>
     <!-- FindRecyclerViewAdapter -->
-    <string name="fca_format_telefono" translatable="true"><xliff:g id="telefono">Teléfono: %1$1s</xliff:g></string>
-    <string name="fca_format_direccion" translatable="true"><xliff:g id="direccion">Dirección: %1$1s</xliff:g></string>
-    <string name="fca_format_localidad" translatable="true">Localidad: </string>
-    <string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>
+    <!--<string name="fca_format_telefono" translatable="true"><xliff:g id="telefono">Teléfono: %1$1s</xliff:g></string>-->
+    <!--<string name="fca_format_direccion" translatable="true"><xliff:g id="direccion">Dirección: %1$1s</xliff:g></string>-->
+    <!--<string name="fca_format_localidad" translatable="true">Localidad: </string>-->
+    <!--<string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>-->
 
+    <string name="fca_telefono" translatable="true">Teléfono:</string>
+    <string name="fca_direccion" translatable="true">Dirección:</string>
+    <string name="fca_localidad" translatable="true">Localidad:</string>
+    <string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>
+    <string name="fca_distancia" translatable="true">Distancia:</string>
     <!-- Searchable configuration -->
     <string name="sc_search_hint" translatable="true">buscar farmacias</string>
 
