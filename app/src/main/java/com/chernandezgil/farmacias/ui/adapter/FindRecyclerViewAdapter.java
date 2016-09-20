@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
@@ -49,17 +48,19 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private int lastAnimatedPosition = -1;
     private static final int ANIMATED_ITEMS_COUNT = 10;
     private int mColorSpan;
+    private CustomItemAnimator mCustomItemAnimator;
 
-    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview) {
+    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview,CustomItemAnimator customItemAnimator) {
         mRecyclerView = recyclerview;
         mContext = context;
+        mCustomItemAnimator = customItemAnimator;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
             expandCollapse = new AutoTransition();
             expandCollapse.setDuration(200);
             expandCollapse.setInterpolator(AnimationUtils.loadInterpolator(mContext,
-                    android.R.interpolator.fast_out_slow_in));
+                    android.R.interpolator.linear));
             expandCollapse.addListener(new Transition.TransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {
@@ -73,7 +74,9 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
                 @Override
                 public void onTransitionEnd(Transition transition) {
+                    mCustomItemAnimator.setAnimateMoves(true);
                     mRecyclerView.setOnTouchListener(null);
+
                 }
 
                 @Override
@@ -106,6 +109,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 public void onClick(View v) {
                     final int position = holder.getAdapterPosition();
                     setDelayedTransition();
+                    mCustomItemAnimator.setAnimateMoves(false);
                     if (position == RecyclerView.NO_POSITION) return;
                     // collapse any currently expanded items
                     if (expandedPosition != RecyclerView.NO_POSITION) {

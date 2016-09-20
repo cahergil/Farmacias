@@ -6,9 +6,9 @@ import android.support.v7.widget.RecyclerView;
  * Created by Carlos on 19/09/2016.
  */
 
-public class CustomAnimator extends SlideInItemAnimator {
+public class CustomItemAnimator extends SlideInItemAnimator {
     private boolean animateMoves = false;
-    public CustomAnimator() {
+    public CustomItemAnimator() {
         super();
     }
 

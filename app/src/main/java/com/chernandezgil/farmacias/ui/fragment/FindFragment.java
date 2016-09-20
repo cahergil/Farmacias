@@ -3,7 +3,6 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Context;
 import android.database.MatrixCursor;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -47,7 +45,7 @@ import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.presenter.FindPresenter;
-import com.chernandezgil.farmacias.ui.adapter.CustomAnimator;
+import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -64,11 +62,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 
-import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-
-import static android.support.v7.recyclerview.R.styleable.RecyclerView;
 
 
 /**
@@ -405,9 +400,10 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     }
     private void setUpRecyclerView() {
 
-        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView);
-        mRecyclerView.setItemAnimator(new CustomAnimator());
-        SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
+        CustomItemAnimator customItemAnimator = new CustomItemAnimator();
+        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator);
+        mRecyclerView.setItemAnimator(customItemAnimator);
+    //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
