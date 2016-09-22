@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     <!-- Customize your theme here. -->
-    <!--<item name="searchViewStyle">@style/AppTheme.SearchView</item>-->
+    <!-- no longer neccesary since not applying content activity transitions but overridePendingTransitions-->
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     <item name="colorAccent">@color/colorAccent</item>

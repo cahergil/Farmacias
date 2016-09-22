@@ -18,6 +18,7 @@ public class RecentSuggestionsProvider extends android.content.SearchRecentSugge
     public final static String AUTHORITY = "com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider";
     public final static int MODE = DATABASE_MODE_QUERIES;
 
+
     private UriMatcher matcher;
     private static final int SUGGESTIONS_CODE = 5;
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
@@ -26,6 +27,7 @@ public class RecentSuggestionsProvider extends android.content.SearchRecentSugge
     public RecentSuggestionsProvider() {
         matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY,SUGGESTIONS_CODE);
+
 
         setupSuggestions(AUTHORITY,MODE);
     }
@@ -54,5 +56,8 @@ public class RecentSuggestionsProvider extends android.content.SearchRecentSugge
         //return c;
     }
 
-
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        return super.delete(uri, selection, selectionArgs);
+    }
 }

@@ -10,7 +10,7 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:layout_width="match_parent"
-    android:stateListAnimator="@animator/found_pharmacy"
+    android:stateListAnimator="@animator/statelistanimator_pharmacy"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="2dp">
 

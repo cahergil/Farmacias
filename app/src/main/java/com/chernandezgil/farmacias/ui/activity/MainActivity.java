@@ -18,7 +18,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -285,8 +284,11 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_settings) {
             mRadio = mSharedPreferences.getRadio();
             Intent intent = new Intent(this, SettingsActivity.class);
-            ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
-            startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
+//            ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
+//            startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
+            startActivityForResult(intent,REQUEST_CODE_SETTINGS);
+            overridePendingTransition(
+                    R.anim.slide_in,R.anim.stay_exit);
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);

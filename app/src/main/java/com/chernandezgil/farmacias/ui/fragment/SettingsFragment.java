@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,10 +13,12 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.graphics.drawable.VectorDrawableCompat;
+import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.SeekBarPreference;
+import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 
 /**
  * Created by Carlos on 22/09/2016.
@@ -39,6 +42,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_email_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_share_app_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_version_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_delete_history_key)));
     }
 
     private void bindPreferenceSummaryToValue(Preference preference) {
@@ -124,7 +128,13 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (key.equals(getString(R.string.pref_delete_history_key))) {
-         //   getContext().getContentResolver().delete()
+            // RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath("suggestions") segun
+            // el codigo de la clase para los insert hay que agregar suggestions
+            Uri uri = RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath("suggestions").build();
+            int deletedRows = getActivity().getContentResolver().delete(uri,null,null);
+            if(deletedRows>0) {
+                Toast.makeText(getActivity(),getString(R.string.pref_delete_toast_message),Toast.LENGTH_SHORT).show();
+            }
         }
 
         return true;

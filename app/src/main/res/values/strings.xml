@@ -38,6 +38,7 @@
     <string name="pref_delete_history_key" translatable="false">delete</string>
     <string name="pref_delete_history_title" translatable="true">Borrar historial de busqueda</string>
     <string name="pref_delete_history_summary" translatable="true">Al hacer click borraras el historial de busquedas realizadas hasta ahora</string>
+    <string name="pref_delete_toast_message" translatable="true">Historial borrado</string>
     <!-- ListTabFragment -->
     <string name="ltf_removed_from_favorite" translatable="true">Farmacia eliminada de favoritos</string>
     <string name="ltf_added_to_favorite" translatable="true">Farmacia añadida a favoritos</string>

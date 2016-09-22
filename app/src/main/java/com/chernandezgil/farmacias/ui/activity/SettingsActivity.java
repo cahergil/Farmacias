@@ -24,31 +24,18 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Util.logD(LOG_TAG,"onCreate");
-        setContentView(R.layout.activity_settings); //make this trick in so that the enter transitions appears
+        //comment: no more necessary because I am no longer using Transitions api v21
+        //setContentView(R.layout.activity_settings);
+        //make this trick in so that the enter transitions appears
         //put inside android.R.id.content identification
+
+
         actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.settings_title));
         actionBar.setDisplayHomeAsUpEnabled(false);
-        Transition enterTrans = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            enterTrans = new Slide(Gravity.RIGHT);
-            enterTrans.setDuration(300);
-            enterTrans.setInterpolator(AnimationUtils.loadInterpolator(this,android.R.interpolator.linear));
 
-            enterTrans.excludeTarget(android.R.id.statusBarBackground,true);
-            enterTrans.excludeTarget(android.R.id.navigationBarBackground,true);
-
-
-            //   enterTrans.addTarget(android.R.id.content);
-            getWindow().setEnterTransition(enterTrans);
-        }
-
-
-
-        SettingsFragment set=new SettingsFragment();
-        //set.setEnterTransition(enterTrans);
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content,set)
+                .replace(android.R.id.content,new SettingsFragment())
                 .commit();
 
     }
@@ -57,8 +44,10 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //the automatic exit transition doesn't work if i show the up button, therefore the up button is disabled
+        //the automatic exit transition works with back button
         setResult(RESULT_OK);
         super.onBackPressed();
+        overridePendingTransition(R.anim.stay_reenter, R.anim.slide_out);
     }
 }
 
