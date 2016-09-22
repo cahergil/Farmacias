@@ -3,9 +3,9 @@ package com.chernandezgil.farmacias;
 import android.app.Application;
 import android.content.Context;
 
-import com.chernandezgil.farmacias.presenter.DaggerMainComponent;
+
 import com.chernandezgil.farmacias.presenter.MainComponent;
-import com.chernandezgil.farmacias.presenter.MainModule;
+
 import com.squareup.leakcanary.LeakCanary;
 
 

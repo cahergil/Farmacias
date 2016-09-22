@@ -1,31 +1,44 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppThemeLightStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <!--<item name="searchViewStyle">@style/AppTheme.SearchView</item>-->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/white</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowBackground">@color/white</item>
-        <item name="snackbarBuilderStyle">@style/SampleSnackbarStyle</item>
-    </style>
-    <style name="SampleSnackbarStyle" parent="SnackbarBuilder">
-        <item name="snackbarBuilder_parentViewId">@id/coordinator</item>
-        <item name="snackbarBuilder_duration">shortTime</item>
-        <item name="snackbarBuilder_messageTextColor">@color/white</item>
-        <item name="snackbarBuilder_actionTextColor">@color/colorAccent</item>
-    </style>
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <!--if false it draws the status bar with color black-->
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <!--transparent so that the drawer can be seen behind the status bar-->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:colorControlHighlight">@color/colorAccent</item>
+    <!--&lt;!&ndash; Base application theme. &ndash;&gt;-->
+    <!--<style name="SettingsTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="searchViewStyle">@style/AppTheme.SearchView</item>&ndash;&gt;-->
+        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+        <!--<item name="colorPrimaryDark">@color/white</item>-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
+        <!--<item name="android:windowBackground">@color/white</item>-->
+        <!--<item name="snackbarBuilderStyle">@style/SampleSnackbarStyle</item>-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <!--<item name="android:colorControlHighlight">@color/colorAccent</item>-->
+        <!--&lt;!&ndash;enable content transitions&ndash;&gt;-->
+        <!--<item name="android:windowContentTransitions">true</item>-->
+    <!--</style>-->
 
-    </style>
+
+    <!--<style name="AppTheme.Settings">-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--&lt;!&ndash;if false it draws the status bar with color black&ndash;&gt;-->
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--&lt;!&ndash;transparent so that the drawer can be seen behind the status bar&ndash;&gt;-->
+        <!--<item name="android:statusBarColor">@color/red_700</item>-->
+        <!--<item name="android:colorControlHighlight">@color/colorAccent</item>-->
+        <!--&lt;!&ndash;enable content transitions&ndash;&gt;-->
+        <!--<item name="android:windowContentTransitions">true</item>-->
+
+
+    <!--</style>-->
+    <!--<style name="AppTheme.NoActionBar">-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--&lt;!&ndash;if false it draws the status bar with color black&ndash;&gt;-->
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--&lt;!&ndash;transparent so that the drawer can be seen behind the status bar&ndash;&gt;-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <!--<item name="android:colorControlHighlight">@color/colorAccent</item>-->
+        <!--&lt;!&ndash;enable content transitions&ndash;&gt;-->
+        <!--<item name="android:windowContentTransitions">true</item>-->
+    <!--</style>-->
 
     <style name="NavigationViewTheme" parent="AppTheme">
         <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Body2</item>

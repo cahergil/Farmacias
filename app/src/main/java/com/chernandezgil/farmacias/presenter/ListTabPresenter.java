@@ -81,17 +81,17 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     @Override
-    public void setLocation(Location location) {
-        mLocation = location;
+    public void setLocation(Location currentLocation) {
+        mLocation = currentLocation;
     }
 
     @Override
-    public void onGetAddressFromLocation(Location location) {
+    public void onGetAddressFromLocation(Location currentLocation) {
         List<Address> addresses = null;
         try {
             addresses = mGeocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude(),
                     1);
         } catch (IOException ioe) {
 
@@ -126,9 +126,9 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     @Override
-    public void handleClickGo(Pharmacy pharmacy,Location locatin, String address) {
+    public void handleClickGo(Pharmacy pharmacy, Location currentLocation, String currentAddress) {
         Intent intent=Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
-                address,
+                currentAddress,
                 new LatLng(pharmacy.getLat(), pharmacy.getLon()),
                 pharmacy.getAddressFormatted()
         );
@@ -147,7 +147,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     @Override
     public void handleClickShare(Pharmacy pharmacy) {
         String name = pharmacy.getName();
-        double distance = pharmacy.getDistance() / 1000;
+        double distance = pharmacy.getDistance() ;
         String address = pharmacy.getAddressFormatted();
         String phone = pharmacy.getPhone();
         Intent intent = Util.getShareIntent(name, distance, address, phone);

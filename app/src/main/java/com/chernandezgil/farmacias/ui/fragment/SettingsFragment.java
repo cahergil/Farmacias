@@ -1,75 +1,38 @@
-package com.chernandezgil.farmacias.ui.activity;
+package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.view.Gravity;
-import android.view.View;
-import android.view.Window;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.SeekBarPreference;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.chernandezgil.farmacias.ui.activity.ActivitySettings2;
 
 /**
- * Created by Carlos on 11/08/2016.
+ * Created by Carlos on 22/09/2016.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity implements  Preference.OnPreferenceChangeListener
-,Preference.OnPreferenceClickListener {
 
-    private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
+public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener,
+        Preference.OnPreferenceClickListener{
 
-//    @BindView(R.id.toolbar_activity_settings)
-//     Toolbar mToolbar;
-    private ActionBar mActionBar;
-
+    private static final String LOG_TAG = SettingsFragment.class.getSimpleName();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        Util.logD(LOG_TAG, "onCreate");
 
-            Transition enterTrans = new Slide(Gravity.RIGHT);
-            enterTrans.setDuration(1000);
-           // enterTrans.excludeTarget()
-         //   enterTrans.addTarget(android.R.id.list);
-            getWindow().setEnterTransition(enterTrans);
-
-
-        }
- //       setContentView(R.layout.activity_settings);
-        ButterKnife.bind(this);
-
-
-     //   setSupportActionBar(mToolbar);
-        setUpToolBar();
-
-
-
-
-        // Add 'general' preferences, defined in the XML file
+        // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.seek_bar_key)));
 
@@ -77,47 +40,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements  Pr
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_email_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_share_app_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_version_key)));
-
-    }
-
-    private void setUpToolBar(){
-        mActionBar =getSupportActionBar();
-        mActionBar.setTitle(getString(R.string.settings_title));
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
-
-    //    mToolbar.setTitle(getString(R.string.settings_title));
-    //    mToolbar.setTitleTextColor(Color.WHITE);
-
-        //http://developer.android.com/intl/es/reference/android/support/v7/appcompat/R.drawable.html
-        //by default the color is pale grey
-      //  final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_mtrl_am_alpha); //23.3
-        //  final Drawable upArrow= ContextCompat.getDrawable(this,R.drawable.ic_action_back);
-        final Drawable upArrow= ContextCompat.getDrawable(this,R.drawable.abc_ic_ab_back_material); //23.2,24.0
-        //tint the arrow to white
-//        upArrow.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
-//        mToolbar.setNavigationIcon(upArrow);
-//
-//
-//        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setResult(RESULT_OK);
-//                NavUtils.navigateUpFromSameTask(SettingsActivity.this);
-//            }
-//        });
-
-    }
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-    }
-
-
-    protected void onPause() {
-
-        super.onPause();
     }
 
     private void bindPreferenceSummaryToValue(Preference preference) {
@@ -130,7 +52,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements  Pr
                     PreferenceManager
                             .getDefaultSharedPreferences(preference.getContext())
                             .getBoolean(preference.getKey(), false));
-        } else if (preference instanceof SeekBarPreference){
+        } else if (preference instanceof SeekBarPreference) {
             // Trigger the listener immediately with the preference's
             // current value.
             onPreferenceChange(preference,
@@ -142,13 +64,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements  Pr
                     PreferenceManager
                             .getDefaultSharedPreferences(preference.getContext())
                             .getString(preference.getKey(), ""));
-            if(preference instanceof Preference) {
-                Preference pref=(Preference) preference;
+            if (preference instanceof Preference) {
+                Preference pref = (Preference) preference;
                 //scale the vector drawable R.drawable.google_play to 24f
-                if(getString(R.string.pref_rate_key).equals(pref.getKey())) {
-                    VectorDrawableCompat drawable = VectorDrawableCompat.create(getApplicationContext().getResources(),
+                if (getString(R.string.pref_rate_key).equals(pref.getKey())) {
+                    VectorDrawableCompat drawable = VectorDrawableCompat.create(getActivity().getApplicationContext().getResources(),
                             R.drawable.google_play, null);
-                    Bitmap bitmap = Util.createScaledBitMapFromVectorDrawable(getApplicationContext(), drawable, 24f);
+                    Bitmap bitmap = Util.createScaledBitMapFromVectorDrawable(getActivity().getApplicationContext(), drawable, 24f);
                     Drawable rateIcon = new BitmapDrawable(getResources(), bitmap);
                     pref.setIcon(rateIcon);
                 }
@@ -158,20 +80,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements  Pr
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object value) {
-        String stringValue = value.toString();
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        String stringValue = newValue.toString();
 
         if (preference instanceof SeekBarPreference) {
             preference.setSummary(("" + stringValue + " Km"));
 
 
-        } else if(preference instanceof  Preference) {
+        } else if (preference instanceof Preference) {
             String key = preference.getKey();
             //we take the versionName and assign it to the pref var.
             if (key == getString(R.string.pref_version_key)) {
                 String versionName;
                 try {
-                    versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                    versionName = getActivity().getPackageManager().getPackageInfo(
+                            getActivity().getPackageName(), 0).versionName;
 
                 } catch (PackageManager.NameNotFoundException e) {
                     versionName = null;
@@ -182,10 +105,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements  Pr
         }
         return true;
     }
-
-
-
-
 
     @Override
     public boolean onPreferenceClick(Preference preference) {

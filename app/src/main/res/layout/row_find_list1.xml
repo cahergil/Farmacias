@@ -57,19 +57,7 @@
 
             />
 
-        <TextView
-            android:id="@+id/plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/txtPhone"
-            android:layout_alignBaseline="@+id/txtPhone"
-            android:gravity="center_vertical"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:text="MÁS"
-            android:textColor="@color/blue_mobile_web"
 
-            />
 
         <TextView
             tools:text="Conde de Cartagena 36, Badajoz"

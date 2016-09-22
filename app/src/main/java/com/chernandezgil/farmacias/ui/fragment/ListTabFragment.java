@@ -164,7 +164,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onStart() {
         Util.logD(LOG_TAG, "onStart");
         super.onStart();
-        mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
 
     }
 
@@ -172,18 +172,20 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onResume() {
         Util.logD(LOG_TAG, "onResume");
         super.onResume();
+        mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
         Util.logD(LOG_TAG, "onPause");
-        mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
         super.onPause();
     }
 
     @Override
     public void onStop() {
         Util.logD(LOG_TAG, "onStop");
+        mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
 

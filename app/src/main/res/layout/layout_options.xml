@@ -25,6 +25,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:background="?selectableItemBackgroundBorderless"
             android:visibility="gone"
             android:id="@+id/ivGo"
             style="@style/ImageViewOptions"
@@ -33,6 +34,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:background="?selectableItemBackgroundBorderless"
             android:visibility="gone"
             android:id="@+id/ivShare"
             style="@style/ImageViewOptions"
@@ -41,6 +43,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:background="?selectableItemBackgroundBorderless"
             android:visibility="gone"
             android:id="@+id/ivSchedule"
             style="@style/ImageViewOptions"
@@ -49,6 +52,7 @@
         <View style="@style/VerticalSparator" />
 
         <ImageView
+            android:background="?selectableItemBackgroundBorderless"
             android:id="@+id/ivFavorite"
             android:visibility="gone"
             style="@style/ImageViewOptions"

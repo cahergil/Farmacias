@@ -2,6 +2,7 @@ package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,12 +12,14 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -29,12 +32,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 
 import com.chernandezgil.farmacias.BuildConfig;
+import com.chernandezgil.farmacias.Main2Activity;
 import com.chernandezgil.farmacias.customwidget.TouchableWrapper;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
@@ -139,7 +145,11 @@ public class MainActivity extends AppCompatActivity implements
         Util.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        if(Build.VERSION.SDK_INT>Build.VERSION_CODES.LOLLIPOP) {
+//            TransitionInflater inflater = TransitionInflater.from(this);
+//            Transition transition = inflater.inflateTransition(R.transition.exit_from_main);
+//            getWindow().setExitTransition(transition);
+        }
         mUnbinder=ButterKnife.bind(this);
         mSharedPreferences = new PreferencesManagerImp(getApplicationContext());
         mMainActivityPresenter = new MainActivityPresenter(mSharedPreferences);
@@ -280,8 +290,9 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             mRadio = mSharedPreferences.getRadio();
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent,REQUEST_CODE_SETTINGS);
+            Intent intent = new Intent(this, ActivitySettings2.class);
+            ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
+            startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);

@@ -43,7 +43,7 @@ public interface MapTabContract {
         public HashMap onGetHashMap();
         public void setLocation(Location location);
         public void onSetLastMarkerClick(PharmacyObjectMap pharmacyObjectMap);
-        public String onGetAddressFromLocation(Location location);
+        public String onGetAddressFromLocation(Location currentLocation);
         public void   onSetAddress(String address);
         public Bitmap onRequestCustomBitmap(String order,boolean isOpen);
         public void onSetMarkerBitMap(Bitmap bitmap);

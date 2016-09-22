@@ -158,7 +158,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     public void handleClickShare() {
         //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
         String name = mLastMarkerClicked.getName();
-        double distance = mLastMarkerClicked.getDistance() / 1000;
+        double distance = mLastMarkerClicked.getDistance() ;
         String address = mLastMarkerClicked.getAddressFormatted();
         String phone = mLastMarkerClicked.getPhone();
         Intent intent = Util.getShareIntent(name, distance, address, phone);
@@ -277,14 +277,14 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     }
 
     @Override
-    public String onGetAddressFromLocation(Location location) {
+    public String onGetAddressFromLocation(Location currentLocation) {
 
 
         List<Address> addresses = null;
         try {
             addresses = mGeocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude(),
                     1);
         } catch (IOException ioe) {
 

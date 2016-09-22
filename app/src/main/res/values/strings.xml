@@ -55,5 +55,6 @@
     <string name="fca_distancia" translatable="true">Distancia:</string>
     <!-- Searchable configuration -->
     <string name="sc_search_hint" translatable="true">buscar farmacias</string>
+    <string name="title_activity_main2">Main2Activity</string>
 
 </resources>

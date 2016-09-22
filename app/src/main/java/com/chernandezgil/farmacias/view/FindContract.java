@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.view;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 
@@ -22,6 +23,9 @@ public interface FindContract {
         public void showLoading();
         public void hideLoading();
         public void hideQuickSearchRecyclerView();
+        public void launchActivity(Intent intent);
+        public void showSnackBar(String message);
+
 
 
 
@@ -37,7 +41,11 @@ public interface FindContract {
         public void onRestartLoader(String newText);
         public void onInitLoaderQuickSearch();
         public void onRestartLoaderQuickSearch(String text);
-
+        public void setLocation(Location currentLocation);
+        public void onClickGo(Pharmacy pharmacy,Location currentLocation);
+        public void onClickFavorite(Pharmacy pharmacy);
+        public void onClickPhone(String phone);
+        public void onClickShare(Pharmacy pharmacy);
 
 
     }

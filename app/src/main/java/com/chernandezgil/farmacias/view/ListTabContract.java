@@ -31,9 +31,9 @@ public interface ListTabContract {
         void detachView();
 
         public void onStartLoader();
-        public void onGetAddressFromLocation(Location location);
-        public void setLocation(Location location);
-        public void handleClickGo(Pharmacy pharmacy,Location locatin, String address);
+        public void onGetAddressFromLocation(Location currentLocation);
+        public void setLocation(Location currentLocation);
+        public void handleClickGo(Pharmacy pharmacy,Location currentLocation, String currentAddress);
         public void handleClickCall(String phone);
         public void handleClickShare(Pharmacy pharmacy);
         public void handleClickFavorite(Pharmacy pharmacy);

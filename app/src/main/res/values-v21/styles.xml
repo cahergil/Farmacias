@@ -1,5 +1,18 @@
 <resources>
 
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- Customize your theme here. -->
+    <!--<item name="searchViewStyle">@style/AppTheme.SearchView</item>-->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:windowBackground">@color/white</item>
+    <item name="snackbarBuilderStyle">@style/SampleSnackbarStyle</item>
+    <item name="android:windowContentTransitions">true</item>
+
+
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -8,7 +21,14 @@
         <!--transparent so that the drawer can be seen behind the status bar-->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:colorControlHighlight">@color/colorAccent</item>
+        <!--enable content transitions-->
+        <item name="android:windowContentTransitions">true</item>
+
+
     </style>
+
+
+
 
     <style name="NavigationViewTheme" parent="AppTheme">
         <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Body2</item>

@@ -8,24 +8,22 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/white</item>
-
         <item name="snackbarBuilderStyle">@style/SampleSnackbarStyle</item>
     </style>
+
     <style name="SampleSnackbarStyle" parent="SnackbarBuilder">
         <item name="snackbarBuilder_parentViewId">@id/coordinator</item>
         <item name="snackbarBuilder_duration">shortTime</item>
         <item name="snackbarBuilder_messageTextColor">@color/white</item>
         <item name="snackbarBuilder_actionTextColor">@color/colorAccent</item>
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!--<style name="AppTheme.SearchView" parent="@style/Widget.AppCompat.SearchView">-->
-        <!--&lt;!&ndash; Layout for query suggestion rows &ndash;&gt;-->
-        <!--<item name="suggestionRowLayout">@layout/abc_search_dropdown_item_icons_2line</item>-->
-    <!--</style>-->
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -41,11 +39,13 @@
         <item name="android:background">@color/black</item>
         <item name="android:alpha">0.12</item>
     </style>
+
     <style name="SeparatorColor">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
         <item name="android:background">@color/colorPrimary</item>
     </style>
+
     <style name="Widget.TimeRow" parent="android:Widget">
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
@@ -75,6 +75,7 @@
 
 
     </style>
+
     <style name="VerticalSparator">
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">12dp</item>

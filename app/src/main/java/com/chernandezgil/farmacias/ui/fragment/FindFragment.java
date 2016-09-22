@@ -2,13 +2,19 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 
 import android.support.v4.app.LoaderManager;
@@ -41,6 +47,7 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
@@ -71,7 +78,9 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class FindFragment extends Fragment implements FindContract.View, FindQuickSearchAdapter.OnClickHandler {
+public class FindFragment extends Fragment implements FindContract.View,
+        FindQuickSearchAdapter.OnClickHandler,FindRecyclerViewAdapter.OnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
 
     private static final String LOG_TAG = FindFragment.class.getSimpleName();
@@ -120,8 +129,9 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         }
         LoaderProvider loaderProvider = new LoaderProvider(getContext());
         LoaderManager loaderManager = getLoaderManager();
+        Geocoder geocoder = new Geocoder(getActivity());
         // loaderManager.enableDebugLogging(true);
-        mPresenter = new FindPresenter(mLocation, loaderManager, loaderProvider);
+        mPresenter = new FindPresenter(mLocation, loaderManager, loaderProvider,geocoder);
 
         setHasOptionsMenu(true);
         mRecentSearchSuggestions = new SearchRecentSuggestions(getContext(),
@@ -239,6 +249,20 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
 
     }
 
+    @Override
+    public void onResume() {
+        Util.logD(LOG_TAG, "onResume");
+        super.onResume();
+        mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        Util.logD(LOG_TAG, "onStop");
+        mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onStop();
+    }
+
     private void initializeSearchCardView() {
         SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
         //if we haben removed the focus before this is necessary. If it is the first click not.
@@ -268,15 +292,16 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
                     Util.logD(LOG_TAG, "edit_text lost focus");
                     mRecyclerView.setVisibility(View.VISIBLE);
                     //napa, backpressed funciona cuando no esta rotada la pantalla, no se porque, da un OOM exception
-                    if(!mRotation) {
-                        if (isBackPressed) {
-                            isBackPressed = false;
-                        } else {
-                            hideQuickSearchRecyclerView();
-                        }
-                    } else {
-                        hideQuickSearchRecyclerView();
-                    }
+//                    if(!mRotation) {
+//                        if (isBackPressed) {
+//                            isBackPressed = false;
+//                        } else {
+//                            hideQuickSearchRecyclerView();
+//                        }
+//                    } else {
+//                        hideQuickSearchRecyclerView();
+//                    }
+                    hideQuickSearchRecyclerView();
                     unDimScren();
                 }
             }
@@ -431,7 +456,7 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
     private void setUpRecyclerView() {
 
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator);
+        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator, this);
         mRecyclerView.setItemAnimator(customItemAnimator);
     //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
 
@@ -567,6 +592,54 @@ public class FindFragment extends Fragment implements FindContract.View, FindQui
         hideQuickSearchRecyclerView(); // task done when back in search editor
      //   clearSearchEditor();
      //   clearFocusFromSearchEditor();
+    }
+
+    @Override
+    public void showSnackBar(String message) {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                Snackbar.make(mRootLayout, message, Snackbar.LENGTH_SHORT).show();
+            }
+        }, 30);
+    }
+
+    @Override
+    public void onClickGo(Pharmacy pharmacy) {
+        mPresenter.onClickGo(pharmacy,mLocation);
+    }
+
+    @Override
+    public void onClickFavorite(Pharmacy pharmacy) {
+        mPresenter.onClickFavorite(pharmacy);
+    }
+
+    @Override
+    public void onClickPhone(String phone) {
+        mPresenter.onClickPhone(phone);
+    }
+
+    @Override
+    public void onClickShare(Pharmacy pharmacy) {
+        mPresenter.onClickShare(pharmacy);
+    }
+
+    @Override
+    public void launchActivity(Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(mSharedPreferences.getLocationKey())) {
+            //update location variable
+            mLocation = mSharedPreferences.getLocation();
+            //update location in presenter
+            mPresenter.setLocation(mLocation);
+
+
+        }
     }
 
     @Override

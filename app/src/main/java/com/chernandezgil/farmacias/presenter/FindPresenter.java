@@ -3,8 +3,12 @@ package com.chernandezgil.farmacias.presenter;
 
 
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,15 +16,21 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.view.FindContract;
+import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import clojure.lang.Cons;
+import rx.Observable;
 
 /**
  * Created by Carlos on 05/09/2016.
@@ -36,11 +46,13 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     private static final int LOADER_QUICK_SEARCH = 4;
     private Handler mainHandler;
     private Location mLocation;
-
-    public FindPresenter(Location location, LoaderManager loaderManager, LoaderProvider loaderProvider) {
+    private Geocoder mGeocoder;
+    public FindPresenter(Location location, LoaderManager loaderManager, LoaderProvider loaderProvider,
+                         Geocoder geocoder) {
         mLocation = location;
         mLoaderManager = loaderManager;
         mLoaderProvider = loaderProvider;
+        mGeocoder = geocoder;
         mainHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -53,6 +65,12 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     @Override
     public void detachView() {
         mView = null;
+    }
+
+
+    @Override
+    public void setLocation(Location currentLocation) {
+        mLocation = currentLocation;
     }
 
     /**
@@ -92,6 +110,42 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
         return bundle;
     }
 
+    @Override
+    public void onClickGo(Pharmacy pharmacy,Location currentLocation) {
+        String currentAddress = onGetAddressFromLocation(mLocation);
+        Intent intent =Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(),
+                mLocation.getLongitude() ),currentAddress,
+                new LatLng(pharmacy.getLat(),pharmacy.getLon()),pharmacy.getAddressFormatted() );
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void onClickFavorite(Pharmacy pharmacy) {
+        final String snackMessage = Util.changeFavoriteInDb(pharmacy.isFavorite(), pharmacy.getPhone());
+        if (snackMessage == null) {
+            return;
+        }
+        mView.showSnackBar(snackMessage);
+    }
+
+    @Override
+    public void onClickPhone(String phone) {
+        String uri = "tel:" + phone;
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        mView.launchActivity(intent);
+
+    }
+
+    @Override
+    public void onClickShare(Pharmacy pharmacy) {
+        String name = pharmacy.getName();
+        double distance = pharmacy.getDistance() ;
+        String address = pharmacy.getAddressFormatted();
+        String phone = pharmacy.getPhone();
+        Intent intent = Util.getShareIntent(name, distance, address, phone);
+        mView.launchActivity(intent);
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -244,7 +298,10 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
                 suggestionsBean.setName(data.getString(1));
                 list.add(suggestionsBean);
             } while (data.moveToNext());
+            //not forget to override hasCode and equals in SuggestionsBean class
+            list =Observable.from(list).distinct().toList().toBlocking().first();
         }
+
         return list;
     }
 
@@ -252,4 +309,38 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+    public String onGetAddressFromLocation(Location currentLocation) {
+        List<Address> addresses = null;
+        try {
+            addresses = mGeocoder.getFromLocation(
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude(),
+                    1);
+        } catch (IOException ioe) {
+
+        }
+
+        if (addresses == null || addresses.size() == 0) {
+            Util.logD(LOG_TAG, "no address found");
+            return mLocation.getLatitude() + Constants.COMMA + mLocation.getLongitude();
+        } else {
+            Address address = addresses.get(0);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            // Fetch the address lines using getAddressLine,
+            // join them, and send them to the thread.
+            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                stringBuilder.append(address.getAddressLine(i));
+                if (i != address.getMaxAddressLineIndex() - 1) {
+                    stringBuilder.append(Constants.COMMA);
+                }
+            }
+            Util.logD(LOG_TAG, "address found");
+
+            return stringBuilder.toString();
+        }
+
+    }
+
 }

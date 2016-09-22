@@ -50,11 +50,14 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private int mColorSpan;
     private int mColorSpanData;
     private CustomItemAnimator mCustomItemAnimator;
+    private OnClickHandler mCallback;
 
-    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview,CustomItemAnimator customItemAnimator) {
+    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview,CustomItemAnimator customItemAnimator,
+                                   OnClickHandler callback) {
         mRecyclerView = recyclerview;
         mContext = context;
         mCustomItemAnimator = customItemAnimator;
+        mCallback = callback;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
@@ -100,12 +103,26 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         mColorSpanData = Util.modifyAlpha(ContextCompat.getColor(mContext,R.color.black),0.54f);
     }
 
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //   Util.logD(LOG_TAG,"onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list1, parent, false);
+
         MyViewHolder holder = new MyViewHolder(view);
+        holder.ivPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final int position = holder.getAdapterPosition();
+                Pharmacy pharmacy = mList.get(position);
+                mCallback.onClickPhone(pharmacy.getPhone());
+            }
+        });
         holder.ivPhone.setOnClickListener(this);
+        holder.ivGo.setOnClickListener(this);
+        holder.ivShare.setOnClickListener(this);
+        holder.ivSchedule.setOnClickListener(this);
+        holder.ivFavorite.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,8 +146,35 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 }
             });
         }
-        holder.tvPlus.setOnClickListener(this);
+
         return holder;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        final int id = v.getId();
+        MyViewHolder holder = (MyViewHolder) v.getTag();
+        final int position = holder.getAdapterPosition();
+        final Pharmacy pharmacy = mList.get(position);
+        switch (id) {
+            case R.id.ivPhone:
+                mCallback.onClickPhone(pharmacy.getPhone());
+                break;
+            case R.id.ivGo:
+                mCallback.onClickGo(pharmacy);
+                break;
+            case R.id.ivShare:
+                mCallback.onClickShare(pharmacy);
+                break;
+            case R.id.ivSchedule:
+
+                break;
+            case R.id.ivFavorite:
+                mCallback.onClickFavorite(pharmacy);
+                break;
+
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -188,18 +232,26 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 + pharmacy.getProvince();
 
         holder.tvLocality.setText(createSpannable(locality, sLocality, span,spanData));
-        holder.tvPlus.setTag(holder);
+
 
         holder.tvAdress.setText(createSpannable(sDireccion + pharmacy.getAddress(), sDireccion, span,spanData));
         holder.tvDistance.setText(createSpannable(mContext.getString(R.string.format_distancia, pharmacy.getDistance()),
                 mContext.getString(R.string.fca_distancia) + Constants.SPACE, span,spanData));
         holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span,spanData));
+        holder.ivFavorite.setImageResource(pharmacy.isFavorite()?R.drawable.heart:R.drawable.heart_outline);
+
         if (Build.VERSION.SDK_INT>Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;
             setExpanded(holder, isExpanded);
         } else {
             setExpanded(holder,true);
         }
+        //i have chosen to do this because the code is very repetitive en the click handler
+        holder.ivPhone.setTag(holder);
+        holder.ivGo.setTag(holder);
+        holder.ivShare.setTag(holder);
+        holder.ivSchedule.setTag(holder);
+        holder.ivFavorite.setTag(holder);
     }
 
     private SpannableString createSpannable(String string, String stringToSpan,
@@ -237,17 +289,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         notifyDataSetChanged();
     }
 
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        switch (id) {
-            case R.id.ivPhone:
 
-
-                break;
-        }
-
-    }
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -259,8 +301,6 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         TextView tvAdress;
         @BindView(R.id.distance)
         TextView tvDistance;
-        @BindView(R.id.plus)
-        TextView tvPlus;
         @BindView(R.id.txtPhone)
         TextView tvTxtPhone;
         @BindView(R.id.ivGo)
@@ -281,5 +321,12 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             ButterKnife.bind(this, itemView);
 
         }
+    }
+
+    public interface OnClickHandler{
+        void onClickGo(Pharmacy pharmacy);
+        void onClickFavorite(Pharmacy pharmacy);
+        void onClickPhone(String phone);
+        void onClickShare(Pharmacy pharmacy);
     }
 }
