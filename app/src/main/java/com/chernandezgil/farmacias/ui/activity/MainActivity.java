@@ -2,7 +2,6 @@ package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,16 +31,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 
 import com.chernandezgil.farmacias.BuildConfig;
-import com.chernandezgil.farmacias.Main2Activity;
-import com.chernandezgil.farmacias.customwidget.TouchableWrapper;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -290,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             mRadio = mSharedPreferences.getRadio();
-            Intent intent = new Intent(this, ActivitySettings2.class);
+            Intent intent = new Intent(this, SettingsActivity.class);
             ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
             startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
             return true;

@@ -16,7 +16,6 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.SeekBarPreference;
-import com.chernandezgil.farmacias.ui.activity.ActivitySettings2;
 
 /**
  * Created by Carlos on 22/09/2016.
@@ -124,6 +123,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_play_store_address));
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
+        } else if (key.equals(getString(R.string.pref_delete_history_key))) {
+         //   getContext().getContentResolver().delete()
         }
 
         return true;

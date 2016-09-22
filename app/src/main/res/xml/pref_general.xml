@@ -8,6 +8,13 @@
             android:title="Radio de busqueda"
             android:key="@string/seek_bar_key"
             />
+        <Preference
+
+            android:key="@string/pref_delete_history_key"
+            android:summary="@string/pref_delete_history_summary"
+            android:title="@string/pref_delete_history_title">
+
+        </Preference>
 
     </PreferenceCategory>
 
