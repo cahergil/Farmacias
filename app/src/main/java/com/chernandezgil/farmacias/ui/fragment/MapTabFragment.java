@@ -148,6 +148,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private PreferencesManager mSharedPreferences;
     private SnackBarWrapper mSnackBar;
     public static final String USER_LOCATION = "userLocation";
+    private boolean mCancelThread;
 
 
     private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
@@ -239,6 +240,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         markerBitmap=Util.getBitmapFromVectorDrawable(getActivity().getApplicationContext(),R.drawable.hospital_pin_stroke);
         mPresenter.onSetMarkerBitMap(markerBitmap);
+
 
         return view;
     }
@@ -367,7 +369,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     public void run() {
                         int count=0;
                         CustomCameraUpdate cu=null;
-                        while(cu==null) {
+                        while(cu==null && !mCancelThread) {
                             count++;
                             cu= mPresenter.getCameraUpdate();
                             Util.logD(LOG_TAG,"count"+count);
@@ -377,8 +379,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                                 e.printStackTrace();
                             }
                         }
-
-                        moveCamera(cu);
+                        if(!mCancelThread) {
+                            moveCamera(cu);
+                        }
                     }
                 });
 
@@ -395,8 +398,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
     public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap) {
-        //if(!isAdded()) return;
-        //me da un npe porque el pharmacyObjetMap es nulo: a ver si con esta linea se arregla
+
+
         if(pharmacyObjectMap==null) {
             return;
         }
@@ -430,6 +433,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if(cameraUpdate.isNoResultsPosition()) {
             handleNoResults((cameraUpdate));
         } else {
+            mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_COLLAPSED);
             mMap.moveCamera(cameraUpdate.getmCameraUpdate());
         }
 
@@ -439,6 +443,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private void handleNoResults(CustomCameraUpdate cameraUpdate){
         mMap.moveCamera(cameraUpdate.getmCameraUpdate());
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15),2000, null);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         String message="Sin resultados. Radio de busqueda insuficiente";
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
     }
@@ -494,9 +499,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public void launchActivity(Intent intent) {
+
         startActivity(intent);
     }
-    private void setStateBottomSheet(int state) {
+
+    @Override
+    public  void setStateBottomSheet(int state) {
         if(state==STATE_COLLAPSED) {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
@@ -508,7 +516,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         //initially set hidden(in case there are no pharmacies around).Not working
         mBottomSheetBehavior.setHideable(true);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
 
     }
@@ -581,9 +589,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public boolean onMarkerClick(Marker marker) {
 
             mPresenter.handleOnMarkerClick(marker);
-            if( !isBottomSheetExpanded()) {
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            }
             return false;
     }
     @Override
@@ -673,7 +678,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private boolean isBottomSheetExpanded(){
+    @Override
+    public boolean isBottomSheetExpanded(){
        return mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED;
     }
 
@@ -697,6 +703,18 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //    }
 
 
+    @Override
+    public void onDestroyView() {
+        mCancelThread = true;
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Util.logD(LOG_TAG, "onDestroy");
+        unbinder.unbind();
+        super.onDestroy();
+    }
 
     @Override
     public void onDetach() {
@@ -712,14 +730,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    @Override
-    public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
-        unbinder.unbind();
-        super.onDestroy();
     }
 
 }

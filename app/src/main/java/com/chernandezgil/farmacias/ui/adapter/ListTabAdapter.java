@@ -2,16 +2,13 @@ package com.chernandezgil.farmacias.ui.adapter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IntDef;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -31,13 +28,9 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.expandable.ExpandableLayoutListener;
-import com.chernandezgil.farmacias.expandable.ExpandableLinearLayout;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import butterknife.BindView;
@@ -144,7 +137,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       //  Util.logD(LOG_TAG,"onCreateViewHolder");
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list1,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
         MyViewHolder holder = new MyViewHolder(view);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,10 +55,10 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     View mEmptyView;
-    @BindView(R.id.txtLoading)
-    TextView tvLoading;
     @BindView(R.id.frame)
     FrameLayout mRootView;
+    @BindView(R.id.progressBar)
+    ProgressBar mProgressBar;
 
     private Location mLocation;
     private ListTabPresenter mPresenter;
@@ -221,12 +222,12 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void showLoading() {
-        tvLoading.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoading() {
-        tvLoading.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override

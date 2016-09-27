@@ -28,6 +28,8 @@ public interface MapTabContract {
         public void showSnackBar(String message);
         public void launchActivity(Intent intent);
         public void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy);
+        public boolean isBottomSheetExpanded();
+        public void setStateBottomSheet(int state);
     }
     public interface Presenter<V> {
 
@@ -54,6 +56,7 @@ public interface MapTabContract {
         public void handleClickShare();
         public void handleClickFavorite();
         public void handleOnMarkerClick(Marker marker);
+
 
 
 

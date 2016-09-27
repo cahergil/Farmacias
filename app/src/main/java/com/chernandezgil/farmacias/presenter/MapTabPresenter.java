@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
@@ -89,7 +90,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         mGeocoder = checkNotNull(geocoder, "geocoder cannot be null");
         this.preferencesManager = preferencesManager;
         mRadio = this.preferencesManager.retrieveRadioBusquedaFromSp() * 1000;
-        mCameraUpdate = new CustomCameraUpdate();
+    //    mCameraUpdate = new CustomCameraUpdate();
         mainHandler = new Handler(Looper.getMainLooper());
 
 
@@ -192,6 +193,9 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
         PharmacyObjectMap pharmacy = (PharmacyObjectMap) mMarkersHashMap.get(marker);
         if (!pharmacy.getName().equals(MapTabFragment.USER_LOCATION)) {
+            if(!mView.isBottomSheetExpanded()) {
+                mView.setStateBottomSheet(3);
+            }
             mView.showPharmacyInBottomSheet(pharmacy);
         }
 
@@ -445,7 +449,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < mFarmaciasList.size(); i++) {
+                int size = mFarmaciasList.size();
+                for (int i = 0; i < size; i++) {
                     if (i == 0) {
                         mFirstSortedPharmacy = mFarmaciasList.get(i);
                     }
@@ -456,15 +461,18 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                         mUserUbicationMarker = getUserLocationMarker();
                         if (mFirstSortedPharmacy != null) {
                             mView.addMarkerToMap(mUserUbicationMarker);
-                            //creo que el mLastMarkerClicked no hace falta, ya lo tiene el fragment
-                            //en rotacion lo guarda
                             mView.preShowPharmacyInBottomSheet(mFirstSortedPharmacy, mLastMarkerClicked);
                         }
                         zoomAnimateLevelToFitMarkers(120);
 
                     }
-                }
 
+                }
+                if (size == 0) {
+                    mUserUbicationMarker = getUserLocationMarker();
+                    mView.addMarkerToMap(mUserUbicationMarker);
+                    zoomAnimateLevelToFitMarkers(120);
+                }
 
             }
         });
@@ -548,6 +556,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             b.include(ll);
         }
         LatLngBounds bounds = b.build();
+        mCameraUpdate = new CustomCameraUpdate();
         if (markerCounter == 1) {
             mCameraUpdate.setmCameraUpdate(CameraUpdateFactory.newLatLng(new LatLng(mLocation.getLatitude(),
                     mLocation.getLongitude())));

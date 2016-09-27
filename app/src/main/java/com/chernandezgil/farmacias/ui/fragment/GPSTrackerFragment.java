@@ -65,11 +65,15 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     @Override
     public void onPause() {
         Util.logD(LOG_TAG, "onPause");
-        stopTracking();
+
         super.onPause();
     }
 
-
+    @Override
+    public void onStop() {
+//        stopTracking();
+        super.onStop();
+    }
 
     private void requestLocationSettings(){
         Util.logD(LOG_TAG, "requestLocationSettings");
@@ -136,7 +140,9 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setFastestInterval(GPS_FATEST_INTERVAL)
-                .setInterval(GPS_INTERVAL);
+                .setInterval(GPS_INTERVAL)
+                .setSmallestDisplacement(100f);
+
     }
 
     @SuppressWarnings({"MissingPermission"})

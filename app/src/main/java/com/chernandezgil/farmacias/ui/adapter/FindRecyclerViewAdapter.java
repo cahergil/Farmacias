@@ -3,9 +3,7 @@ package com.chernandezgil.farmacias.ui.adapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -29,17 +27,11 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by Carlos on 05/09/2016.
@@ -147,7 +139,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //   Util.logD(LOG_TAG,"onCreateViewHolder");
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list1, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list, parent, false);
 
         MyViewHolder holder = new MyViewHolder(view);
         holder.ivPhone.setOnClickListener(new View.OnClickListener() {

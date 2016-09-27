@@ -6,11 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/txtLoading"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="cargando lista..."
+        android:layout_gravity="center_vertical"
         android:visibility="invisible"
         tools:visibility="visible"/>
 
