@@ -10,4 +10,9 @@
         android:interpolator="@android:anim/accelerate_interpolator"
 
         />
+    <scale android:fromYScale="0.8"
+        android:toYScale="1.0"
+        android:fromXScale="1.0"
+        android:toXScale="1.0"
+        android:duration="300"/>
 </set>

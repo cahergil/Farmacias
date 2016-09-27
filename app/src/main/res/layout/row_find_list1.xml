@@ -35,7 +35,7 @@
             android:maxLines="1"
             android:textColor="@color/colorPrimary"
             android:textSize="20sp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
             tools:text="Farmacia Carlos La puente" />
 
         <View

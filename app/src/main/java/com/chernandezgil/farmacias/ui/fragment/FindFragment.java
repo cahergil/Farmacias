@@ -456,12 +456,14 @@ public class FindFragment extends Fragment implements FindContract.View,
     private void setUpRecyclerView() {
 
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator, this);
         mRecyclerView.setItemAnimator(customItemAnimator);
     //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
 
+
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+       // mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
         Util.logD(LOG_TAG,"prueba");

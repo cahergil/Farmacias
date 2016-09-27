@@ -3,7 +3,9 @@ package com.chernandezgil.farmacias.ui.adapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -11,6 +13,7 @@ import android.text.style.ForegroundColorSpan;
 import android.transition.AutoTransition;
 import android.transition.Transition;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,11 +29,17 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Carlos on 05/09/2016.
@@ -46,19 +55,50 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private RecyclerView mRecyclerView;
     private Transition expandCollapse = null;
     private int lastAnimatedPosition = -1;
-    private static final int ANIMATED_ITEMS_COUNT = 10;
+    private static final int ANIMATED_ITEMS_COUNT = 50;
     private int mColorSpan;
     private int mColorSpanData;
     private CustomItemAnimator mCustomItemAnimator;
     private OnClickHandler mCallback;
+    private float offset;
+    private static int firstVisibleInRecyclerViw;
 
-    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview,CustomItemAnimator customItemAnimator,
+
+
+    @Constants.ScrollDirection
+    int scrollDirection;
+
+    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview, CustomItemAnimator customItemAnimator,
                                    OnClickHandler callback) {
         mRecyclerView = recyclerview;
         mContext = context;
         mCustomItemAnimator = customItemAnimator;
         mCallback = callback;
+        offset = mContext.getResources().getDimensionPixelSize(R.dimen.offset_y);
 
+        scrollDirection = Constants.SCROLL_UP;
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    scrollDirection = Constants.SCROLL_UP;
+                    Log.i("RecyclerView scrolled: ", "scroll up!");
+                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
+
+                } else {
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
+                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
+
+                }
+
+
+            }
+        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
             expandCollapse = new AutoTransition();
@@ -99,8 +139,8 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 }
             });
         }
-        mColorSpan =Util.modifyAlpha(ContextCompat.getColor(mContext,R.color.black),0.87f);
-        mColorSpanData = Util.modifyAlpha(ContextCompat.getColor(mContext,R.color.black),0.54f);
+        mColorSpan = Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.87f);
+        mColorSpanData = Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.54f);
     }
 
 
@@ -181,13 +221,28 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
+
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
+//        Observable.from(new String[]{"1","2"})
+//
+//                .delay(5000, TimeUnit.MILLISECONDS)
+//                .map(s -> {
+//                    return "1";
+//                })
+
+//        Observable.timer(50, TimeUnit.MILLISECONDS)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(s -> {
+//                    runEnterAnimation(holder.itemView, position);
+//                    bindHolder(holder, position);
+//                });
+        //  runEnterAnimation(holder.itemView, position);
+
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
-
-
     }
 
     private void runEnterAnimation(View view, int position) {
@@ -195,14 +250,32 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             return;
         }
 
-        if (position > lastAnimatedPosition) {
-            lastAnimatedPosition = position;
-            view.setTranslationY(Util.getScreenHeight(mContext));
-            view.animate()
-                    .translationY(0)
-                    .setInterpolator(new DecelerateInterpolator(3.f))
-                    .setDuration(700)
-                    .start();
+
+        if (scrollDirection == Constants.SCROLL_UP) {
+            Log.d(LOG_TAG, "runEnterAnimation_up");
+            if (position > lastAnimatedPosition) {
+                lastAnimatedPosition = position;
+                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                view.setTranslationY(Util.getScreenHeight(mContext));
+                view.animate()
+                        .translationY(0)
+                        .setInterpolator(new DecelerateInterpolator(3.f))
+                        .setDuration(500)
+                        .start();
+
+            }
+        } else {
+            Log.d(LOG_TAG, "runEnterAnimation_down");
+            if (position < lastAnimatedPosition) {
+                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                lastAnimatedPosition = position;
+//                view.setTranslationY(-Util.getScreenHeight(mContext));
+//                view.animate()
+//                        .translationY(0)
+//                        .setInterpolator(new DecelerateInterpolator(3.f))
+//                        .setDuration(500)
+//                        .start();
+            }
         }
     }
 
@@ -231,20 +304,20 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 + Constants.SPACE
                 + pharmacy.getProvince();
 
-        holder.tvLocality.setText(createSpannable(locality, sLocality, span,spanData));
+        holder.tvLocality.setText(createSpannable(locality, sLocality, span, spanData));
 
 
-        holder.tvAdress.setText(createSpannable(sDireccion + pharmacy.getAddress(), sDireccion, span,spanData));
+        holder.tvAdress.setText(createSpannable(sDireccion + pharmacy.getAddress(), sDireccion, span, spanData));
         holder.tvDistance.setText(createSpannable(mContext.getString(R.string.format_distancia, pharmacy.getDistance()),
-                mContext.getString(R.string.fca_distancia) + Constants.SPACE, span,spanData));
-        holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span,spanData));
-        holder.ivFavorite.setImageResource(pharmacy.isFavorite()?R.drawable.heart:R.drawable.heart_outline);
+                mContext.getString(R.string.fca_distancia) + Constants.SPACE, span, spanData));
+        holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span, spanData));
+        holder.ivFavorite.setImageResource(pharmacy.isFavorite() ? R.drawable.heart : R.drawable.heart_outline);
 
-        if (Build.VERSION.SDK_INT>Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;
             setExpanded(holder, isExpanded);
         } else {
-            setExpanded(holder,true);
+            setExpanded(holder, true);
         }
         //i have chosen to do this because the code is very repetitive en the click handler
         holder.ivPhone.setTag(holder);
@@ -255,10 +328,10 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     }
 
     private SpannableString createSpannable(String string, String stringToSpan,
-                                            ForegroundColorSpan span,ForegroundColorSpan span2) {
+                                            ForegroundColorSpan span, ForegroundColorSpan span2) {
         SpannableString spannable = new SpannableString(string);
         spannable.setSpan(span, 0, stringToSpan.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        spannable.setSpan(span2,stringToSpan.length(),string.length()-1,Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        spannable.setSpan(span2, stringToSpan.length(), string.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         return spannable;
 
     }
@@ -288,8 +361,6 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
         notifyDataSetChanged();
     }
-
-
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -323,10 +394,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
     }
 
-    public interface OnClickHandler{
+    public interface OnClickHandler {
         void onClickGo(Pharmacy pharmacy);
+
         void onClickFavorite(Pharmacy pharmacy);
+
         void onClickPhone(String phone);
+
         void onClickShare(Pharmacy pharmacy);
     }
 }

@@ -1,22 +1,34 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntDef;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.transition.AutoTransition;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.expandable.ExpandableLayoutListener;
@@ -24,6 +36,8 @@ import com.chernandezgil.farmacias.expandable.ExpandableLinearLayout;
 import com.chernandezgil.farmacias.model.Pharmacy;
 
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,76 +52,192 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     private Context mContext;
     private ListTabAdapterOnClickHandler mClickHandler;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
-    private boolean mRotation;
+    private CustomItemAnimator mCustomItemAnimator;
+    private int expandedPosition = RecyclerView.NO_POSITION;
+    private Transition expandCollapse = null;
     private TimeMeasure mTm;
-    private boolean[] mRotationArray;
-    private boolean[] expandState;
-    //to handle Loader loading again
-    private boolean[] oldexpandState;
+    private static int COLLAPSE = 2;
+    private static int EXPAND = 3;
+    private RecyclerView mRecyclerView;
+    private int lastAnimatedPosition = -1;
+    private static final int ANIMATED_ITEMS_COUNT = 50;
 
-    public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler){
+
+
+    @Constants.ScrollDirection
+    int scrollDirection;
+
+
+
+    public ListTabAdapter(Context context,ListTabAdapterOnClickHandler clickHandler,RecyclerView recyclerView,CustomItemAnimator customItemAnimator){
         mContext=context;
         mClickHandler=clickHandler;
+        mRecyclerView = recyclerView;
         mTm=new TimeMeasure("start ListTabAdapter");
+        mCustomItemAnimator = customItemAnimator;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+            expandCollapse = new AutoTransition();
+            expandCollapse.setDuration(200);
+            expandCollapse.setInterpolator(AnimationUtils.loadInterpolator(mContext,
+                    android.R.interpolator.linear));
+            expandCollapse.addListener(new Transition.TransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+                    mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return true;
+                        }
+                    });
+                }
+
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    mCustomItemAnimator.setAnimateMoves(true);
+                    mRecyclerView.setOnTouchListener(null);
+
+                }
+
+                @Override
+                public void onTransitionCancel(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionPause(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionResume(Transition transition) {
+
+                }
+            });
+        }
+        scrollDirection = Constants.SCROLL_UP;
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    scrollDirection = Constants.SCROLL_UP;
+                    Log.i("RecyclerView scrolled: ", "scroll up!");
+                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
+                    //    Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
+                } else {
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
+                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
+                    //   Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
+                }
+                //     firstVisibleInRecyclerViw = currentFirstVisible;
+
+            }
+        });
 
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       //  Util.logD(LOG_TAG,"onCreateViewHolder");
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list,parent,false);
-        return new MyViewHolder(view);
-
-    }
-
-    @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-      //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
-        Pharmacy pharmacy=mPharmacyList.get(position);
-        if(expandState[position]) {
-            if(mRotationArray[position]) {
-                holder.viewOptionsRow.expand();
-                mRotationArray[position] = false;
-                holder.ivArrow.setRotation(180);
-
-            }
-        }
-        holder.viewOptionsRow.setListener(new ExpandableLayoutListener() {
+        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list1,parent,false);
+        MyViewHolder holder = new MyViewHolder(view);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAnimationStart() {
+            public void onClick(View v) {
+                final int position = holder.getAdapterPosition();
+                setDelayedTransition();
+                mCustomItemAnimator.setAnimateMoves(false);
+                if (position == RecyclerView.NO_POSITION) return;
+                // collapse any currently expanded items
+                if (expandedPosition != RecyclerView.NO_POSITION) {
+                    notifyItemChanged(expandedPosition, COLLAPSE);
+                }
+                if (expandedPosition != position) {
+                    expandedPosition = position;
+                    notifyItemChanged(position, EXPAND);
+                } else {
+                    expandedPosition = RecyclerView.NO_POSITION;
+                }
 
-            }
-
-            @Override
-            public void onAnimationEnd() {
-
-            }
-
-            @Override
-            public void onPreOpen() {
-                Util.logD(LOG_TAG,"**********************************on Preopen");
-                expandState[position]=true;
-
-            }
-
-            @Override
-            public void onPreClose() {
-                Util.logD(LOG_TAG,"**********************************on PreClose");
-                expandState[position]= false;
-            }
-
-            @Override
-            public void onOpened() {
-
-            }
-
-            @Override
-            public void onClosed() {
 
             }
         });
+        return holder;
+
+    }
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void setDelayedTransition() {
+        TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
+    }
+    private void setExpanded(ListTabAdapter.MyViewHolder holder, boolean isExpanded) {
+        holder.itemView.setActivated(isExpanded);
+        holder.llOptionsRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivGo.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivPhone.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivClock.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivShare.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+    }
+    @Override
+    public void onBindViewHolder(ListTabAdapter.MyViewHolder holder, int position, List<Object> payloads) {
+
+        if ((payloads.contains(EXPAND) || payloads.contains(COLLAPSE))) {
+            setExpanded(holder, position == expandedPosition);
+        } else {
+            onBindViewHolder(holder, position);
+        }
+    }
 
 
+    @Override
+    public void onBindViewHolder(MyViewHolder holder, int position) {
 
+      //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
+
+        runEnterAnimation(holder.itemView, position);
+        bindHolder(holder, position);
+
+    }
+    private void runEnterAnimation(View view, int position) {
+        if (position >= ANIMATED_ITEMS_COUNT - 1) {
+            return;
+        }
+
+
+        if (scrollDirection == Constants.SCROLL_UP) {
+            Log.d(LOG_TAG, "runEnterAnimation_up");
+            if (position > lastAnimatedPosition) {
+                lastAnimatedPosition = position;
+                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                view.setTranslationY(Util.getScreenHeight(mContext));
+                view.animate()
+                        .translationY(0)
+                        .setInterpolator(new DecelerateInterpolator(3.f))
+                        .setDuration(500)
+                        .start();
+
+            }
+        } else {
+            Log.d(LOG_TAG, "runEnterAnimation_down");
+            if (position < lastAnimatedPosition) {
+                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                lastAnimatedPosition = position;
+//                view.setTranslationY(-Util.getScreenHeight(mContext));
+//                view.animate()
+//                        .translationY(0)
+//                        .setInterpolator(new DecelerateInterpolator(3.f))
+//                        .setDuration(500)
+//                        .start();
+            }
+        }
+    }
+    private void bindHolder(MyViewHolder holder, int position) {
+        Pharmacy pharmacy=mPharmacyList.get(position);
 
         holder.tvName.setText(pharmacy.getName());
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
@@ -117,15 +247,16 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         int color;
         GradientDrawable gradientDrawable;
         if(isOpen) {
-            color=getColor(R.color.pharmacy_open_list);
-            holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
+            color=getColor(R.color.pharmacy_open);
+         //   holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
             gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_open);
         } else {
             color=getColor(R.color.pharmacy_close);
-            holder.tvOpen.setTextColor(color);
+         //   holder.tvOpen.setTextColor(color);
             gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_close);
         }
-        holder.tvDistance.setBackground(gradientDrawable);
+        holder.tvOpen.setTextColor(color);
+        //     holder.tvDistance.setBackground(gradientDrawable);
 
         int favDraResid;
         if(pharmacy.isFavorite()) {
@@ -139,11 +270,18 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         setBitmapFromVectorDrawable(holder.ivShare,R.drawable.share,color);
         setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
 
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            final boolean isExpanded = position == expandedPosition;
+            setExpanded(holder, isExpanded);
+        } else {
+            setExpanded(holder, true);
+        }
 
-      //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
-      //  holder.ivArrow.setImageDrawable(drawableCompat);
+        holder.tvOrder.setText(pharmacy.getOrder());
 
 
+        //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
+        //  holder.ivArrow.setImageDrawable(drawableCompat);
 
     }
     public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
@@ -159,28 +297,9 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
 
 
     }
-    public void setExpandStateArray(boolean[] stateList,boolean rotation){
-        oldexpandState=stateList;
-        mRotation=rotation;
-        if(mRotation) {
-          copyStateToRotationArray(stateList);
-          mRotation=false;
-        }
 
-    }
-    private void copyStateToRotationArray(boolean[] stateList){
-        mRotationArray = new boolean[stateList.length];
-        for (int i = 0;i<stateList.length;i++) {
-            mRotationArray[i] = stateList[i];
-        }
-    }
-    public boolean[] getExpandStateArray(){
-        return oldexpandState;
-    }
-    private int getColor(@ColorRes int resId){
-        int color=ContextCompat.getColor(mContext,resId);
-        return color;
-    }
+
+
     @Override
     public int getItemCount() {
 
@@ -190,26 +309,18 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
 
     public void swapData(List<Pharmacy> pharmacyList) {
         mPharmacyList=pharmacyList;
-        if(oldexpandState == null ) {
-            expandState=new boolean[pharmacyList.size()];
-            for (int i = 0; i < mPharmacyList.size(); i++) {
-                expandState[i]=false;
-
-            }
-
-            oldexpandState = expandState;
-        } else {
-          expandState = oldexpandState;
-
-        }
-
-
         notifyDataSetChanged();
 
     }
 
+    private int getColor(@ColorRes int resId){
+        int color=ContextCompat.getColor(mContext,resId);
+        return color;
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
+        @BindView(R.id.tvOrder)
+        public  TextView tvOrder;
         @BindView(R.id.tvName)
         public TextView tvName;
         @BindView(R.id.tvStreet)
@@ -218,73 +329,65 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         public TextView tvDistance;
         @BindView(R.id.tvOpen)
         public TextView tvOpen;
-        @BindView(R.id.optionsRow)
-        public ExpandableLinearLayout viewOptionsRow;
-        @BindView(R.id.ivArrow)
-        public ImageView ivArrow;
-        @BindView(R.id.ivScheduleb)
+        @BindView(R.id.ivSchedule)
         public ImageView ivClock;
-        @BindView(R.id.ivPhoneb)
+        @BindView(R.id.ivPhone)
         public ImageView ivPhone;
-        @BindView(R.id.ivShareb)
+        @BindView(R.id.ivShare)
         public ImageView ivShare;
-        @BindView(R.id.ivFavoriteb)
+        @BindView(R.id.ivFavorite)
         public ImageView ivFavorite;
-        @BindView(R.id.ivGob)
+        @BindView(R.id.ivGo)
         public ImageView ivGo;
+//        @BindView(R.id.holderContainer)
+//        public CardView cardView;
+        @BindView(R.id.optionsRow)
+        public LinearLayout llOptionsRow;
 
-        @BindView(R.id.holderContainer)
-        public CardView cardView;
 
         public MyViewHolder(View v) {
             super(v);
             ButterKnife.bind(this, v);
 
-            viewOptionsRow.setOnClickListener(this);
-            ivArrow.setOnClickListener(this);
             ivPhone.setOnClickListener(this);
             ivShare.setOnClickListener(this);
             ivFavorite.setOnClickListener(this);
             ivGo.setOnClickListener(this);
-            viewOptionsRow.collapse();
-            int position = getAdapterPosition();
+            ivClock.setOnClickListener(this);
+
+
+
 
         }
-
-
         @Override
         public void onClick(View view) {
             int id= view.getId();
             int position = getAdapterPosition();
             switch (id) {
-                case R.id.tvOpen:
-                case R.id.ivArrow:
 
-                    mClickHandler.onClickOptions(this);
-
-
-                    break;
-                case R.id.ivPhoneb:
+                case R.id.ivPhone:
                     mClickHandler.onClickPhone(mPharmacyList.get(position).getPhone());
                     break;
-                case R.id.ivGob:
+                case R.id.ivGo:
                     mClickHandler.onClickGo(mPharmacyList.get(position));
                     break;
-                case R.id.ivShareb:
+                case R.id.ivShare:
                     mClickHandler.onClickShare(mPharmacyList.get(position));
                     break;
-                case R.id.ivFavoriteb:
+                case R.id.ivFavorite:
                     mClickHandler.onClickFavorite(mPharmacyList.get(position));
-                break;
+                    break;
 
             }
         }
+
+
+
     }
 
     public static interface ListTabAdapterOnClickHandler {
         void onClickGo(Pharmacy pharmacy);
         void onClickFavorite(Pharmacy pharmacy);
-        void onClickOptions(MyViewHolder viewHolder);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
     }

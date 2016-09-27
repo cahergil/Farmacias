@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.chernandezgil.farmacias.presenter.MainComponent;
 
+
 import com.squareup.leakcanary.LeakCanary;
 
 
@@ -20,6 +21,7 @@ public class MyApplication extends Application{
     public void onCreate() {
         super.onCreate();
         LeakCanary.install(this);
+
           this.context=getApplicationContext();
 //          mMapComponent= DaggerMainComponent.builder()
 //                    .mainModule(new MainModule())

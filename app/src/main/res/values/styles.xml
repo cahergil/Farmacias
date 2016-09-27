@@ -43,7 +43,7 @@
     <style name="SeparatorColor">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">2dp</item>
-        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:background">@color/gray400</item>
     </style>
 
     <style name="Widget.TimeRow" parent="android:Widget">
@@ -54,6 +54,16 @@
         <item name="android:textSize">14sp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="Widget.TimeRow2" parent="android:Widget">
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 

@@ -28,6 +28,7 @@ import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.ListTabPresenter;
+import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -155,9 +156,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         }
         outState.putParcelable(RECYCLER_STATE_KEY, mRecyclerView.getLayoutManager().onSaveInstanceState());
 
-        if (mAdapter != null) {
-            outState.putBooleanArray(EXPANDABLE_STATE_KEY, mAdapter.getExpandStateArray());
-        }
+
     }
 
     @Override
@@ -190,12 +189,14 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
 
     private void setUpRecyclerView() {
+        CustomItemAnimator customItemAnimator = new CustomItemAnimator();
+        mAdapter = new ListTabAdapter(getActivity(),this,mRecyclerView,customItemAnimator);
+       // SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
 
-        mAdapter = new ListTabAdapter(getActivity(),this);
-        SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
-        mRecyclerView.setAdapter(animatorAdapter);
+        mRecyclerView.setItemAnimator(customItemAnimator);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private ListTabAdapter getAdapter(){
@@ -204,10 +205,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Util.logD(LOG_TAG, "showResults");
-        mAdapter.setExpandStateArray(mSpandState, mRotation);
-        if (mRotation) {
-            mRotation = false;
-        }
+
         mAdapter.swapData(pharmacyList);
         if (mLayoutManagerState != null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
@@ -262,12 +260,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     }
 
-    @Override
-    public void onClickOptions(ListTabAdapter.MyViewHolder vh) {
 
-        mPresenter.handleClickOptions(vh);
-
-    }
 
     @Override
     public void onClickPhone(String phone) {

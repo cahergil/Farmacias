@@ -37,7 +37,7 @@ public interface ListTabContract {
         public void handleClickCall(String phone);
         public void handleClickShare(Pharmacy pharmacy);
         public void handleClickFavorite(Pharmacy pharmacy);
-        public void handleClickOptions(ListTabAdapter.MyViewHolder vh);
+
 
 
 

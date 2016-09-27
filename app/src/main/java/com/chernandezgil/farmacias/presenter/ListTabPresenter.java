@@ -119,11 +119,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     }
 
-    @Override
-    public void handleClickOptions(ListTabAdapter.MyViewHolder vh) {
-        vh.ivArrow.animate().rotation(vh.ivArrow.getRotation() == 180 ? 0 : 180);
-        vh.viewOptionsRow.toggle();
-    }
+
 
     @Override
     public void handleClickGo(Pharmacy pharmacy, Location currentLocation, String currentAddress) {
