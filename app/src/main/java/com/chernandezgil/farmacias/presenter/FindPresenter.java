@@ -24,6 +24,7 @@ import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.view.FindContract;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -235,7 +236,9 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
                 farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
-                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
+                        new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
+                //double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance / 1000);

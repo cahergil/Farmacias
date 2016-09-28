@@ -57,6 +57,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindColor;
@@ -444,7 +446,23 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mMap.moveCamera(cameraUpdate.getmCameraUpdate());
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15),2000, null);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        String message="Sin resultados. Radio de busqueda insuficiente";
+        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        list.add(new LatLng(39.63108,-7.62451));
+        list.add(new LatLng(37.92687,-7.59155));
+        list.add(new LatLng(37.92687,-4.52637));
+        list.add(new LatLng(40.41768,-4.63623));
+        list.add(new LatLng(40.54929,-6.97083));
+        list.add(new LatLng(39.63108,-7.62451));
+        list.add(new LatLng(37.92687,-7.59155));
+        list.add(new LatLng(37.92687,-4.52637));
+        String message;
+        if(Util.contains(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),list)){
+            message="Sin resultados. Radio de busqueda insuficiente";
+          // Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
+        } else {
+            message="Fuera de Extremadura";
+        }
+
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
     }
 

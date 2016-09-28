@@ -22,6 +22,7 @@ import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
 import com.github.davidmoten.rx.Transformers;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -103,9 +104,6 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
         } else {
             Address address = addresses.get(0);
             StringBuilder stringBuilder = new StringBuilder();
-
-            // Fetch the address lines using getAddressLine,
-            // join them, and send them to the thread.
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 stringBuilder.append(address.getAddressLine(i));
                 if (i != address.getMaxAddressLineIndex() - 1) {
@@ -172,8 +170,9 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
-
-                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
+                        new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
+               // double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
                 farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
                 farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));

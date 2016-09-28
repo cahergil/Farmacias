@@ -260,10 +260,10 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStop() {
         Util.logD(LOG_TAG, "onStop");
         if(mGoogleApiClient != null ) {
-            GPSTrackerFragment trackerFragment = getTrackFragment();
-            if (trackerFragment != null) {
-                trackerFragment.stopTracking();
-            }
+//            GPSTrackerFragment trackerFragment = getTrackFragment();
+//            if (trackerFragment != null) {
+//                trackerFragment.stopTracking();
+//            }
             mGoogleApiClient.disconnect();
             Util.logD(LOG_TAG, "mGoogleApiClient.disconnect()");
         }

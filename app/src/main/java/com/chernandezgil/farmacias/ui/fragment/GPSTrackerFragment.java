@@ -65,13 +65,12 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     @Override
     public void onPause() {
         Util.logD(LOG_TAG, "onPause");
-
+        stopTracking();
         super.onPause();
     }
 
     @Override
     public void onStop() {
-//        stopTracking();
         super.onStop();
     }
 

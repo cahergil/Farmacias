@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.maps.android.SphericalUtil;
 
 
 import java.io.IOException;
@@ -387,7 +388,11 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
                 //float dist=calculateDistance(latDest,lonDest,mLocation);
-                double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                //Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
+                        new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
+
+
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance);

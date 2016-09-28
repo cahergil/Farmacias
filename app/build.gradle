@@ -114,5 +114,7 @@ dependencies {
 
     compile 'com.github.andrewlord1990:snackbarbuilder:0.6.0'
 
+    compile 'com.google.maps.android:android-maps-utils:0.4+'
+
 
 }

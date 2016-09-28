@@ -44,6 +44,7 @@ import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -392,5 +393,55 @@ public class Util {
     public static @CheckResult @ColorInt int modifyAlpha(@ColorInt int color,
                                                          @FloatRange(from = 0f, to = 1f) float alpha) {
         return modifyAlpha(color, (int) (255f * alpha));
+    }
+
+
+    public static boolean contains(LatLng location,ArrayList<LatLng> polyLoc)
+    {
+        if (location==null)
+            return false;
+
+        LatLng lastPoint = polyLoc.get(polyLoc.size()-1);
+        boolean isInside = false;
+        double x = location.longitude;
+
+        for(LatLng point: polyLoc)
+        {
+            double x1 = lastPoint.longitude;
+            double x2 = point.longitude;
+            double dx = x2 - x1;
+
+            if (Math.abs(dx) > 180.0)
+            {
+                // we have, most likely, just jumped the dateline (could do further validation to this effect if needed).  normalise the numbers.
+                if (x > 0)
+                {
+                    while (x1 < 0)
+                        x1 += 360;
+                    while (x2 < 0)
+                        x2 += 360;
+                }
+                else
+                {
+                    while (x1 > 0)
+                        x1 -= 360;
+                    while (x2 > 0)
+                        x2 -= 360;
+                }
+                dx = x2 - x1;
+            }
+
+            if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x))
+            {
+                double grad = (point.latitude - lastPoint.latitude) / dx;
+                double intersectAtLat = lastPoint.latitude + ((x - x1) * grad);
+
+                if (intersectAtLat > location.latitude)
+                    isInside = !isInside;
+            }
+            lastPoint = point;
+        }
+
+        return isInside;
     }
 }
