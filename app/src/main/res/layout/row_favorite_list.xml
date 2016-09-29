@@ -85,15 +85,34 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/ivReorder"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="7"
-                android:alpha="0.54"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                app:srcCompat="@drawable/ic_reorder"/>
+                android:layout_weight="7">
+                <ImageView
+                    android:id="@+id/ivReorder"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:alpha="0.54"
+                    android:visibility="visible"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    app:srcCompat="@drawable/ic_reorder"/>
+                <TextView
+                    android:id="@+id/tvUndo"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="UNDO"
+                    android:textSize="15dp"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:visibility="invisible"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:gravity="center_vertical"
+                    />
+            </FrameLayout>
+
         </LinearLayout>
 
         <include
@@ -103,7 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/llHorizontal"
             android:layout_marginTop="8dp"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
     </RelativeLayout>
 

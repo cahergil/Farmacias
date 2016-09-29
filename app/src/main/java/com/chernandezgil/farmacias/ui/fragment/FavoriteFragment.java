@@ -26,6 +26,7 @@ import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FavoriteAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
+import com.chernandezgil.farmacias.ui.adapter.item_decoration.CustomItemDecoration;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.SimpleItemTouchHelperCallback;
 import com.chernandezgil.farmacias.view.FavoriteContract;
@@ -92,6 +93,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         mAdapter = new FavoriteAdapter(getActivity().getApplicationContext(),this,mRecyclerView,customItemAnimator,this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
+     //   mRecyclerView.addItemDecoration(new CustomItemDecoration());
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -149,8 +151,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     }
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setBackgroundColor(Util.modifyAlpha(ContextCompat.getColor(getActivity(),R.color.red_200),0.40f));
-
+   //     viewHolder.itemView.setBackgroundColor(Util.modifyAlpha(ContextCompat.getColor(getActivity(),R.color.red_200),0.40f));
         mItemTouchHelper.startDrag(viewHolder);
 
     }

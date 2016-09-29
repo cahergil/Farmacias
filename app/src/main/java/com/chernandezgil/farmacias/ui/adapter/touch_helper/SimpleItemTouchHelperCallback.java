@@ -32,7 +32,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     private void init(){
-        background = new ColorDrawable(Color.RED);
+        background = new ColorDrawable(Util.getColor(R.color.colorAccent));
         xMark = Util.getDrawable(R.drawable.ic_clear_24dp);
         xMark.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         xMarkMargin = (int)Util.getDimension(R.dimen.ic_clear_margin);
@@ -55,9 +55,13 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+        int position = viewHolder.getAdapterPosition();
+
+         mAdapter.pendingRemoval(position);
+     //   mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
         Util.logD("onSwiped","onSwiped");
     }
+
 
     @Override
     public boolean isLongPressDragEnabled() {
@@ -96,15 +100,39 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void onChildDraw(Canvas c, RecyclerView recyclerView,
                             RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
-
+        Util.logD("onChildDraw","dX:"+dX + ",dY:"+dY+",isCurrentlyActive:"+isCurrentlyActive);
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            Util.logD("onChildDraw","dX:"+dX + ",dY:"+dY+",isCurrentlyActive:"+isCurrentlyActive);
+
 //            float width = (float) viewHolder.itemView.getWidth();
 //            float alpha = 1.0f - Math.abs(dX) / width;
 //            viewHolder.itemView.setAlpha(alpha);
-            viewHolder.itemView.setTranslationX(dX);
+//            viewHolder.itemView.setTranslationX(dX);
+            View itemView = viewHolder.itemView;
+            // not sure why, but this method get's called for viewholder that are already swiped away
+            if (viewHolder.getAdapterPosition() == -1) {
+                // not interested in those
+                return;
+            }
+            if (!initiated) {
+                init();
+            }
 
+            // draw red background
+            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+            background.draw(c);
+            // draw x mark
+            int itemHeight = itemView.getBottom() - itemView.getTop();
+            int intrinsicWidth = xMark.getIntrinsicWidth();
+            int intrinsicHeight = xMark.getIntrinsicWidth();
 
+            int xMarkLeft = itemView.getRight() - xMarkMargin - intrinsicWidth;
+            int xMarkRight = itemView.getRight() - xMarkMargin;
+            int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
+            int xMarkBottom = xMarkTop + intrinsicHeight;
+            xMark.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+
+            xMark.draw(c);
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY,

@@ -42,4 +42,7 @@ public interface ItemTouchHelperAdapter {
      * @see RecyclerView.ViewHolder#getAdapterPosition()
      */
     void onItemDismiss(int position);
+
+    void pendingRemoval(int position);
+    boolean isPendingRemoval(int position);
 }

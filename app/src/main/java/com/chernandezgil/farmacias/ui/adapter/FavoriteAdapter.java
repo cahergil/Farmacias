@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +31,9 @@ import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperAdapte
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperViewHolder;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,13 +62,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private final OnStartDragListener mDragStartListener;
     @Constants.ScrollDirection
     int scrollDirection;
+    //swipe dismiss
+    private static final int PENDING_REMOVAL_TIMEOUT = 3000; // 3sec
+    private List<Pharmacy> itemsPendingRemoval;
+    private Handler handler = new Handler(); // hanlder for running delayed runnables
+    private HashMap<Pharmacy, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
+
 
 
 
     public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
                           RecyclerView recyclerView, CustomItemAnimator customItemAnimator,
-                           OnStartDragListener dragStartListener
-    ){
+                           OnStartDragListener dragStartListener){
         mContext=context;
         mClickHandler=clickHandler;
         mRecyclerView = recyclerView;
@@ -73,12 +81,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         mCustomItemAnimator = customItemAnimator;
         mDragStartListener = dragStartListener;
 
+        itemsPendingRemoval = new ArrayList<>();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
             expandCollapse = new AutoTransition();
             expandCollapse.setDuration(200);
             expandCollapse.setInterpolator(AnimationUtils.loadInterpolator(mContext,
-                    android.R.interpolator.linear));
+                    android.R.interpolator.fast_out_slow_in));
             expandCollapse.addListener(new Transition.TransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {
@@ -125,14 +135,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                     scrollDirection = Constants.SCROLL_UP;
                     Log.i("RecyclerView scrolled: ", "scroll up!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
-                    //    Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
+
                 } else {
                     scrollDirection = Constants.SCROLL_DOWN;
                     Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
-                    //   Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
+
                 }
-                //     firstVisibleInRecyclerViw = currentFirstVisible;
+
 
             }
         });
@@ -163,7 +173,29 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
 
 
+    @Override
+    public boolean isPendingRemoval(int position) {
+        Pharmacy item = mList.get(position);
+        return itemsPendingRemoval.contains(item);
+    }
+    @Override
+    public void pendingRemoval(int position) {
+        final Pharmacy pharmacy=mList.get(position);
+        if(!itemsPendingRemoval.contains(pharmacy)) {
+            itemsPendingRemoval.add(pharmacy);
+            // this will redraw row in "undo" state
+            notifyItemChanged(position);
+            Runnable pendingRemovalRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    onItemDismiss(mList.indexOf(pharmacy));
+                }
+            };
+            handler.postDelayed(pendingRemovalRunnable, PENDING_REMOVAL_TIMEOUT);
+            pendingRunnables.put(pharmacy, pendingRemovalRunnable);
+        }
 
+    }
 
 
     @Override
@@ -254,51 +286,66 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             if (position < lastAnimatedPosition) {
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
-//                view.setTranslationY(-Util.getScreenHeight(mContext));
-//                view.animate()
-//                        .translationY(0)
-//                        .setInterpolator(new DecelerateInterpolator(3.f))
-//                        .setDuration(500)
-//                        .start();
             }
         }
     }
     private void bindHolder(MyViewHolder holder, int position) {
-        Pharmacy pharmacy= mList.get(position);
+        final Pharmacy pharmacy= mList.get(position);
+        if (itemsPendingRemoval.contains(pharmacy)) {
 
-        holder.tvName.setText(pharmacy.getName());
-        holder.tvStreet.setText(pharmacy.getAddressFormatted());
-        holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()));
-        boolean isOpen=pharmacy.isOpen();
-        holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
-        int favDraResid;
-        if(pharmacy.isFavorite()) {
-            favDraResid=R.drawable.ic_heart;
-        } else {
-            favDraResid=R.drawable.ic_heart_outline;
-        }
-        holder.ivFavorite.setImageResource(favDraResid);
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            final boolean isExpanded = position == expandedPosition;
-            setExpanded(holder, isExpanded);
-        } else {
-            setExpanded(holder, true);
-        }
-
-        holder.ivReorder.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEventCompat.getActionMasked(event) ==
-                        MotionEvent.ACTION_DOWN) {
-                    mDragStartListener.onStartDrag(holder);
-
+            holder.itemView.setBackgroundColor(Util.getColor(R.color.colorAccent));
+            holder.ivReorder.setVisibility(View.INVISIBLE);
+            holder.tvUndo.setVisibility(View.VISIBLE);
+            holder.tvUndo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Runnable pendingRemovalRunnable = pendingRunnables.get(pharmacy);
+                    pendingRunnables.remove(pharmacy);
+                    if (pendingRemovalRunnable != null) {
+                        handler.removeCallbacks(pendingRemovalRunnable);
+                    }
+                    itemsPendingRemoval.remove(pharmacy);
+                    notifyItemChanged(mList.indexOf(pharmacy));
 
                 }
+            });
 
-                return false;
+        } else {
+            holder.tvUndo.setVisibility(View.INVISIBLE);
+            holder.tvUndo.setOnClickListener(null);
+            holder.tvName.setText(pharmacy.getName());
+            holder.tvStreet.setText(pharmacy.getAddressFormatted());
+            holder.tvDistance.setText(mContext.getString(R.string.format_distance, pharmacy.getDistance()));
+            boolean isOpen = pharmacy.isOpen();
+            holder.tvOpen.setText(isOpen ? "Abierta" : "Cerrada");
+            int favDraResid;
+            if (pharmacy.isFavorite()) {
+                favDraResid = R.drawable.ic_heart;
+            } else {
+                favDraResid = R.drawable.ic_heart_outline;
             }
-        });
+            holder.ivFavorite.setImageResource(favDraResid);
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+                final boolean isExpanded = position == expandedPosition;
+                setExpanded(holder, isExpanded);
+            } else {
+                setExpanded(holder, true);
+            }
+            holder.ivReorder.setVisibility(View.VISIBLE);
+            holder.ivReorder.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (MotionEventCompat.getActionMasked(event) ==
+                            MotionEvent.ACTION_DOWN) {
+                        mDragStartListener.onStartDrag(holder);
+
+                    }
+
+                    return false;
+                }
+            });
+        }
 
     }
 
@@ -337,13 +384,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         public ImageView ivFavorite;
         @BindView(R.id.ivGo)
         public ImageView ivGo;
-        //        @BindView(R.id.holderContainer)
-//        public CardView cardView;
         @BindView(R.id.optionsRow)
         public LinearLayout llOptionsRow;
-
         @BindView(R.id.ivReorder)
-        ImageView ivReorder;
+        public ImageView ivReorder;
+        @BindView(R.id.tvUndo)
+        public TextView tvUndo;
 
 
         public MyViewHolder(View v) {

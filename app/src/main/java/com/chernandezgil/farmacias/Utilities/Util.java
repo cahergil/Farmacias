@@ -244,8 +244,9 @@ public class Util {
 
     }
 
-    public static int getColor(Context context,@ColorRes int resId){
-        int color= ContextCompat.getColor(context,resId);
+    public static int getColor(@ColorRes int resId){
+
+        int color= ContextCompat.getColor(MyApplication.getContext(),resId);
         return color;
     }
 
