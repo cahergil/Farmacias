@@ -5,16 +5,17 @@
         <item
             android:checked="true"
             android:id="@+id/item_navigation_localizador"
+            android:icon="@drawable/nearby"
 
-            android:title="Localizador" />
+            android:title="@string/nd_localizador" />
         <item
             android:id="@+id/item_navigation_buscar"
-
-            android:title="Buscar Farmacia" />
+            android:icon="@drawable/ic_lupa_suggestions"
+            android:title="@string/nd_buscar" />
         <item
             android:id="@+id/item_navigation_favoritas"
-
-            android:title="Favoritas" />
+            android:icon="@drawable/ic_heart"
+            android:title="@string/nd_favorites" />
         <item
             android:id="@+id/item_navigation_opcion2"
 
@@ -25,12 +26,12 @@
         <menu>
             <item
                 android:id="@+id/item_navigation_drawer_settings"
-
+                android:icon="@drawable/ic_settings"
                 android:title="Settings" />
             <item
                 android:id="@+id/item_navigation_drawer_help_and_feedback"
-
-                android:title="Help and feedback" />
+                android:icon="@drawable/ic_donate"
+                android:title="Donar" />
         </menu>
     </item>
 

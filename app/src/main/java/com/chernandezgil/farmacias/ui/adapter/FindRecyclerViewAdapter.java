@@ -303,7 +303,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         holder.tvDistance.setText(createSpannable(mContext.getString(R.string.format_distancia, pharmacy.getDistance()),
                 mContext.getString(R.string.fca_distancia) + Constants.SPACE, span, spanData));
         holder.tvTxtPhone.setText(createSpannable(sPhone + pharmacy.getPhoneFormatted(), sPhone, span, spanData));
-        holder.ivFavorite.setImageResource(pharmacy.isFavorite() ? R.drawable.heart : R.drawable.heart_outline);
+        holder.ivFavorite.setImageResource(pharmacy.isFavorite() ? R.drawable.ic_heart : R.drawable.ic_heart_outline);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;

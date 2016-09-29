@@ -56,7 +56,7 @@
             android:id="@+id/ivFavorite"
             android:visibility="gone"
             style="@style/ImageViewOptions"
-            app:srcCompat="@drawable/heart" />
+            app:srcCompat="@drawable/ic_heart" />
 
     </LinearLayout>
 

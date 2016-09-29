@@ -18,7 +18,7 @@
         tools:visibility="visible"/>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/findRecyclerView"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusableInTouchMode="true"

@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:tint="@color/white"
-                app:srcCompat="@drawable/heart"/>
+                app:srcCompat="@drawable/ic_heart"/>
         </FrameLayout>
 
     </LinearLayout>

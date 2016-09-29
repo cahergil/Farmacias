@@ -18,6 +18,7 @@ import android.os.Looper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
@@ -443,5 +444,15 @@ public class Util {
         }
 
         return isInside;
+    }
+
+
+    public static Drawable getDrawable(@DrawableRes int drawableResId) {
+        Drawable d=ContextCompat.getDrawable(MyApplication.getContext(), drawableResId);
+        return d;
+    }
+
+    public static float getDimension(@DimenRes int dimensionResId) {
+        return MyApplication.getContext().getResources().getDimension(dimensionResId);
     }
 }

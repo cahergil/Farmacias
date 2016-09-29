@@ -23,4 +23,12 @@ public class Constants {
 
     public static final int SCROLL_DOWN = 0;
     public static final int SCROLL_UP = 1;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({MAP_TAB,FAVORITE})
+    public @interface LayoutType {
+    }
+
+    public static final int MAP_TAB = 0;
+    public static final int FAVORITE = 1;
 }

@@ -38,6 +38,7 @@ import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
+import com.chernandezgil.farmacias.ui.fragment.FavoriteFragment;
 import com.chernandezgil.farmacias.ui.fragment.FindFragment;
 import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
@@ -376,6 +377,17 @@ public class MainActivity extends AppCompatActivity implements
                 FindFragment findFragment = new FindFragment();
                 fragmentManager.beginTransaction()
                         .replace(R.id.fragment, findFragment)
+                        .commit();
+
+
+                break;
+
+            case 2:
+
+                fragmentManager = getSupportFragmentManager();
+                FavoriteFragment favoriteFragment = new FavoriteFragment();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment, favoriteFragment)
                         .commit();
 
 

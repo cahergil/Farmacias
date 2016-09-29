@@ -69,4 +69,14 @@ public class LoaderProvider  {
                 DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
         );
     }
+
+    public Loader<Cursor> getFavoritesPharmacies() {
+        return new CursorLoader(mContext,
+                DbContract.FarmaciasEntity.CONTENT_URI,
+                null,
+                DbContract.FarmaciasEntity.FAVORITE + "=?",
+                new String[]{"1"},
+                DbContract.FarmaciasEntity.NAME + " ASC"
+        );
+    }
 }

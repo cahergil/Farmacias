@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -47,7 +45,6 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Util;
-import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
@@ -87,7 +84,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
-    @BindView(R.id.findRecyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     TextView mEmptyView;
@@ -144,7 +141,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Util.logD(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_find, container, false);
+        View view = inflater.inflate(R.layout.fragment_find_favorite, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
         setDimDrawable();
@@ -456,7 +453,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     private void setUpRecyclerView() {
 
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator, this);
         mRecyclerView.setItemAnimator(customItemAnimator);
     //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);

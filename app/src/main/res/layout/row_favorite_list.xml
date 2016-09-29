@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_search"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:layout_marginTop="8dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:stateListAnimator="@animator/statelistanimator_pharmacy"
+    card_view:cardCornerRadius="2dp">
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
+
+        <LinearLayout
+            android:id="@+id/llHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/llVertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/tvName"
+                    style="@style/Widget.TimeRow2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:alpha="0.87"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+
+                    android:textColor="@android:color/black"
+                    android:textSize="15sp"
+                    tools:text="Farmacia Fernandez de los Rios" />
+
+
+                <TextView
+                    android:id="@+id/tvStreet"
+                    style="@style/Widget.TimeRow2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="Calle Conde de Cartagena 36" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvOpen"
+                        style="@style/Widget.TimeRow2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="center"
+                        tools:text="Open" />
+
+                    <TextView
+                        android:id="@+id/tvDistance"
+                        android:layout_width="0dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        tools:text="0,124 Km" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivReorder"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="7"
+                android:alpha="0.54"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:srcCompat="@drawable/ic_reorder"/>
+        </LinearLayout>
+
+        <include
+
+            layout="@layout/layout_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/llHorizontal"
+            android:layout_marginTop="8dp"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
+
+

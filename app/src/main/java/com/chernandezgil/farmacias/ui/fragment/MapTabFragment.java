@@ -26,7 +26,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -58,7 +57,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindColor;
@@ -645,7 +643,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //            Marker marker=getKeyFromValue(pharmacy);
 //            HashMap hashMap= mPresenter.onGetHashMap();
 //            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
-            Drawable favDraResid=ContextCompat.getDrawable(getActivity(),pharmacy.isFavorite()?R.drawable.heart:R.drawable.heart_outline);
+            Drawable favDraResid=ContextCompat.getDrawable(getActivity(),pharmacy.isFavorite()?R.drawable.ic_heart :R.drawable.ic_heart_outline);
             ivFavorite.setImageDrawable(favDraResid);
             setTintedVectorDrawable(ivCall, R.drawable.phone, color);
             setTintedVectorDrawable(ivGo, R.drawable.directions, color);

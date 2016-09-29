@@ -2,13 +2,10 @@ package com.chernandezgil.farmacias.ui.adapter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -29,21 +26,26 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperAdapter;
+import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperViewHolder;
+import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
 
-
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Carlos on 08/08/2016.
+ * Created by Carlos on 28/09/2016.
  */
-public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHolder> {
 
-    private List<Pharmacy> mPharmacyList;
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyViewHolder> implements
+        ItemTouchHelperAdapter{
+
+    private List<Pharmacy> mList;
     private Context mContext;
-    private ListTabAdapterOnClickHandler mClickHandler;
+    private FavoriteAdapterOnClickHandler mClickHandler;
     private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
     private CustomItemAnimator mCustomItemAnimator;
     private int expandedPosition = RecyclerView.NO_POSITION;
@@ -54,24 +56,22 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     private RecyclerView mRecyclerView;
     private int lastAnimatedPosition = -1;
     private static final int ANIMATED_ITEMS_COUNT = 50;
-
-
-
-
+    private final OnStartDragListener mDragStartListener;
     @Constants.ScrollDirection
     int scrollDirection;
 
 
 
-    public ListTabAdapter(Context context, ListTabAdapterOnClickHandler clickHandler,
-                          RecyclerView recyclerView, CustomItemAnimator customItemAnimator
-                        ){
+    public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
+                          RecyclerView recyclerView, CustomItemAnimator customItemAnimator,
+                           OnStartDragListener dragStartListener
+    ){
         mContext=context;
         mClickHandler=clickHandler;
         mRecyclerView = recyclerView;
-        mTm=new TimeMeasure("start ListTabAdapter");
+        mTm=new TimeMeasure("start FavoriteAdapter");
         mCustomItemAnimator = customItemAnimator;
-
+        mDragStartListener = dragStartListener;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
@@ -113,8 +113,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 }
             });
         }
-        //NOTE: should be UP, but there is to much happening on the UI thread and is not working smooth
-        scrollDirection = Constants.SCROLL_DOWN;
+        scrollDirection = Constants.SCROLL_UP;
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -139,11 +138,39 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         });
 
     }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        Util.logD("onItemMove","onItemMove");
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(mList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(mList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        mList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+
+
+
+
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      //  Util.logD(LOG_TAG,"onCreateViewHolder");
+        //  Util.logD(LOG_TAG,"onCreateViewHolder");
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_favorite_list, parent, false);
 
         MyViewHolder holder = new MyViewHolder(view);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +201,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
-    private void setExpanded(ListTabAdapter.MyViewHolder holder, boolean isExpanded) {
+    private void setExpanded(FavoriteAdapter.MyViewHolder holder, boolean isExpanded) {
         holder.itemView.setActivated(isExpanded);
         holder.llOptionsRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivGo.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -184,7 +211,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
     }
     @Override
-    public void onBindViewHolder(ListTabAdapter.MyViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(FavoriteAdapter.MyViewHolder holder, int position, List<Object> payloads) {
 
         if ((payloads.contains(EXPAND) || payloads.contains(COLLAPSE))) {
             setExpanded(holder, position == expandedPosition);
@@ -197,7 +224,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-      //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
+        //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
 
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
@@ -237,38 +264,20 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         }
     }
     private void bindHolder(MyViewHolder holder, int position) {
-        Pharmacy pharmacy=mPharmacyList.get(position);
+        Pharmacy pharmacy= mList.get(position);
 
         holder.tvName.setText(pharmacy.getName());
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
-        holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()/1000));
+        holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()));
         boolean isOpen=pharmacy.isOpen();
         holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
-        int color;
-        GradientDrawable gradientDrawable;
-        if(isOpen) {
-            color=getColor(R.color.pharmacy_open);
-         //   holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
-            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_open);
-        } else {
-            color=getColor(R.color.pharmacy_close);
-         //   holder.tvOpen.setTextColor(color);
-            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_close);
-        }
-        holder.tvOpen.setTextColor(color);
-        //     holder.tvDistance.setBackground(gradientDrawable);
-
         int favDraResid;
         if(pharmacy.isFavorite()) {
             favDraResid=R.drawable.ic_heart;
         } else {
             favDraResid=R.drawable.ic_heart_outline;
         }
-        setBitmapFromVectorDrawable(holder.ivClock,R.drawable.clock,color);
-        setBitmapFromVectorDrawable(holder.ivFavorite,favDraResid,color);
-        setBitmapFromVectorDrawable(holder.ivGo,R.drawable.directions,color);
-        setBitmapFromVectorDrawable(holder.ivShare,R.drawable.share,color);
-        setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
+        holder.ivFavorite.setImageResource(favDraResid);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;
@@ -277,52 +286,39 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             setExpanded(holder, true);
         }
 
-
-        holder.tvOrder.setText(pharmacy.getOrder());
-
-
-
-        //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
-        //  holder.ivArrow.setImageDrawable(drawableCompat);
-
-    }
-    public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
-
-        //create vector drawable and tint it
-        VectorDrawableCompat drawable=VectorDrawableCompat.create(mContext.getResources(),drawableResId,null);
-        if(drawable==null) return;
-        drawable.setTint(color);
-        //convert tinted vector drawable to bitmap
-        Bitmap bitmap= Util.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
-        imageView.setImageBitmap(bitmap);
+        holder.ivReorder.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) ==
+                        MotionEvent.ACTION_DOWN) {
+                    mDragStartListener.onStartDrag(holder);
 
 
+                }
+
+                return false;
+            }
+        });
 
     }
-
-
 
     @Override
     public int getItemCount() {
 
-        if (mPharmacyList == null) return 0;
-        return mPharmacyList.size();
+        if (mList == null) return 0;
+        return mList.size();
     }
 
     public void swapData(List<Pharmacy> pharmacyList) {
-        mPharmacyList=pharmacyList;
+        mList =pharmacyList;
         notifyDataSetChanged();
 
     }
 
-    private int getColor(@ColorRes int resId){
-        int color=ContextCompat.getColor(mContext,resId);
-        return color;
-    }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
-        @BindView(R.id.tvOrder)
-        public  TextView tvOrder;
+    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener,
+            ItemTouchHelperViewHolder{
+
         @BindView(R.id.tvName)
         public TextView tvName;
         @BindView(R.id.tvStreet)
@@ -341,10 +337,13 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         public ImageView ivFavorite;
         @BindView(R.id.ivGo)
         public ImageView ivGo;
-//        @BindView(R.id.holderContainer)
+        //        @BindView(R.id.holderContainer)
 //        public CardView cardView;
         @BindView(R.id.optionsRow)
         public LinearLayout llOptionsRow;
+
+        @BindView(R.id.ivReorder)
+        ImageView ivReorder;
 
 
         public MyViewHolder(View v) {
@@ -368,26 +367,34 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             switch (id) {
 
                 case R.id.ivPhone:
-                    mClickHandler.onClickPhone(mPharmacyList.get(position).getPhone());
+                    mClickHandler.onClickPhone(mList.get(position).getPhone());
                     break;
                 case R.id.ivGo:
-                    mClickHandler.onClickGo(mPharmacyList.get(position));
+                    mClickHandler.onClickGo(mList.get(position));
                     break;
                 case R.id.ivShare:
-                    mClickHandler.onClickShare(mPharmacyList.get(position));
+                    mClickHandler.onClickShare(mList.get(position));
                     break;
                 case R.id.ivFavorite:
-                    mClickHandler.onClickFavorite(mPharmacyList.get(position));
+                    mClickHandler.onClickFavorite(mList.get(position));
                     break;
 
             }
         }
 
 
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black),0.10f));
+        }
 
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(Color.WHITE);
+        }
     }
 
-    public static interface ListTabAdapterOnClickHandler {
+    public static interface FavoriteAdapterOnClickHandler {
         void onClickGo(Pharmacy pharmacy);
         void onClickFavorite(Pharmacy pharmacy);
         void onClickPhone(String phone);
