@@ -20,22 +20,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
-import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.ListTabPresenter;
-import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
 import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -43,7 +41,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import it.gmariotti.recyclerview.adapter.SlideInBottomAnimatorAdapter;
 
 /**
  * Created by Carlos on 06/08/2016.
@@ -94,7 +91,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         LoaderProvider loaderProvider = new LoaderProvider(getActivity().getApplicationContext());
@@ -108,7 +105,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_list, container, false);
-        Util.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView");
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
 
@@ -136,7 +133,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG,"onViewCreated");
+        Utils.logD(LOG_TAG,"onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         mPresenter.onStartLoader();
       //  setUserVisibleHint(true); setting it here doen't work
@@ -145,7 +142,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Util.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        Utils.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
     @Override
@@ -162,7 +159,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onStart() {
-        Util.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart");
         super.onStart();
 
 
@@ -170,21 +167,21 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onResume() {
-        Util.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume");
         super.onResume();
         mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause() {
-        Util.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause");
 
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop");
         mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
@@ -205,7 +202,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
-        Util.logD(LOG_TAG, "showResults");
+        Utils.logD(LOG_TAG, "showResults");
 
         mAdapter.swapData(pharmacyList);
         if (mLayoutManagerState != null) {
@@ -243,7 +240,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onClickGo(Pharmacy pharmacy) {
-        Util.logD(LOG_TAG, "onClickGo");
+        Utils.logD(LOG_TAG, "onClickGo");
 
         mPresenter.handleClickGo(pharmacy,mLocation,mAddress);
 
@@ -386,7 +383,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
         unbinder.unbind();
         super.onDestroy();
     }

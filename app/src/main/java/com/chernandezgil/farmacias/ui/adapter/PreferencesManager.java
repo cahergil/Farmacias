@@ -3,6 +3,10 @@ package com.chernandezgil.farmacias.ui.adapter;
 import android.content.SharedPreferences;
 import android.location.Location;
 
+import com.chernandezgil.farmacias.model.Pharmacy;
+
+import java.util.List;
+
 /**
  * Created by Carlos on 11/08/2016.
  */
@@ -18,4 +22,7 @@ public interface PreferencesManager {
     public void saveLocation(Location location);
     public Location getLocation();
     public int getRadio();
+    public void saveFavoriteList(List<Pharmacy> list);
+    public List<Pharmacy> getFavorites();
+
 }

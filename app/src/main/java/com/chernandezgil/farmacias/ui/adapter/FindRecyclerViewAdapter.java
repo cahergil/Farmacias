@@ -25,8 +25,9 @@ import android.widget.TextView;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.ColorUtils;
 import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,7 +140,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //   Util.logD(LOG_TAG,"onCreateViewHolder");
+        //   Utils.logD(LOG_TAG,"onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_find_list, parent, false);
 
         MyViewHolder holder = new MyViewHolder(view);
@@ -249,7 +250,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
-                view.setTranslationY(Util.getScreenHeight(mContext));
+                view.setTranslationY(Utils.getScreenHeight(mContext));
                 view.animate()
                         .translationY(0)
                         .setInterpolator(new DecelerateInterpolator(3.f))
@@ -262,7 +263,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             if (position < lastAnimatedPosition) {
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
-//                view.setTranslationY(-Util.getScreenHeight(mContext));
+//                view.setTranslationY(-Utils.getScreenHeight(mContext));
 //                view.animate()
 //                        .translationY(0)
 //                        .setInterpolator(new DecelerateInterpolator(3.f))
@@ -341,7 +342,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public int getItemCount() {
-        //     Util.logD(LOG_TAG,"getItemCount:");
+        //     Utils.logD(LOG_TAG,"getItemCount:");
         if (mList == null) return 0;
         return mList.size();
     }

@@ -34,9 +34,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
-import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
@@ -154,7 +154,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Util.logD(LOG_TAG,"onReceive");
+            Utils.logD(LOG_TAG,"onReceive");
             //update location variable
             mLocation = mSharedPreferences.getLocation();
             //get the new address
@@ -177,7 +177,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Rect rect=new Rect();
         bottomSheet.getGlobalVisibleRect(rect);
         if(!rect.contains(point.x,point.y)) {
-            Util.logD(LOG_TAG,"outside bottom sheet");
+            Utils.logD(LOG_TAG,"outside bottom sheet");
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     }
@@ -191,7 +191,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTm= new TimeMeasure(LOG_TAG);
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
@@ -211,7 +211,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
         unbinder=ButterKnife.bind(this,view);
         setUpBotomSheet();
@@ -222,7 +222,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvFavorite();
 
 
-        mapFragment = Util.handleMapFragmentRecreation(getChildFragmentManager(),
+        mapFragment = Utils.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
 
@@ -238,7 +238,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         }
 
 
-        markerBitmap=Util.getBitmapFromVectorDrawable(getActivity().getApplicationContext(),R.drawable.hospital_pin_stroke);
+        markerBitmap= Utils.getBitmapFromVectorDrawable(getActivity().getApplicationContext(),R.drawable.hospital_pin_stroke);
         mPresenter.onSetMarkerBitMap(markerBitmap);
 
 
@@ -247,7 +247,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG,"onViewCreated");
+        Utils.logD(LOG_TAG,"onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         //start the loader once the view is ready
         mPresenter.onStartLoader();
@@ -258,7 +258,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Util.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        Utils.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
 
@@ -304,7 +304,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public void onStart() {
-        Util.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart");
         super.onStart();
 
 
@@ -312,7 +312,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onResume() {
-        Util.logD(LOG_TAG,"onResume");
+        Utils.logD(LOG_TAG,"onResume");
         super.onResume();
         IntentFilter filter = new IntentFilter(ListTabFragment.NEW_LOCATION);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,filter);
@@ -320,14 +320,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onPause() {
-        Util.logD(LOG_TAG,"onPause");
+        Utils.logD(LOG_TAG,"onPause");
          super.onPause();
 
     }
 
     @Override
     public void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop");
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
         super.onStop();
     }
@@ -335,7 +335,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @SuppressWarnings("ResourceType")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Util.logD(LOG_TAG, "onMapsReady");
+        Utils.logD(LOG_TAG, "onMapsReady");
         //mTm.log("onMapsReady:"+this.toString());
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -372,7 +372,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                         while(cu==null && !mCancelThread) {
                             count++;
                             cu= mPresenter.getCameraUpdate();
-                            Util.logD(LOG_TAG,"count"+count);
+                            Utils.logD(LOG_TAG,"count"+count);
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
@@ -409,7 +409,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if(pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Tu ubicación")
-                    .snippet(Util.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
+                    .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
             //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
         } else {
@@ -454,7 +454,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         list.add(new LatLng(37.92687,-7.59155));
         list.add(new LatLng(37.92687,-4.52637));
         String message;
-        if(Util.contains(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),list)){
+        if(Utils.contains(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),list)){
             message="Sin resultados. Radio de busqueda insuficiente";
           // Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
         } else {
@@ -609,12 +609,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
     @Override
     public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
-        Util.logD(LOG_TAG,"preshowPharmacy");
+        Utils.logD(LOG_TAG,"preshowPharmacy");
 
         //if there has been a rotation
         if(mRotation) {
             if(lastClicked!=null) {
-                Util.logD(LOG_TAG,"firstsor");
+                Utils.logD(LOG_TAG,"firstsor");
                 //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
                 addMarkerToMap(lastClicked);
                 firstSortedPharmacy = lastClicked;
@@ -727,7 +727,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
         unbinder.unbind();
         super.onDestroy();
     }

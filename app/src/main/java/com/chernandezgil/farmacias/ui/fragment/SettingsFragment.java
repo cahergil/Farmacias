@@ -1,6 +1,5 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -16,7 +15,7 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SeekBarPreference;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 
@@ -32,7 +31,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.pref_general);
@@ -73,7 +72,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 if (getString(R.string.pref_rate_key).equals(pref.getKey())) {
                     VectorDrawableCompat drawable = VectorDrawableCompat.create(getActivity().getApplicationContext().getResources(),
                             R.drawable.google_play, null);
-                    Bitmap bitmap = Util.createScaledBitMapFromVectorDrawable(getActivity().getApplicationContext(), drawable, 24f);
+                    Bitmap bitmap = Utils.createScaledBitMapFromVectorDrawable(getActivity().getApplicationContext(), drawable, 24f);
                     Drawable rateIcon = new BitmapDrawable(getResources(), bitmap);
                     pref.setIcon(rateIcon);
                 }

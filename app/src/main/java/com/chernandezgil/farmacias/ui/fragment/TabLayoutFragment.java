@@ -1,15 +1,12 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -17,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 
@@ -44,7 +41,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         mSharedPreferences=new PreferencesManagerImp(getActivity().getApplicationContext());
         if(savedInstanceState !=null) {
@@ -56,7 +53,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Util.logD(LOG_TAG, "onSaveInstanceState");
+        Utils.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putInt("current_item_key",mViewPager.getCurrentItem());
 
@@ -66,7 +63,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView");
         View view=inflater.inflate(R.layout.fragment_tablayout,container,false);
         ButterKnife.bind(this,view);
 
@@ -76,7 +73,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Util.logD(LOG_TAG, "onActivityCreated");
+        Utils.logD(LOG_TAG, "onActivityCreated");
         setUpViewPager();
         setUpTabLayout();
         mViewPager.setCurrentItem(mSharedPreferences.getCurrentItemTabLayout());
@@ -91,24 +88,24 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onStart() {
         super.onStart();
-        Util.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart");
     }
 
     @Override
     public void onResume() {
-        Util.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume");
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Util.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause");
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop");
 
         super.onStop();
     }
@@ -155,7 +152,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         public Adapter(Context ctxt,FragmentManager fm) {
 
             super(fm);
-           // Util.logD(LOG_TAG,"Adapter");
+           // Utils.logD(LOG_TAG,"Adapter");
 
             context = ctxt;
 
@@ -173,7 +170,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
         @Override
         public Fragment getItem(int position) {
-            //Util.logD(LOG_TAG,"getItem:"+position);
+            //Utils.logD(LOG_TAG,"getItem:"+position);
             switch (position) {
                 case 0:
                      return new ListTabFragment();
@@ -189,7 +186,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 
-            //Util.logD(LOG_TAG,"instantiateItem:"+position);
+            //Utils.logD(LOG_TAG,"instantiateItem:"+position);
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             fragment.setUserVisibleHint(true);
             registeredFragments.put(position, fragment);
@@ -198,20 +195,20 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            //Util.logD(LOG_TAG,"destroyItem:"+position);
+            //Utils.logD(LOG_TAG,"destroyItem:"+position);
             registeredFragments.remove(position);
             super.destroyItem(container, position, object);
         }
 
         @Override
         public int getCount() {
-            //Util.logD(LOG_TAG,"getCount");
+            //Utils.logD(LOG_TAG,"getCount");
             return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            //Util.logD(LOG_TAG,"getPageTitle:"+position);
+            //Utils.logD(LOG_TAG,"getPageTitle:"+position);
             switch (position) {
                 case 0:
                     return context.getString(R.string.tlf_tab_list_string);
@@ -229,7 +226,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     @Override
     public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
         super.onDestroy();
     }
 }

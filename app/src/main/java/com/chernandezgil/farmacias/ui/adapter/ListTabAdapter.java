@@ -27,8 +27,9 @@ import android.widget.TextView;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 
 
 import java.util.List;
@@ -141,7 +142,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      //  Util.logD(LOG_TAG,"onCreateViewHolder");
+      //  Utils.logD(LOG_TAG,"onCreateViewHolder");
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list, parent, false);
 
@@ -197,7 +198,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-      //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
+      //  Utils.logD(LOG_TAG,"onBindViewHolder, position"+position);
 
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
@@ -214,7 +215,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
-                view.setTranslationY(Util.getScreenHeight(mContext));
+                view.setTranslationY(Utils.getScreenHeight(mContext));
                 view.animate()
                         .translationY(0)
                         .setInterpolator(new DecelerateInterpolator(3.f))
@@ -227,7 +228,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             if (position < lastAnimatedPosition) {
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
-//                view.setTranslationY(-Util.getScreenHeight(mContext));
+//                view.setTranslationY(-Utils.getScreenHeight(mContext));
 //                view.animate()
 //                        .translationY(0)
 //                        .setInterpolator(new DecelerateInterpolator(3.f))
@@ -293,7 +294,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         if(drawable==null) return;
         drawable.setTint(color);
         //convert tinted vector drawable to bitmap
-        Bitmap bitmap= Util.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
+        Bitmap bitmap= Utils.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
         imageView.setImageBitmap(bitmap);
 
 

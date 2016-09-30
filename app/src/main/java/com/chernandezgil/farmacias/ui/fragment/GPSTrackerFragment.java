@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
@@ -51,7 +51,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         createLocationRequest();
@@ -64,7 +64,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     @Override
     public void onPause() {
-        Util.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause");
         stopTracking();
         super.onPause();
     }
@@ -75,7 +75,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     }
 
     private void requestLocationSettings(){
-        Util.logD(LOG_TAG, "requestLocationSettings");
+        Utils.logD(LOG_TAG, "requestLocationSettings");
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
         PendingResult<LocationSettingsResult> result =
@@ -88,11 +88,11 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
                 //final LocationSettingsStates= result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
-                        Util.logD(LOG_TAG, "settingsResult:SUCCESS");
+                        Utils.logD(LOG_TAG, "settingsResult:SUCCESS");
                         startTracking();
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Util.logD(LOG_TAG, "settingsResult:RESOLUTION_REQUIRED");
+                        Utils.logD(LOG_TAG, "settingsResult:RESOLUTION_REQUIRED");
                         try {
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
@@ -100,11 +100,11 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
                                     getActivity(),
                                     REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
-                            Util.logD(LOG_TAG, "error insideRESOLUTION_REQUIRED:" + e.getMessage());
+                            Utils.logD(LOG_TAG, "error insideRESOLUTION_REQUIRED:" + e.getMessage());
                         }
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Util.logD(LOG_TAG, "settingsResult:SETTINGS_CHANGE_UNAVAILABLE");
+                        Utils.logD(LOG_TAG, "settingsResult:SETTINGS_CHANGE_UNAVAILABLE");
                 }
             }
         });
@@ -113,13 +113,13 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     public void startTracking() {
         startLocationUpdates(getGoogleApiClient());
-        Util.logD(LOG_TAG, "startLocationUpdates");
+        Utils.logD(LOG_TAG, "startLocationUpdates");
 
     }
 
     public void stopTracking() {
         stopLocationUpdates(getGoogleApiClient());
-        Util.logD(LOG_TAG, "stopLocationUpdates");
+        Utils.logD(LOG_TAG, "stopLocationUpdates");
     }
 
     @Override
@@ -153,7 +153,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
             public void onResult(@NonNull Status status) {
                 if(!status.isSuccess()) {
 
-                    Util.logD(LOG_TAG, String.format("requestLocationUpdates returned an error:code:%s ," +
+                    Utils.logD(LOG_TAG, String.format("requestLocationUpdates returned an error:code:%s ," +
                             "message: %s",status.getStatusCode(),status.getStatusMessage()));
 
                     getActivity().finish();
@@ -172,7 +172,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Location lastLocation = location;
-        Util.logD(LOG_TAG, "onLocationChanged");
+        Utils.logD(LOG_TAG, "onLocationChanged");
         if (lastLocation == null) {
             lastLocation = LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
 
@@ -181,10 +181,10 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         if (mFirstRun) {
             mFirstRun = false;
             mSharedPreferences.saveLocation(lastLocation);
-            Util.logD(LOG_TAG, "locationSaved");
+            Utils.logD(LOG_TAG, "locationSaved");
             LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(createBroadcastIntent());
         } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
-            Util.logD(LOG_TAG, "locationSaved");
+            Utils.logD(LOG_TAG, "locationSaved");
             mSharedPreferences.saveLocation(lastLocation);
             restartTimeCounter();
         }
@@ -205,7 +205,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     @Override
     public void onDestroyView() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
    //     mSharedPreferences = null;
         super.onDestroyView();
     }

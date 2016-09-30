@@ -7,11 +7,18 @@ import android.preference.PreferenceManager;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
+import com.chernandezgil.farmacias.model.Pharmacy;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Carlos on 11/08/2016.
  */
 public class PreferencesManagerImp implements PreferencesManager {
+    private static final String FAVORITE_LIST_KEY ="favorite_list_key";
     private final SharedPreferences mPrefs;
     private final SharedPreferences.Editor mEditor;
     private final Context context;
@@ -95,5 +102,30 @@ public class PreferencesManagerImp implements PreferencesManager {
     @Override
     public int getRadio() {
         return mPrefs.getInt(context.getString(R.string.seek_bar_key),2);
+    }
+
+    @Override
+    public void saveFavoriteList(List<Pharmacy> list) {
+        if(list == null) return;
+
+        mEditor.putString(FAVORITE_LIST_KEY,new Gson().toJson(list));
+        mEditor.apply();
+
+    }
+
+    @Override
+    public List<Pharmacy> getFavorites() {
+
+        if(mPrefs.contains(FAVORITE_LIST_KEY)) {
+            String jsonString = mPrefs.getString(FAVORITE_LIST_KEY, null);
+            Gson gsonObject = new Gson();
+            if (jsonString != null) {
+                Pharmacy[] arrayFavorite = gsonObject.fromJson(jsonString, Pharmacy[].class);
+                //the list returned by Arrays.asList is inmmutable, we need to create another list based on this one
+                return new ArrayList<>(Arrays.asList(arrayFavorite));
+
+            }
+        }
+        return new ArrayList<>();
     }
 }

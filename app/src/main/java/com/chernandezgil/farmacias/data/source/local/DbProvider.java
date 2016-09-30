@@ -9,11 +9,10 @@ import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 
 /**
@@ -31,6 +30,7 @@ public class DbProvider extends ContentProvider {
     private static final int FARMACIAS = 100;
     private static final int FARMACIAS_ID = 101;
     private static final int QUICK_SEARCH = 200;
+    private static final int FAVORITE_ID = 301;
     String[] suggestionsColumnNames = {DbContract.FarmaciasEntity._ID,
             DbContract.FarmaciasEntity.NAME
     };
@@ -44,8 +44,11 @@ public class DbProvider extends ContentProvider {
         matcher.addURI(authority, DbContract.PATH_FARMACIAS + "/*", FARMACIAS_ID);
         matcher.addURI(authority, DbContract.PATH_FARMACIAS, FARMACIAS);
 
-        matcher.addURI(authority, DbContract.PATH_QUICK_SEARCH, QUICK_SEARCH);
         matcher.addURI(authority, DbContract.PATH_QUICK_SEARCH + "/*", QUICK_SEARCH);
+        matcher.addURI(authority, DbContract.PATH_QUICK_SEARCH, QUICK_SEARCH);
+
+
+        matcher.addURI(authority, DbContract.PATH_FAVORITES + "/*", FAVORITE_ID);
         return matcher;
 
     }
@@ -76,7 +79,7 @@ public class DbProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Cursor retCursor=null;
+        Cursor retCursor = null;
         final int match = mUriMatcher.match(uri);
         switch (match) {
 
@@ -104,14 +107,13 @@ public class DbProvider extends ContentProvider {
             case QUICK_SEARCH:
 
 
-
                 Uri uri1 = RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath(SearchManager.SUGGEST_URI_PATH_QUERY).build();
 
                 Cursor recentSearch = getContext().getContentResolver().query(uri1, new String[]{SearchManager.SUGGEST_COLUMN_QUERY}, SearchManager.SUGGEST_COLUMN_QUERY + " like ?",
                         selectionArgs, sortOrder);
 
-                if (Util.isEmptyRequest(selectionArgs)) {
-                    if(recentSearch.getCount()>0) {
+                if (Utils.isEmptyRequest(selectionArgs)) {
+                    if (recentSearch.getCount() > 0) {
                         retCursor = createMatrixCursor(recentSearch, RECENT_SEARCH_ORIGIN);
                         recentSearch.close();
                     } else {
@@ -128,13 +130,13 @@ public class DbProvider extends ContentProvider {
                             null,
                             sortOrder);
 
-                    MatrixCursor matrixCursorA = createMatrixCursor(searchDatabase,DATABASE_SEARCH_ORIGIN);
+                    MatrixCursor matrixCursorA = createMatrixCursor(searchDatabase, DATABASE_SEARCH_ORIGIN);
 
-                    MatrixCursor  matrixCursorB=null;
+                    MatrixCursor matrixCursorB = null;
 
-                    if(recentSearch.getCount()>0) {
-                        matrixCursorB = createMatrixCursor(recentSearch,RECENT_SEARCH_ORIGIN);
-                        retCursor =new MergeCursor(new Cursor[]{matrixCursorB,matrixCursorA});
+                    if (recentSearch.getCount() > 0) {
+                        matrixCursorB = createMatrixCursor(recentSearch, RECENT_SEARCH_ORIGIN);
+                        retCursor = new MergeCursor(new Cursor[]{matrixCursorB, matrixCursorA});
                         matrixCursorB.close();
                         matrixCursorA.close();
                     } else {
@@ -142,7 +144,6 @@ public class DbProvider extends ContentProvider {
                     }
                     searchDatabase.close();
                     recentSearch.close();
-
 
 
                 }
@@ -216,11 +217,13 @@ public class DbProvider extends ContentProvider {
                 rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, s, strings);
 
                 break;
-
+            case FAVORITE_ID:
+                rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, s, strings);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if (rowsUpdated != 0) {
+        if (rowsUpdated != 0 && match != FAVORITE_ID) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;

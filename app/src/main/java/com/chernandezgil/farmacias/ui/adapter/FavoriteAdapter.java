@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -26,8 +27,9 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.ColorUtils;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.Pharmacy;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperAdapter;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperViewHolder;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
@@ -68,21 +70,23 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private List<Pharmacy> itemsPendingRemoval;
     private Handler handler = new Handler(); // hanlder for running delayed runnables
     private HashMap<Pharmacy, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
-
+    private PreferencesManager mSharedPreferences;
 
 
 
     public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
                           RecyclerView recyclerView, CustomItemAnimator customItemAnimator,
-                           OnStartDragListener dragStartListener){
+                           OnStartDragListener dragStartListener, PreferencesManager preferencesManager){
         mContext=context;
         mClickHandler=clickHandler;
         mRecyclerView = recyclerView;
         mTm=new TimeMeasure("start FavoriteAdapter");
         mCustomItemAnimator = customItemAnimator;
         mDragStartListener = dragStartListener;
-
+        mSharedPreferences = preferencesManager;
         itemsPendingRemoval = new ArrayList<>();
+        //we have to initilize mList so that if there is no favorite, when returning mList to fragment
+        //mList = new ArrayList<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
@@ -152,7 +156,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        Util.logD("onItemMove","onItemMove");
+        Utils.logD("onItemMove","onItemMove");
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(mList, i, i + 1);
@@ -166,10 +170,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         return true;
     }
 
-    @Override
+
     public void onItemDismiss(int position) {
+        Utils.changeFavoriteInDb(mList.get(position).getPhone());
         mList.remove(position);
         notifyItemRemoved(position);
+        //in order to show the animation call this also
+        notifyItemRangeChanged(position, getItemCount());
     }
 
 
@@ -201,7 +208,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //  Util.logD(LOG_TAG,"onCreateViewHolder");
+        //  Utils.logD(LOG_TAG,"onCreateViewHolder");
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_favorite_list, parent, false);
 
@@ -258,7 +265,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        //  Util.logD(LOG_TAG,"onBindViewHolder, position"+position);
+        //  Utils.logD(LOG_TAG,"onBindViewHolder, position"+position);
 
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
@@ -275,7 +282,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
-                view.setTranslationY(Util.getScreenHeight(mContext));
+                view.setTranslationY(Utils.getScreenHeight(mContext));
                 view.animate()
                         .translationY(0)
                         .setInterpolator(new DecelerateInterpolator(3.f))
@@ -295,7 +302,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         final Pharmacy pharmacy= mList.get(position);
         if (itemsPendingRemoval.contains(pharmacy)) {
 
-            holder.itemView.setBackgroundColor(Util.getColor(R.color.colorAccent));
+            holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
             holder.ivReorder.setVisibility(View.INVISIBLE);
             holder.tvUndo.setVisibility(View.VISIBLE);
             holder.tvUndo.setOnClickListener(new View.OnClickListener() {
@@ -359,12 +366,35 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     }
 
     public void swapData(List<Pharmacy> pharmacyList) {
-        mList =pharmacyList;
+        mList = reorderListIfNecessary(pharmacyList);
         notifyDataSetChanged();
 
     }
 
+    private List<Pharmacy> reorderListIfNecessary(List<Pharmacy> pharmacyList) {
+        List<Pharmacy> storedFavorites= mSharedPreferences.getFavorites();
+        //delete from original list those elements removed in other screens
+        for (int i = 0;i <storedFavorites.size();i++) {
+            if(!pharmacyList.contains(storedFavorites.get(i))) {
+                storedFavorites.remove(i);
+            }
+        }
+        //add to original list those elements added in other screens
+        //the new elements are added according the sortorder of the query in the content provider,
+        //currently name of pharmacy order.
+        for (int i = 0; i<pharmacyList.size();i++) {
+            Pharmacy element = pharmacyList.get(i);
+            if(!storedFavorites.contains(element)) {
+                storedFavorites.add(element);
+            }
+        }
+        return storedFavorites;
+    }
 
+    public List<Pharmacy> getmList(){
+        return mList;
+
+    }
     public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener,
             ItemTouchHelperViewHolder {
 

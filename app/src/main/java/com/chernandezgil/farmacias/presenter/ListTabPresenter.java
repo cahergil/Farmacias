@@ -13,11 +13,10 @@ import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
-import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
 import com.github.davidmoten.rx.Transformers;
@@ -76,7 +75,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public void onStartLoader() {
-        Util.logD(LOG_TAG,"onStartLoader");
+        Utils.logD(LOG_TAG,"onStartLoader");
         mView.showLoading();
         mLoaderManager.initLoader(FARMACIAS_LOADER, null, this);
     }
@@ -99,7 +98,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
         }
 
         if (addresses == null || addresses.size() == 0) {
-            Util.logD(LOG_TAG, "no address found");
+            Utils.logD(LOG_TAG, "no address found");
             mView.setAddress(null);
         } else {
             Address address = addresses.get(0);
@@ -110,7 +109,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                     stringBuilder.append(Constants.COMMA);
                 }
             }
-            Util.logD(LOG_TAG, "address found");
+            Utils.logD(LOG_TAG, "address found");
 
             mView.setAddress(stringBuilder.toString());
         }
@@ -121,7 +120,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public void handleClickGo(Pharmacy pharmacy, Location currentLocation, String currentAddress) {
-        Intent intent=Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
+        Intent intent= Utils.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()),
                 currentAddress,
                 new LatLng(pharmacy.getLat(), pharmacy.getLon()),
                 pharmacy.getAddressFormatted()
@@ -144,13 +143,13 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
         double distance = pharmacy.getDistance() ;
         String address = pharmacy.getAddressFormatted();
         String phone = pharmacy.getPhone();
-        Intent intent = Util.getShareIntent(name, distance, address, phone);
+        Intent intent = Utils.getShareIntent(name, distance, address, phone);
         mView.launchActivity(intent);
     }
 
     @Override
     public void handleClickFavorite(Pharmacy pharmacy) {
-        final String snackMessage = Util.changeFavoriteInDb(pharmacy.isFavorite(), pharmacy.getPhone());
+        final String snackMessage = Utils.changeFavoriteInDb(pharmacy.isFavorite(), pharmacy.getPhone());
         if (snackMessage == null) {
             return;
         }
@@ -158,7 +157,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     private void bindView(Cursor data) {
-        Util.logD(LOG_TAG,"bindView");
+        Utils.logD(LOG_TAG,"bindView");
         mFarmaciasList=new ArrayList<>();
 
         if (data.isClosed()) return;
@@ -172,7 +171,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
                 double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
                         new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
-               // double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+               // double distance = Utils.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 farmacia.setName(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.NAME)));
                 farmacia.setAddress(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.ADDRESS)));
                 farmacia.setLocality(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.LOCALITY)));
@@ -185,8 +184,8 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                 farmacia.setDistance(distance);
                 String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
                 farmacia.setHours(hours);
-                farmacia.setOpen(Util.isPharmacyOpen(hours));
-                String addressFormatted = Util.formatAddress(farmacia.getAddress(),
+                farmacia.setOpen(Utils.isPharmacyOpen(hours));
+                String addressFormatted = Utils.formatAddress(farmacia.getAddress(),
                         farmacia.getPostal_code(),
                         farmacia.getLocality(),
                         farmacia.getProvince());
@@ -245,7 +244,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
                 .flatMap(s -> Observable.from(s))
                 .compose(Transformers.mapWithIndex())
                 .map(t -> {
-                    t.value().setOrder(Util.characterFromInteger((int) t.index()));
+                    t.value().setOrder(Utils.characterFromInteger((int) t.index()));
                     return t.value();
                 })
                 .toList()
@@ -259,7 +258,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         if (id == FARMACIAS_LOADER) {
-            Util.logD(LOG_TAG, "onCreateLoader List");
+            Utils.logD(LOG_TAG, "onCreateLoader List");
             return mLoaderProvider.getPharmacies();
         }
         return null;
@@ -267,7 +266,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Util.logD(LOG_TAG,"onLoadFinished List");
+        Utils.logD(LOG_TAG,"onLoadFinished List");
         if (loader.getId() == FARMACIAS_LOADER) {
             new Thread() {
                 @Override

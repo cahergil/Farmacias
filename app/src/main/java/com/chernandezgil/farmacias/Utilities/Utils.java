@@ -10,24 +10,14 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.CheckResult;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
-import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -41,8 +31,6 @@ import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
-import com.chernandezgil.farmacias.ui.activity.MainActivity;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -53,7 +41,7 @@ import java.util.Locale;
 /**
  * Created by Carlos on 06/07/2016.
  */
-public class Util {
+public class Utils {
     static int screenHeight = 0;
     static int oldStatusBarFlags;
     public static void logD(final String tag, String message) {
@@ -257,7 +245,20 @@ public class Util {
         return false;
     }
 
+    public static int changeFavoriteInDb(String phone) {
+        Context context = MyApplication.getContext();
+        Uri uri = DbContract.FarmaciasEntity.buildFavoritesUriByPhone(phone);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DbContract.FarmaciasEntity.FAVORITE,0);
+        int rowsUpdated = context.getContentResolver().update(uri, contentValues,
+                DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
+                null);
+        if (rowsUpdated == 1) {
+            Utils.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);
 
+        }
+        return rowsUpdated;
+    }
     public static String changeFavoriteInDb(boolean oldFavoriteValue,String phone) {
         String snackMessage;
         Context context = MyApplication.getContext();
@@ -278,7 +279,7 @@ public class Util {
                 null);
 
         if (rowsUpdated == 1) {
-            Util.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);
+            Utils.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);
             return snackMessage;
         }
         return null;

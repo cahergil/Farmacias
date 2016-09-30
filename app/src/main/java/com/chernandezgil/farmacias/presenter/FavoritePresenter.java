@@ -1,16 +1,14 @@
 package com.chernandezgil.farmacias.presenter;
 
 import android.database.Cursor;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.Pharmacy;
@@ -20,8 +18,6 @@ import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import clojure.lang.IFn;
 
 /**
  * Created by Carlos on 28/09/2016.
@@ -58,7 +54,7 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
 
     @Override
     public void onInitLoader() {
-        Util.logD(LOG_TAG,"onInitLoader");
+        Utils.logD(LOG_TAG,"onInitLoader");
         mLoaderManager.initLoader(LOADER,null,this);
     }
 
@@ -115,20 +111,20 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
                 farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
                 String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
                 farmacia.setPhone(phone);
-                farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
+                farmacia.setPhoneFormatted(Utils.formatPhoneNumber(phone));
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
                 double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
                         new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
-                //double distance = Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                //double distance = Utils.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 farmacia.setLat(latDest);
                 farmacia.setLon(lonDest);
                 farmacia.setDistance(distance / 1000);
 
                 String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
                 farmacia.setHours(hours);
-                farmacia.setOpen(Util.isPharmacyOpen(hours));
-                String addressFormatted = Util.formatAddress(farmacia.getAddress(),
+                farmacia.setOpen(Utils.isPharmacyOpen(hours));
+                String addressFormatted = Utils.formatAddress(farmacia.getAddress(),
                         farmacia.getPostal_code(),
                         farmacia.getLocality(),
                         farmacia.getProvince());

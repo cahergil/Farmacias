@@ -23,10 +23,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.LinearInterpolator;
-import android.widget.LinearLayout;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,13 +106,13 @@ public class ExpandableLinearLayout extends LinearLayout implements ExpandableLa
         size = a.getInteger(R.styleable.ExpandableLayout_ael_size,0);
 
         final int interpolatorType = a.getInteger(R.styleable.ExpandableLayout_ael_interpolator,
-                Utils.LINEAR_INTERPOLATOR);
+                com.chernandezgil.farmacias.expandable.Utils.LINEAR_INTERPOLATOR);
         //String layout_height=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_height");
         //String layout_margin=attrs.getAttributeValue("http://schemas.android.com/apk/res/android","layout_margin");
         //mDefaultLayoutSize=getPixels(layout_height)+getPixels(layout_margin);
         mDefaultLayoutSize = size;
         a.recycle();
-        interpolator = Utils.createInterpolator(interpolatorType);
+        interpolator = com.chernandezgil.farmacias.expandable.Utils.createInterpolator(interpolatorType);
         isExpanded = defaultExpanded;
 
     }
@@ -121,7 +120,7 @@ public class ExpandableLinearLayout extends LinearLayout implements ExpandableLa
     private int getPixels(String size){
         size = size.replace("dip","");
         Float valueFloat = Float.valueOf(size);
-        return (int) Util.convertDpToPixel(valueFloat,getContext());
+        return (int) Utils.convertDpToPixel(valueFloat,getContext());
 
     }
     @Override

@@ -44,14 +44,14 @@ import android.widget.Toast;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.presenter.FindPresenter;
-import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -117,7 +117,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
 
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
@@ -140,7 +140,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_find_favorite, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
@@ -153,7 +153,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onActivityCreated");
+        Utils.logD(LOG_TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         initializeSearchUiWidgets();
         if (savedInstanceState == null) {
@@ -174,7 +174,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 //if quickSearchRecyclerView was visible before rotation, that means that the user
                 //was searching-> restore state of searching
                 if (quickSearchRecyclerViewVisibility == View.VISIBLE) {
-                    Util.setLightStatusBar(mSearchCardView,getActivity());
+                    Utils.setLightStatusBar(mSearchCardView,getActivity());
                     mQuickSearchRecyclerView.setVisibility(View.VISIBLE);
                     //don't know why always get the mSearchEditor.getText()=""
                     //although in the view appears the characters.
@@ -222,7 +222,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 //the previous results. This way always present the recent searches
                 mPresenter.onRestartLoaderQuickSearch("");
                 initializeSearchCardView();
-                Util.setLightStatusBar(mSearchCardView,getActivity());
+                Utils.setLightStatusBar(mSearchCardView,getActivity());
 
                 return true;
 
@@ -248,14 +248,14 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void onResume() {
-        Util.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume");
         super.onResume();
         mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop");
         mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
@@ -279,14 +279,14 @@ public class FindFragment extends Fragment implements FindContract.View,
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
-                    Util.logD(LOG_TAG, "edit_text has focus");
+                    Utils.logD(LOG_TAG, "edit_text has focus");
                     mRecyclerView.setVisibility(View.GONE);
                     showQuickSearchRecyclerView();
                     dimScreen();
 
                 } else {
 
-                    Util.logD(LOG_TAG, "edit_text lost focus");
+                    Utils.logD(LOG_TAG, "edit_text lost focus");
                     mRecyclerView.setVisibility(View.VISIBLE);
                     //napa, backpressed funciona cuando no esta rotada la pantalla, no se porque, da un OOM exception
 //                    if(!mRotation) {
@@ -404,7 +404,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         mClearSearch.setVisibility(View.INVISIBLE);
     }
     private void startQuickSearch(String s,boolean flagShowQuickSearchRecyclerView) {
-        Util.logD(LOG_TAG, "startQuickSearch");
+        Utils.logD(LOG_TAG, "startQuickSearch");
 
         if(flagShowQuickSearchRecyclerView) {
             showQuickSearchRecyclerView();
@@ -463,13 +463,13 @@ public class FindFragment extends Fragment implements FindContract.View,
        // mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
-        Util.logD(LOG_TAG,"prueba");
+        Utils.logD(LOG_TAG,"prueba");
 
     }
 
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
-        Util.logD(LOG_TAG, "showResults");
+        Utils.logD(LOG_TAG, "showResults");
         mAdapter.swapData(pharmacyList);
 
 
@@ -484,7 +484,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void showResultsQuickSearch(List<SuggestionsBean> list) {
-        Util.logD(LOG_TAG,"showResultsQuickSearch");
+        Utils.logD(LOG_TAG,"showResultsQuickSearch");
 
         mFindQuickSearchAdapter.swapData(list);
     }
@@ -643,7 +643,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void onDestroyView() {
-        Util.logD(LOG_TAG, "onDestroyView");
+        Utils.logD(LOG_TAG, "onDestroyView");
 
         restoreToolbarActivityUiState();
         mCompositeSubscription.unsubscribe();
@@ -653,7 +653,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
         super.onDestroy();
     }
 

@@ -4,20 +4,13 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 
-import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.ui.activity.MainActivity;
 
 /**
@@ -39,8 +32,8 @@ public class SearchUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 final Animator animatorHide = ViewAnimationUtils.createCircularReveal(cardView,
-                        cardView.getWidth() - (int) Util.convertDpToPixel(56, context),
-                        (int) Util.convertDpToPixel(23, context),
+                        cardView.getWidth() - (int) Utils.convertDpToPixel(56, context),
+                        (int) Utils.convertDpToPixel(23, context),
                         (float) Math.hypot(cardView.getWidth(), cardView.getHeight()),
                         0);
                 animatorHide.addListener(new Animator.AnimatorListener() {
@@ -55,8 +48,8 @@ public class SearchUtils {
                        cardView.setVisibility(View.GONE);
                         //the following statement will only apply when the view used to set the light mode be invisible,
                         //that is dissapears from the screen
-                        Util.clearLightStatusBar(myActivity);
-                       //  Util.clearNick(cardView);
+                        Utils.clearLightStatusBar(myActivity);
+                       //  Utils.clearNick(cardView);
                         ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(view.getWindowToken(), 0);
                         listView.setVisibility(View.GONE);
                     }
@@ -83,8 +76,8 @@ public class SearchUtils {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 final Animator animatorShow = ViewAnimationUtils.createCircularReveal(cardView,
-                        cardView.getWidth() - (int) Util.convertDpToPixel(56, context),
-                        (int) Util.convertDpToPixel(23, context),
+                        cardView.getWidth() - (int) Utils.convertDpToPixel(56, context),
+                        (int) Utils.convertDpToPixel(23, context),
                         0,
                         (float) Math.hypot(cardView.getWidth(), cardView.getHeight()));
                 animatorShow.addListener(new Animator.AnimatorListener() {

@@ -91,12 +91,12 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
 
     //to convert some web obtained svg(transformed to vector drawable) to bitmap
+    //I think I use one method only
     compile 'com.bettervectordrawable:lib:0.8'
 
-    //recylerview animatino
-    compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
-    //not used so far
-    compile 'jp.wasabeef:recyclerview-animators:2.2.4'
+    //recylerview animations
+    //compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
+    //compile 'jp.wasabeef:recyclerview-animators:2.2.4'
     //guava for collections
     compile 'com.google.guava:guava:19.0'
 
@@ -116,5 +116,17 @@ dependencies {
 
     compile 'com.google.maps.android:android-maps-utils:0.4+'
 
+    compile 'com.google.code.gson:gson:2.3.1'
 
+
+}
+task (depsize) << {
+    def size = 0;
+    configurations._debugApk.collect { it.length() / (1024 * 1024) }.each { size += it }
+    println "Total dependencies size: ${Math.round(size * 100) / 100} Mb"
+
+    configurations
+            ._debugApk
+            .sort { -it.length() }
+            .each { println "${it.name} : ${Math.round(it.length() / (1024) * 100) / 100} kb" }
 }

@@ -1,15 +1,9 @@
 package com.chernandezgil.farmacias.data.source.local;
 
 import android.app.SearchManager;
-import android.content.ContentResolver;
-import android.content.SearchRecentSuggestionsProvider;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.CancellationSignal;
-import android.support.annotation.Nullable;
-
-import com.chernandezgil.farmacias.Utilities.Util;
 
 /**
  * Created by Carlos on 07/09/2016.

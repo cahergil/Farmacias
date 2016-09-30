@@ -35,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.chernandezgil.farmacias.BuildConfig;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -43,7 +44,6 @@ import com.chernandezgil.farmacias.ui.fragment.FindFragment;
 import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
 import com.chernandezgil.farmacias.ui.fragment.MapTabFragment;
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.ui.fragment.TabLayoutFragment;
 import com.chernandezgil.farmacias.ui.fragment.GPSTrackerFragment;
 import com.chernandezgil.farmacias.view.MainActivityContract;
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if(Build.VERSION.SDK_INT>Build.VERSION_CODES.LOLLIPOP) {
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Util.logD(LOG_TAG, "onSaveInstanceState");
+        Utils.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         Icepick.saveInstanceState(this, outState);
 
@@ -227,11 +227,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStart() {
-        Util.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart");
         super.onStart();
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected() && !mResolvingConnectionError) {
             mGoogleApiClient.connect();
-            Util.logD(LOG_TAG, "mGoogleApiClient.connect()");
+            Utils.logD(LOG_TAG, "mGoogleApiClient.connect()");
         }
 
     }
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
-        Util.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause");
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(launcherBroadcast);
     }
@@ -259,21 +259,21 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        Util.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop");
         if(mGoogleApiClient != null ) {
 //            GPSTrackerFragment trackerFragment = getTrackFragment();
 //            if (trackerFragment != null) {
 //                trackerFragment.stopTracking();
 //            }
             mGoogleApiClient.disconnect();
-            Util.logD(LOG_TAG, "mGoogleApiClient.disconnect()");
+            Utils.logD(LOG_TAG, "mGoogleApiClient.disconnect()");
         }
         super.onStop();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Util.logD(LOG_TAG, "onCreateOptionsMeu");
+        Utils.logD(LOG_TAG, "onCreateOptionsMeu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void launchFragment(int position) {
-        Util.logD(LOG_TAG, "launchFragment");
+        Utils.logD(LOG_TAG, "launchFragment");
         FragmentManager fragmentManager;
 
         switch (position) {
@@ -367,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements
                             .commit();
 
                 } catch (IllegalStateException ignored) {
-                    Util.logD(LOG_TAG, "IllegalStateException:" + ignored.getMessage());
+                    Utils.logD(LOG_TAG, "IllegalStateException:" + ignored.getMessage());
                 }
 
                 break;
@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Util.logD(LOG_TAG, "onConnected");
+        Utils.logD(LOG_TAG, "onConnected");
         GPSTrackerFragment trackerFragment = getTrackFragment();
         if (trackerFragment == null) {
             getSupportFragmentManager().beginTransaction()
@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements
 //
 //    @Override
 //    public void onClickMap(MotionEvent event) {
-//        Util.logD(LOG_TAG, "onClickMap");
+//        Utils.logD(LOG_TAG, "onClickMap");
 //        MapTabFragment mapTabFragment = getMapTabFragment();
 //        if (mapTabFragment != null) {
 //            mapTabFragment.handleDispatchTouchEvent(event);
@@ -553,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
 
-        Util.logD(LOG_TAG, "onBackPressed");
+        Utils.logD(LOG_TAG, "onBackPressed");
         int currentItem = getCurrentFragmentInTab();
         if (currentItem != 1) super.onBackPressed();
         MapTabFragment mapTabFragment = getMapTabFragment();
@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
-        Util.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy");
         mUnbinder.unbind();
         mMainActivityPresenter.detachView();
         super.onDestroy();

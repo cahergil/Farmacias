@@ -1,6 +1,6 @@
 package com.chernandezgil.farmacias.supercsv;
 
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.FarmaciasCsvBean;
 
 import org.supercsv.cellprocessor.Optional;
@@ -68,7 +68,7 @@ public class CsvReader {
             }
             return listaFarmacias;
         } catch (Exception e) {
-            Util.logD(LOG_TAG,"error:" + e.getMessage());
+            Utils.logD(LOG_TAG,"error:" + e.getMessage());
             return null;
         } finally {
             if (beanReader != null) {

@@ -3,13 +3,9 @@ package com.chernandezgil.farmacias.ui.activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.view.Gravity;
-import android.view.animation.AnimationUtils;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.ui.fragment.SettingsFragment;
 
 /**
@@ -23,7 +19,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Util.logD(LOG_TAG,"onCreate");
+        Utils.logD(LOG_TAG,"onCreate");
         //comment: no more necessary because I am no longer using Transitions api v21
         //setContentView(R.layout.activity_settings);
         //make this trick in so that the enter transitions appears

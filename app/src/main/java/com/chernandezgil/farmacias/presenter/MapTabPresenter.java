@@ -20,12 +20,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.chernandezgil.farmacias.Utilities.Constants;
-import com.chernandezgil.farmacias.Utilities.Util;
+import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
@@ -129,7 +128,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onStartLoader() {
-        Util.logD(LOG_TAG, "onStartLoader");
+        Utils.logD(LOG_TAG, "onStartLoader");
         mLoaderManager.initLoader(FARMACIAS_LOADER, null, this);
 
     }
@@ -140,7 +139,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         LatLng destinationLatLng = new LatLng(mLastMarkerClicked.getLat(), mLastMarkerClicked.getLon());
         String destinationAddress = mLastMarkerClicked.getAddressFormatted();
 
-        Intent intent = Util.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())
+        Intent intent = Utils.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(), mLocation.getLongitude())
                 , mAddress,
                 destinationLatLng
                 , destinationAddress);
@@ -163,7 +162,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         double distance = mLastMarkerClicked.getDistance() ;
         String address = mLastMarkerClicked.getAddressFormatted();
         String phone = mLastMarkerClicked.getPhone();
-        Intent intent = Util.getShareIntent(name, distance, address, phone);
+        Intent intent = Utils.getShareIntent(name, distance, address, phone);
         mView.launchActivity(intent);
     }
 
@@ -177,7 +176,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         //else would be better perhaps to put after cha
         removeMarkerInHashMapAndMapFromMapFragment(mLastMarkerClicked);
 
-        final String snackMessage = Util.changeFavoriteInDb(
+        final String snackMessage = Utils.changeFavoriteInDb(
                 mLastMarkerClicked.isFavorite(), phone);
         //if no updated row
         if (snackMessage == null) {
@@ -257,7 +256,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
             //objects are equal if they have the same phone number
             if (c.equals(pharmacy)) {
-                Util.logD(LOG_TAG, "key:" + key + ",object:" + c.toString());
+                Utils.logD(LOG_TAG, "key:" + key + ",object:" + c.toString());
                 //return what we want, the key of the HashMap
                 return key;
             }
@@ -296,7 +295,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         }
 
         if (addresses == null || addresses.size() == 0) {
-            Util.logD(LOG_TAG, "no address found");
+            Utils.logD(LOG_TAG, "no address found");
             return null;
         } else {
             Address address = addresses.get(0);
@@ -310,7 +309,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                     stringBuilder.append(Constants.COMMA);
                 }
             }
-            Util.logD(LOG_TAG, "address found");
+            Utils.logD(LOG_TAG, "address found");
             mAddress = stringBuilder.toString();
             return mAddress;
         }
@@ -367,7 +366,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     private void bindView(Cursor data) {
 
-        Util.logD(LOG_TAG, "onBindView");
+        Utils.logD(LOG_TAG, "onBindView");
         mFarmaciasList = new ArrayList<>();
         mFirstSortedPharmacy = null;
         if (data.isClosed()) return;
@@ -384,11 +383,11 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 farmacia.setPostal_code(data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.POSTAL_CODE)));
                 String phone = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.PHONE));
                 farmacia.setPhone(phone);
-                farmacia.setPhoneFormatted(Util.formatPhoneNumber(phone));
+                farmacia.setPhoneFormatted(Utils.formatPhoneNumber(phone));
                 double latDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LAT));
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
                 //float dist=calculateDistance(latDest,lonDest,mLocation);
-                //Util.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
+                //Utils.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
                 double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
                         new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
 
@@ -398,8 +397,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 farmacia.setDistance(distance);
                 String hours = data.getString(data.getColumnIndex(DbContract.FarmaciasEntity.HOURS));
                 farmacia.setHours(hours);
-                farmacia.setOpen(Util.isPharmacyOpen(hours));
-                String addressFormatted = Util.formatAddress(farmacia.getAddress(),
+                farmacia.setOpen(Utils.isPharmacyOpen(hours));
+                String addressFormatted = Utils.formatAddress(farmacia.getAddress(),
                         farmacia.getPostal_code(),
                         farmacia.getLocality(),
                         farmacia.getProvince());
@@ -493,12 +492,12 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             Map.Entry mEntry = (Map.Entry) iter.next();
             Marker key = (Marker) mEntry.getKey();
             PharmacyObjectMap c = (PharmacyObjectMap) mMarkersHashMap.get(key);
-            Util.logD(LOG_TAG, "key:" + key + ",object:" + c.toString());
+            Utils.logD(LOG_TAG, "key:" + key + ",object:" + c.toString());
 //            if(c.equals(pharmacy)) {
 //                return key;
 //            }
         }
-        Util.logD(LOG_TAG, "count" + count);
+        Utils.logD(LOG_TAG, "count" + count);
     }
 
     private PharmacyObjectMap getUserLocationMarker() {
@@ -535,7 +534,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 .flatMap(s -> Observable.from(s))
                 .compose(Transformers.mapWithIndex())
                 .map(t -> {
-                    t.value().setOrder(Util.characterFromInteger((int) t.index()));
+                    t.value().setOrder(Utils.characterFromInteger((int) t.index()));
                     return t.value();
                 }).map(f -> {
                     f.setMarkerImage(onRequestCustomBitmap(f.getOrder(), f.isOpen()));
@@ -597,7 +596,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Util.logD(LOG_TAG, "onLoadFinished");
+        Utils.logD(LOG_TAG, "onLoadFinished");
         if (loader.getId() == FARMACIAS_LOADER) {
             //delay of 50 milliseconds, waiting to mapready <-not sure if this still apply
             new Handler().postDelayed(new Runnable() {

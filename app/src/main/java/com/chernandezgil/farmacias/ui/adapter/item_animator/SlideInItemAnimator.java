@@ -1,4 +1,4 @@
-package com.chernandezgil.farmacias.ui.adapter;
+package com.chernandezgil.farmacias.ui.adapter.item_animator;
 
 
 import android.animation.Animator;

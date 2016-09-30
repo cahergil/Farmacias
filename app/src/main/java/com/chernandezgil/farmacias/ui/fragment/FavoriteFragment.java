@@ -1,13 +1,11 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -18,15 +16,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.FavoritePresenter;
-import com.chernandezgil.farmacias.ui.adapter.CustomItemAnimator;
+import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FavoriteAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
-import com.chernandezgil.farmacias.ui.adapter.item_decoration.CustomItemDecoration;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.SimpleItemTouchHelperCallback;
 import com.chernandezgil.farmacias.view.FavoriteContract;
@@ -90,7 +86,12 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new FavoriteAdapter(getActivity().getApplicationContext(),this,mRecyclerView,customItemAnimator,this);
+        mAdapter = new FavoriteAdapter(getActivity().getApplicationContext(),
+                this,
+                mRecyclerView,
+                customItemAnimator,
+                this,
+                mSharedPreferences);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(customItemAnimator);
@@ -152,7 +153,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     }
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-   //     viewHolder.itemView.setBackgroundColor(Util.modifyAlpha(ContextCompat.getColor(getActivity(),R.color.red_200),0.40f));
+   //     viewHolder.itemView.setBackgroundColor(Utils.modifyAlpha(ContextCompat.getColor(getActivity(),R.color.red_200),0.40f));
         mItemTouchHelper.startDrag(viewHolder);
 
     }
@@ -162,6 +163,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
     @Override
     public void onDestroyView() {
+        mSharedPreferences.saveFavoriteList(mAdapter.getmList());
         mUnbinder.unbind();
         super.onDestroyView();
     }
