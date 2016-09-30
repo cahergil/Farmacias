@@ -93,6 +93,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         mAdapter = new FavoriteAdapter(getActivity().getApplicationContext(),this,mRecyclerView,customItemAnimator,this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemAnimator(customItemAnimator);
      //   mRecyclerView.addItemDecoration(new CustomItemDecoration());
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);

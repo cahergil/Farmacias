@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.ColorUtils;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Util;
 import com.chernandezgil.farmacias.model.Pharmacy;
@@ -131,8 +132,8 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 }
             });
         }
-        mColorSpan = Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.87f);
-        mColorSpanData = Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.54f);
+        mColorSpan = ColorUtils.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.87f);
+        mColorSpanData = ColorUtils.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.54f);
     }
 
 

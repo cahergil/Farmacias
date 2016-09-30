@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.ColorUtils;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Util;
@@ -43,8 +44,8 @@ import butterknife.ButterKnife;
  * Created by Carlos on 28/09/2016.
  */
 
-public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyViewHolder> implements
-        ItemTouchHelperAdapter{
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyViewHolder>
+        implements ItemTouchHelperAdapter {
 
     private List<Pharmacy> mList;
     private Context mContext;
@@ -88,7 +89,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             expandCollapse = new AutoTransition();
             expandCollapse.setDuration(200);
             expandCollapse.setInterpolator(AnimationUtils.loadInterpolator(mContext,
-                    android.R.interpolator.fast_out_slow_in));
+                    android.R.interpolator.linear));
             expandCollapse.addListener(new Transition.TransitionListener() {
                 @Override
                 public void onTransitionStart(Transition transition) {
@@ -216,6 +217,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                 if (expandedPosition != RecyclerView.NO_POSITION) {
                     notifyItemChanged(expandedPosition, COLLAPSE);
                 }
+                // expand item
                 if (expandedPosition != position) {
                     expandedPosition = position;
                     notifyItemChanged(position, EXPAND);
@@ -364,7 +366,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener,
-            ItemTouchHelperViewHolder{
+            ItemTouchHelperViewHolder {
 
         @BindView(R.id.tvName)
         public TextView tvName;
@@ -431,7 +433,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
         @Override
         public void onItemSelected() {
-            itemView.setBackgroundColor(Util.modifyAlpha(ContextCompat.getColor(mContext, R.color.black),0.10f));
+            itemView.setBackgroundColor(ColorUtils.modifyAlpha(ContextCompat.getColor(mContext, R.color.black),0.10f));
         }
 
         @Override

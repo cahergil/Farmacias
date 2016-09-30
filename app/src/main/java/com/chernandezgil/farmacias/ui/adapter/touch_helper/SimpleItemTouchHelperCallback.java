@@ -53,6 +53,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         return true;
     }
 
+
+
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
@@ -61,6 +63,23 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
      //   mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
         Util.logD("onSwiped","onSwiped");
     }
+
+    @Override
+    public float getSwipeThreshold(RecyclerView.ViewHolder viewHolder) {
+
+        return 0.5f;
+    }
+
+    @Override
+    public float getSwipeEscapeVelocity(float defaultValue) {
+        return defaultValue*6.6f;
+    }
+
+//    @Override
+//    public float getSwipeVelocityThreshold(float defaultValue) {
+//        return defaultValue* 15;
+//    }
+
 
 
     @Override
