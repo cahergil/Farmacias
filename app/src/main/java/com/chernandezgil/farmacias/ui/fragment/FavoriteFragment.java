@@ -73,13 +73,33 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         setUpRecyclerView();
         mPresenter.setView(this);
         return view;
-      //
+
     }
+    //A) Android documentation:
+    //you should avoid performing CPU-intensive work during onPause(), such as writing to a database,
+    // because it can slow the visible transition to the next activity (you should instead perform heavy-load shutdown operations during onStop()).
+    //B) Stackoverflow
+    //http://stackoverflow.com/questions/29480890/when-to-save-data-to-database-onpause-or-onstop
+    //1. on Android 7.0+, in a multi-window scenario, your activity will be paused but not stopped
+    // if the user taps on the activity in the other pane, transferring focus to it
+    //2. Although this is not the case:https://developer.android.com/guide/components/activities.html#CoordinatingActivities
+    @Override
+    public void onPause() {
+
+        mSharedPreferences.saveFavoriteList(mAdapter.getmList());
+        super.onPause();
+    }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPresenter.onInitLoader();
+        if(savedInstanceState == null) {
+            mPresenter.onInitLoader();
+        } else {
+            //we don't want the retained loader because it may contain old data
+            mPresenter.onRestartLoader();
+        }
     }
 
     private void setUpRecyclerView(){
@@ -95,7 +115,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(customItemAnimator);
-     //   mRecyclerView.addItemDecoration(new CustomItemDecoration());
+     //   mRecyclerView.addItemDecoration(new CustomItemDecoration()); if not using cardview
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -160,10 +180,10 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
 
 
-
+    //
     @Override
     public void onDestroyView() {
-        mSharedPreferences.saveFavoriteList(mAdapter.getmList());
+
         mUnbinder.unbind();
         super.onDestroyView();
     }

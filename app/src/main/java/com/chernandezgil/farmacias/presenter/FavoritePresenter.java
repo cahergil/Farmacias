@@ -58,6 +58,10 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
         mLoaderManager.initLoader(LOADER,null,this);
     }
 
+    @Override
+    public void onRestartLoader() {
+        mLoaderManager.restartLoader(LOADER,null,this);
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

@@ -37,7 +37,7 @@ public interface FavoriteContract {
         void detachView();
 
         public void onInitLoader();
-
+        public void onRestartLoader();
 
 
     }

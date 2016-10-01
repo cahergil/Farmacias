@@ -38,7 +38,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.START;  //| ItemTouchHelper.END;
+      //  int swipeFlags = ItemTouchHelper.START;  //| ItemTouchHelper.END;
+        int swipeFlags = ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
@@ -134,21 +135,25 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
             }
 
             // draw red background
-            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+            //background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+            background.setBounds(itemView.getLeft(), itemView.getTop(), (int)dX, itemView.getBottom());
             background.draw(c);
             // draw x mark
             int itemHeight = itemView.getBottom() - itemView.getTop();
             int intrinsicWidth = xMark.getIntrinsicWidth();
             int intrinsicHeight = xMark.getIntrinsicWidth();
 
-            int xMarkLeft = itemView.getRight() - xMarkMargin - intrinsicWidth;
-            int xMarkRight = itemView.getRight() - xMarkMargin;
-            int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
-            int xMarkBottom = xMarkTop + intrinsicHeight;
-            xMark.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
-
-            xMark.draw(c);
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+//            int xMarkLeft = itemView.getRight() - xMarkMargin - intrinsicWidth;
+//            int xMarkRight = itemView.getRight() - xMarkMargin;
+//            int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
+//            int xMarkBottom = xMarkTop + intrinsicHeight;
+             int xMarkLeft =itemView.getLeft()+ xMarkMargin;
+             int xMarkRight =itemView.getLeft()+ xMarkMargin+intrinsicWidth;
+             int xMarkTop = itemView.getTop()+(itemHeight - intrinsicHeight)/2;
+             int xMarkBottom = xMarkTop + intrinsicHeight;
+             xMark.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+             xMark.draw(c);
+             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY,
