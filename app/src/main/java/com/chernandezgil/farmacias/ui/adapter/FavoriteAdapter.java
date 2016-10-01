@@ -1,11 +1,11 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -52,7 +52,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private List<Pharmacy> mList;
     private Context mContext;
     private FavoriteAdapterOnClickHandler mClickHandler;
-    private static final String LOG_TAG=ListTabAdapter.class.getSimpleName();
+    private static final String LOG_TAG=FavoriteAdapter.class.getSimpleName();
     private CustomItemAnimator mCustomItemAnimator;
     private int expandedPosition = RecyclerView.NO_POSITION;
     private Transition expandCollapse = null;
@@ -71,7 +71,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private Handler handler = new Handler(); // hanlder for running delayed runnables
     private HashMap<Pharmacy, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
     private PreferencesManager mSharedPreferences;
-
+    private boolean mDismissCanceled;
 
 
     public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
@@ -177,6 +177,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         notifyItemRemoved(position);
         //in order to show the animation call this also
         notifyItemRangeChanged(position, getItemCount());
+
     }
 
 
@@ -190,6 +191,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     public void pendingRemoval(int position) {
         final Pharmacy pharmacy=mList.get(position);
         if(!itemsPendingRemoval.contains(pharmacy)) {
+            Utils.logD(LOG_TAG,"pendingRemoval position:"+position);
             itemsPendingRemoval.add(pharmacy);
             // this will redraw row in "undo" state
             notifyItemChanged(position);
@@ -265,8 +267,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        //  Utils.logD(LOG_TAG,"onBindViewHolder, position"+position);
-
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
 
@@ -303,7 +303,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         if (itemsPendingRemoval.contains(pharmacy)) {
 
             holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
+            Utils.logD(LOG_TAG,"bindViewHolderSwiped,position;"+position);
+            //there seems to be a bounce back effect once onSwaped.
+            //
             holder.ivReorder.setVisibility(View.INVISIBLE);
+            holder.tvName.setVisibility(View.INVISIBLE);
+            holder.tvStreet.setVisibility(View.INVISIBLE);
+            holder.tvOpen.setVisibility(View.INVISIBLE);
+            holder.tvDistance.setVisibility(View.INVISIBLE);
             holder.tvUndo.setVisibility(View.VISIBLE);
             holder.tvUndo.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -315,11 +322,22 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                     }
                     itemsPendingRemoval.remove(pharmacy);
                     notifyItemChanged(mList.indexOf(pharmacy));
+                    mDismissCanceled =true;
 
                 }
             });
 
         } else {
+            Utils.logD(LOG_TAG,"bindViewHolder");
+            if(mDismissCanceled) {
+                mDismissCanceled =false;
+                ObjectAnimator translateToLeft = ObjectAnimator.ofFloat(holder.itemView,
+                        "translationX",holder.itemView.getRight(),holder.itemView.getLeft());
+                translateToLeft.setDuration(200);
+                translateToLeft.start();
+
+            }
+            holder.itemView.setBackgroundColor(Utils.getColor(R.color.white));
             holder.tvUndo.setVisibility(View.INVISIBLE);
             holder.tvUndo.setOnClickListener(null);
             holder.tvName.setText(pharmacy.getName());

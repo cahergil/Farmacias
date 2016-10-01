@@ -117,8 +117,12 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void onChildDraw(Canvas c, RecyclerView recyclerView,
                             RecyclerView.ViewHolder viewHolder, float dX, float dY,
                             int actionState, boolean isCurrentlyActive) {
-        Utils.logD("onChildDraw","dX:"+dX + ",dY:"+dY+",isCurrentlyActive:"+isCurrentlyActive);
+        int position=viewHolder.getAdapterPosition();
+        Utils.logD("onChildDraw","dX:"+dX + ",dY:"+dY+",isCurrentlyActive:"+isCurrentlyActive
+        + ",ActionState:"+actionState+ ",position:"+position);
+
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+
 
 //            float width = (float) viewHolder.itemView.getWidth();
 //            float alpha = 1.0f - Math.abs(dX) / width;
