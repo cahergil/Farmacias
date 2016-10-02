@@ -8,11 +8,14 @@ import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 
@@ -155,6 +158,9 @@ public class FindFragment extends Fragment implements FindContract.View,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setAppBarElevation(R.dimen.appbar_elevation);
+        }
         initializeSearchUiWidgets();
         if (savedInstanceState == null) {
             //LoaderManager retains the cursor of the last result
@@ -267,6 +273,15 @@ public class FindFragment extends Fragment implements FindContract.View,
         mCardOnScreen = true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setAppBarElevation(int elevation) {
+        AppBarLayout appBarLayout= (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
+        if(elevation!=0) {
+            appBarLayout.setElevation(getResources().getDimension(R.dimen.appbar_elevation));
+        } else {
+            appBarLayout.setElevation(0);
+        }
+    }
     private void initializeSearchUiWidgets() {
 
         setUpQuickSearchRecyclerView();
@@ -644,7 +659,9 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public void onDestroyView() {
         Utils.logD(LOG_TAG, "onDestroyView");
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setAppBarElevation(0);
+        }
         restoreToolbarActivityUiState();
         mCompositeSubscription.unsubscribe();
         unbinder.unbind();

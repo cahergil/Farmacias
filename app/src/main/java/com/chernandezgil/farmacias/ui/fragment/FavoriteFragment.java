@@ -1,9 +1,13 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -102,6 +106,25 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         }
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setAppBarElevation(R.dimen.appbar_elevation);
+        }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void setAppBarElevation(int elevation) {
+        AppBarLayout appBarLayout= (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
+        if(elevation!=0) {
+            appBarLayout.setElevation(getResources().getDimension(R.dimen.appbar_elevation));
+        } else {
+            appBarLayout.setElevation(0);
+        }
+    }
+
     private void setUpRecyclerView(){
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -183,7 +206,9 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     //
     @Override
     public void onDestroyView() {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setAppBarElevation(0);
+        }
         mUnbinder.unbind();
         super.onDestroyView();
     }
