@@ -9,20 +9,23 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Carlos on 11/08/2016.
  */
 public class PreferencesManagerImp implements PreferencesManager {
-    private static final String FAVORITE_LIST_KEY ="favorite_list_key";
+
     private final SharedPreferences mPrefs;
     private final SharedPreferences.Editor mEditor;
     private final Context context;
-
+    private static final String FAVORITE_LIST_KEY ="favorite_list_key";
+    private static final String COLOR_MAP_KEY ="color_map_key";
     private static final String LOCATION_KEY = "location_key";
 
 
@@ -118,8 +121,9 @@ public class PreferencesManagerImp implements PreferencesManager {
 
         if(mPrefs.contains(FAVORITE_LIST_KEY)) {
             String jsonString = mPrefs.getString(FAVORITE_LIST_KEY, null);
-            Gson gsonObject = new Gson();
+
             if (jsonString != null) {
+                Gson gsonObject = new Gson();
                 Pharmacy[] arrayFavorite = gsonObject.fromJson(jsonString, Pharmacy[].class);
                 //the list returned by Arrays.asList is inmmutable, we need to create another list based on this one
                 return new ArrayList<>(Arrays.asList(arrayFavorite));
@@ -127,5 +131,24 @@ public class PreferencesManagerImp implements PreferencesManager {
             }
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public void saveColorMap(HashMap<String, Integer> colorMap) {
+        mEditor.putString(COLOR_MAP_KEY,new Gson().toJson(colorMap));
+        mEditor.apply();
+
+    }
+
+    @Override
+    public HashMap<String, Integer> getColorMap() {
+        if(mPrefs.contains(COLOR_MAP_KEY)) {
+            String jsonString = mPrefs.getString(COLOR_MAP_KEY, null);
+            if(jsonString !=null) {
+                java.lang.reflect.Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
+                return  new Gson().fromJson(jsonString,type);
+            }
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.chernandezgil.farmacias.model.Pharmacy;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -24,5 +25,7 @@ public interface PreferencesManager {
     public int getRadio();
     public void saveFavoriteList(List<Pharmacy> list);
     public List<Pharmacy> getFavorites();
+    public void saveColorMap(HashMap<String,Integer> colorMap);
+    public HashMap<String,Integer> getColorMap();
 
 }

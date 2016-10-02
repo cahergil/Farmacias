@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.chernandezgil.farmacias.MyApplication;
+import com.chernandezgil.farmacias.model.ColorMap;
 import com.chernandezgil.farmacias.services.DownloadFarmacias;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 
@@ -19,9 +20,12 @@ public class MainActivityInteractor {
         mContext= MyApplication.getContext();
     }
 
-    public void loadDatabase(){
+    public void loadData(){
         if(mPreferencesManager.isFirstExecution()) {
             launchDownloadService();
+            ColorMap colorMap = new ColorMap();
+            colorMap.generate();
+            mPreferencesManager.saveColorMap(colorMap.getColorHashMap());
             mPreferencesManager.setFirstExecutionFalse();
         }
     }

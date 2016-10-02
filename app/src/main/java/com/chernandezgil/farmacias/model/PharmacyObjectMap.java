@@ -158,18 +158,6 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
         this.isFavorite = in.readByte() != 0;
     }
 
-    public static final Creator<PharmacyObjectMap> CREATOR = new Creator<PharmacyObjectMap>() {
-        @Override
-        public PharmacyObjectMap createFromParcel(Parcel source) {
-            return new PharmacyObjectMap(source);
-        }
-
-        @Override
-        public PharmacyObjectMap[] newArray(int size) {
-            return new PharmacyObjectMap[size];
-        }
-    };
-
     @Override
     public String toString() {
         return "PharmacyObjectMap{" + "nombre"+getName()+

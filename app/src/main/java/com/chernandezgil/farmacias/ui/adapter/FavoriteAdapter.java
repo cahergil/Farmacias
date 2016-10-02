@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +29,7 @@ import com.chernandezgil.farmacias.Utilities.ColorUtils;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.model.ColorMap;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperAdapter;
@@ -72,6 +74,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private HashMap<Pharmacy, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
     private PreferencesManager mSharedPreferences;
     private boolean mDismissCanceled;
+    ColorMap mColorMap;
 
 
     public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
@@ -85,6 +88,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         mDragStartListener = dragStartListener;
         mSharedPreferences = preferencesManager;
         itemsPendingRemoval = new ArrayList<>();
+        initColorMap();
         //we have to initilize mList so that if there is no favorite, when returning mList to fragment
         //mList = new ArrayList<>();
 
@@ -154,6 +158,16 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     }
 
+    private void initColorMap() {
+        mColorMap = new ColorMap();
+        HashMap<String,Integer> storedHashMap = mSharedPreferences.getColorMap();
+        if( storedHashMap != null) {
+            mColorMap.setColorHashMap(storedHashMap);
+            return;
+
+        }
+        mColorMap.generate();
+    }
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         Utils.logD("onItemMove","onItemMove");
@@ -301,18 +315,21 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private void bindHolder(MyViewHolder holder, int position) {
         final Pharmacy pharmacy= mList.get(position);
         if (itemsPendingRemoval.contains(pharmacy)) {
-
-            holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
+            int color= pharmacy.getCircleColor();
+          //  holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
+            holder.itemView.setBackgroundColor(color);
             Utils.logD(LOG_TAG,"bindViewHolderSwiped,position;"+position);
             //there seems to be a bounce back effect once onSwaped.
-            //
+            //after calling notifyItemRangeChanged, e.g threre has been previous dismiss
+            //this effect shows incorrect views, one has to change visibility of them.
+            holder.tvCircle.setVisibility(View.INVISIBLE);
             holder.ivReorder.setVisibility(View.INVISIBLE);
             holder.tvName.setVisibility(View.INVISIBLE);
             holder.tvStreet.setVisibility(View.INVISIBLE);
             holder.tvOpen.setVisibility(View.INVISIBLE);
             holder.tvDistance.setVisibility(View.INVISIBLE);
-            holder.tvUndo.setVisibility(View.VISIBLE);
-            holder.tvUndo.setOnClickListener(new View.OnClickListener() {
+            holder.ivUndo.setVisibility(View.VISIBLE);
+            holder.ivUndo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Runnable pendingRemovalRunnable = pendingRunnables.get(pharmacy);
@@ -328,6 +345,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             });
 
         } else {
+
+            GradientDrawable gradientDrawable;
             Utils.logD(LOG_TAG,"bindViewHolder");
             if(mDismissCanceled) {
                 mDismissCanceled =false;
@@ -337,9 +356,25 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                 translateToLeft.start();
 
             }
+
             holder.itemView.setBackgroundColor(Utils.getColor(R.color.white));
-            holder.tvUndo.setVisibility(View.INVISIBLE);
-            holder.tvUndo.setOnClickListener(null);
+
+            holder.ivUndo.setVisibility(View.INVISIBLE);
+            holder.ivUndo.setOnClickListener(null);
+            holder.tvCircle.setVisibility(View.VISIBLE);
+            holder.ivReorder.setVisibility(View.VISIBLE);
+            holder.tvName.setVisibility(View.VISIBLE);
+            holder.tvStreet.setVisibility(View.VISIBLE);
+            holder.tvOpen.setVisibility(View.VISIBLE);
+            holder.tvDistance.setVisibility(View.VISIBLE);
+            String firsChar =pharmacy.getName().substring(0,1).toUpperCase();
+            holder.tvCircle.setText(pharmacy.getName().substring(0,1));
+            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.shape_circle);
+            int circleColor=mColorMap.getColorForString(firsChar);
+            gradientDrawable.setColor(circleColor);
+            holder.tvCircle.setBackground(gradientDrawable);
+            holder.tvCircle.setTag(circleColor);
+            pharmacy.setCircleColor(circleColor);
             holder.tvName.setText(pharmacy.getName());
             holder.tvStreet.setText(pharmacy.getAddressFormatted());
             holder.tvDistance.setText(mContext.getString(R.string.format_distance, pharmacy.getDistance()));
@@ -438,8 +473,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         public LinearLayout llOptionsRow;
         @BindView(R.id.ivReorder)
         public ImageView ivReorder;
-        @BindView(R.id.tvUndo)
-        public TextView tvUndo;
+        @BindView(R.id.ivUndo)
+        public ImageView ivUndo;
+        @BindView(R.id.ivCircle)
+        public TextView tvCircle;
 
 
         public MyViewHolder(View v) {

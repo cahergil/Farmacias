@@ -35,4 +35,63 @@
     <color name="fav_color">@color/blue_mobile_web</color>
     <color name="suggestions_row">#6D6D6D</color>
     <color name="color_options">#000000</color>
+    <array name="colors">
+        <item>#3b5999</item>
+        <item>#EF6C00</item>
+        <item>#55acee</item>
+        <item>#21759b</item>
+        <item>#f0a30a</item>
+        <item>#43A047</item>
+        <item>#827717</item>
+        <item>#34465d</item>
+        <item>#E91E63</item>
+        <item>#757575</item>
+        <item>#6d8764</item>
+        <item>#cd201f</item>
+        <item>#FFC107</item>
+        <item>#9C27B0</item>
+        <item>#0084ff</item>
+        <item>#795548</item>
+        <item>#673AB7</item>
+        <item>#ff0084</item>
+        <item>#009688</item>
+        <item>#FF5722</item>
+        <item>#000000</item>
+        <item>#2196F3</item>
+        <item>#607D8B</item>
+        <item>#689F38</item>
+        <item>#ff0084</item>
+        <item>#ff5700</item>
+        <item>#4c75a3</item>
+
+    </array>
+    <!--<color name="favorite_0">#3b5999</color>-->
+    <!--<color name="favorite_1">#EF6C00</color>-->
+    <!--<color name="favorite_2">#55acee</color>-->
+    <!--<color name="favorite_3">#21759b</color>-->
+    <!--<color name="favorite_4">#f0a30a</color>-->
+    <!--<color name="favorite_5">#43A047</color>-->
+    <!--<color name="favorite_6">#827717</color>-->
+    <!--<color name="favorite_7">#34465d</color>-->
+    <!--<color name="favorite_8">#E91E63</color>-->
+    <!--<color name="favorite_9">#757575</color>-->
+    <!--<color name="favorite_10">#6d8764</color>-->
+    <!--<color name="favorite_11">#cd201f</color>-->
+    <!--<color name="favorite_12">#25D366</color>-->
+    <!--<color name="favorite_13">#9C27B0</color>-->
+    <!--<color name="favorite_14">#0084ff</color>-->
+    <!--<color name="favorite_15">#795548</color>-->
+    <!--<color name="favorite_16">#673AB7</color>-->
+    <!--<color name="favorite_17">#ff0084</color>-->
+    <!--<color name="favorite_18">#009688</color>-->
+    <!--<color name="favorite_19">#FF5722</color>-->
+    <!--<color name="favorite_20">#000000</color>-->
+    <!--<color name="favorite_21">#2196F3</color>-->
+    <!--<color name="favorite_22">#607D8B</color>-->
+    <!--<color name="favorite_23">#689F38</color>-->
+    <!--<color name="favorite_24">#ff0084</color>-->
+    <!--<color name="favorite_25">#ff5700</color>-->
+    <!--<color name="favorite_26">#4c75a3</color>-->
+
+
 </resources>

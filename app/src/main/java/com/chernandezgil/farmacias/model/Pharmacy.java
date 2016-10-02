@@ -9,7 +9,20 @@ import android.os.Parcelable;
 public class Pharmacy extends PharmacyObjectMap implements Parcelable {
 
     private boolean optionsRow;
+    int circleColor;
 
+
+
+    public Pharmacy() {
+    }
+
+    public int getCircleColor() {
+        return circleColor;
+    }
+
+    public void setCircleColor(int circleColor) {
+        this.circleColor = circleColor;
+    }
 
     public boolean isOptionsRow() {
         return optionsRow;
@@ -17,9 +30,6 @@ public class Pharmacy extends PharmacyObjectMap implements Parcelable {
 
     public void setOptionsRow(boolean optionsRow) {
         this.optionsRow = optionsRow;
-    }
-
-    public Pharmacy() {
     }
 
     @Override
@@ -31,13 +41,13 @@ public class Pharmacy extends PharmacyObjectMap implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeByte(this.optionsRow ? (byte) 1 : (byte) 0);
-
+        dest.writeInt(this.circleColor);
     }
 
     protected Pharmacy(Parcel in) {
         super(in);
         this.optionsRow = in.readByte() != 0;
-
+        this.circleColor = in.readInt();
     }
 
     public static final Creator<Pharmacy> CREATOR = new Creator<Pharmacy>() {

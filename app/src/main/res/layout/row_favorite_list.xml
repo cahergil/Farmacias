@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginTop="4dp"
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@animator/statelistanimator_pharmacy"
-    card_view:cardCornerRadius="2dp">
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="1dp">
 
     <RelativeLayout
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
@@ -22,39 +23,43 @@
             android:id="@+id/llHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="3dp">
+
+                <TextView
+                    android:id="@+id/ivCircle"
+                    android:layout_width="39dp"
+                    android:layout_height="39dp"
+                    android:background="@drawable/shape_circle"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    tools:text="A"
+
+                    />
+
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/llVertical"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="7"
                 android:orientation="vertical">
-
 
                 <TextView
                     android:id="@+id/tvName"
-                    style="@style/Widget.TimeRow2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:alpha="0.87"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-
-                    android:textColor="@android:color/black"
-                    android:textSize="15sp"
+                    style="@style/Widget.PrimaryText"
                     tools:text="Farmacia Fernandez de los Rios" />
-
 
                 <TextView
                     android:id="@+id/tvStreet"
-                    style="@style/Widget.TimeRow2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    style="@style/Widget.SecondaryText"
                     tools:text="Calle Conde de Cartagena 36" />
 
                 <LinearLayout
@@ -85,33 +90,28 @@
 
             </LinearLayout>
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="7">
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical">
+
                 <ImageView
                     android:id="@+id/ivReorder"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:alpha="0.54"
+                    android:layout_alignParentRight="true"
                     android:visibility="visible"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    app:srcCompat="@drawable/ic_reorder"/>
-                <TextView
-                    android:id="@+id/tvUndo"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:text="UNDO"
-                    android:textSize="15dp"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
+                    app:srcCompat="@drawable/ic_reorder" />
+
+                <ImageView
+                    android:id="@+id/ivUndo"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:visibility="invisible"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:gravity="center_vertical"
-                    />
-            </FrameLayout>
+                    android:layout_alignParentRight="true"
+                    app:srcCompat="@drawable/ic_undo" />
+            </RelativeLayout>
 
         </LinearLayout>
 

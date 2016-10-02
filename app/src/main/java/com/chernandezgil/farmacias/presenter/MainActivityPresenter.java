@@ -38,7 +38,7 @@ public class MainActivityPresenter implements MainActivityContract.Presenter<Mai
 
     @Override
     public void onStart() {
-        mMainActivityInteractor.loadDatabase();
+        mMainActivityInteractor.loadData();
     }
 
 

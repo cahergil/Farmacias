@@ -11,6 +11,8 @@ import android.view.View;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.ui.adapter.FavoriteAdapter;
+import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 
 /**
  * Created by Carlos on 28/09/2016.
@@ -137,7 +139,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
             if (!initiated) {
                 init();
             }
-
+           FavoriteAdapter.MyViewHolder myViewHolder= (FavoriteAdapter.MyViewHolder) viewHolder;
+            int color = (int) myViewHolder.tvCircle.getTag();
+           background.setColorFilter(color, PorterDuff.Mode.SRC);
+         //  background.setTint(color);
             // draw red background
             //background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
             background.setBounds(itemView.getLeft(), itemView.getTop(), (int)dX, itemView.getBottom());
