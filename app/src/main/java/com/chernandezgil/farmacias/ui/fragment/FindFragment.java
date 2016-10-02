@@ -90,7 +90,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
-    TextView mEmptyView;
+    RelativeLayout mEmptyView;
     @BindView(R.id.frame)
     FrameLayout mRootLayout;
 
@@ -144,7 +144,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_find_favorite, container, false);
+        View view = inflater.inflate(R.layout.fragment_find, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
         setDimDrawable();

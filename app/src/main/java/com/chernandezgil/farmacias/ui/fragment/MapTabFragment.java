@@ -277,7 +277,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //        return bitmap;
 //    }
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+
 //    private  Bitmap getBitmap(int drawableResId) {
 //      //  VectorDrawableCompat vectorDrawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
 //      //  Drawable vectorDrawable = AppCompatDrawableManager.get().getDrawable(getActivity(), drawableResId);

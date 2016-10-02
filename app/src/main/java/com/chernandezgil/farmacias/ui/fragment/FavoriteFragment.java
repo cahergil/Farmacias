@@ -1,6 +1,6 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
-import android.annotation.TargetApi;
+
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
@@ -17,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -49,7 +49,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
     @BindView(R.id.emptyView)
-    TextView mEmptyView;
+    RelativeLayout mEmptyView;
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
 
@@ -72,7 +72,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_find_favorite,container,false);
+        View view = inflater.inflate(R.layout.fragment_favorites,container,false);
         mUnbinder= ButterKnife.bind(this,view);
         setUpRecyclerView();
         mPresenter.setView(this);
@@ -201,7 +201,10 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
     }
 
-
+    @Override
+    public void onListEmpty() {
+        showNoResults();
+    }
 
     //
     @Override

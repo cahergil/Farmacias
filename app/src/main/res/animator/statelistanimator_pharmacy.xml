@@ -5,7 +5,7 @@
     <item android:state_activated="true">
         <objectAnimator
             android:propertyName="translationZ"
-            android:valueTo="2dp"
+            android:valueTo="8dp"
             android:duration="@android:integer/config_shortAnimTime"
             android:interpolator="@android:interpolator/fast_out_slow_in" />
     </item>

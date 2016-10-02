@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -12,16 +14,22 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:visibility="invisible"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/pharmaciesRecyclerView"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true" />
+
 
     <include
-        layout="@layout/emty_results_others"
         android:id="@+id/emptyView"
+        layout="@layout/emty_results_favorites"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
         android:visibility="gone"
         tools:visibility="visible" />
 

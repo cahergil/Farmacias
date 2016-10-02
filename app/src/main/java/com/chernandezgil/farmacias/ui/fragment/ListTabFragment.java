@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
@@ -51,7 +52,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @BindView(R.id.pharmaciesRecyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
-    View mEmptyView;
+    RelativeLayout mEmptyView;
     @BindView(R.id.frame)
     FrameLayout mRootView;
     @BindView(R.id.progressBar)

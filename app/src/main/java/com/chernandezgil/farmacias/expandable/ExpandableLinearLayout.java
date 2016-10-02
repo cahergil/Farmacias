@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.expandable;
 
+import android.support.annotation.RequiresApi;
 import android.widget.LinearLayout;
 
 
@@ -12,7 +13,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -88,7 +88,7 @@ public class ExpandableLinearLayout extends LinearLayout implements ExpandableLa
         init(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public ExpandableLinearLayout(final Context context, final AttributeSet attrs,
                                   final int defStyleAttr, final int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);

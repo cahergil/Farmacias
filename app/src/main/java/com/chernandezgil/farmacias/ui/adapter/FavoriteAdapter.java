@@ -1,12 +1,12 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -89,8 +89,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         mSharedPreferences = preferencesManager;
         itemsPendingRemoval = new ArrayList<>();
         initColorMap();
-        //we have to initilize mList so that if there is no favorite, when returning mList to fragment
-        //mList = new ArrayList<>();
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
@@ -191,6 +190,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         notifyItemRemoved(position);
         //in order to show the animation call this also
         notifyItemRangeChanged(position, getItemCount());
+        if(mList.isEmpty()) {
+            mClickHandler.onListEmpty();
+        }
 
     }
 
@@ -230,10 +232,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
         MyViewHolder holder = new MyViewHolder(view);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 final int position = holder.getAdapterPosition();
-                setDelayedTransition();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    setDelayedTransition();
+                }
                 mCustomItemAnimator.setAnimateMoves(false);
                 if (position == RecyclerView.NO_POSITION) return;
                 // collapse any currently expanded items
@@ -254,7 +260,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         return holder;
 
     }
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
@@ -532,5 +538,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         void onClickFavorite(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
+        void onListEmpty();
     }
 }

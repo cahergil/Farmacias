@@ -26,18 +26,9 @@
 
 
 
-    <TextView
-
+    <include
+        layout="@layout/emty_results_others"
         android:id="@+id/emptyView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:text="Lista vacia"
         android:visibility="gone"
         tools:visibility="visible" />
 

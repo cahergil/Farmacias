@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.Utilities;
 
 
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
@@ -424,4 +426,6 @@ public class Utils {
     public static float getDimension(@DimenRes int dimensionResId) {
         return MyApplication.getContext().getResources().getDimension(dimensionResId);
     }
+
+
 }

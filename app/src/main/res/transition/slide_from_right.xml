@@ -4,5 +4,5 @@
     android:duration="400"
     android:interpolator="@android:interpolator/fast_out_slow_in"
     android:slideEdge="left"
-    tools:targetApi="21" />
+    tools:requiresApi="21" />
 
