@@ -8,8 +8,9 @@ import android.provider.BaseColumns;
  * Created by Carlos on 09/07/2016.
  */
 public class DbContract {
-    public static final String CONTENT_AUTHORITY = "com.chernandezgil.farmacias";
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final String SCHEME ="content://";
+    public static final String AUTHORITY = "com.chernandezgil.farmacias";
+    public static final Uri BASE_CONTENT_URI = Uri.parse(SCHEME + AUTHORITY);
     public static final String PATH_FARMACIAS="farmacias";
     public static final String PATH_QUICK_SEARCH ="quick_search";
     public static final String PATH_FAVORITES= "favorites";
@@ -21,9 +22,9 @@ public class DbContract {
         public static final Uri CONTENT_URI_PATH_FAVORITES =BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITES).build();
 
         public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_FARMACIAS;
+                "vnd.android.cursor.dir/" + AUTHORITY + "/" + PATH_FARMACIAS;
         public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_FARMACIAS;
+                "vnd.android.cursor.item/" + AUTHORITY + "/" + PATH_FARMACIAS;
 
         public static final String TABLE_NAME="farmacias";
         public static final String NAME="name";
@@ -41,12 +42,12 @@ public class DbContract {
 
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
-        public static Uri buildFarmaciasUriByPhone(String id) {
-            return CONTENT_URI.buildUpon().appendPath(id).build();
+        public static Uri buildFarmaciasUriByPhone(String phone) {
+            return CONTENT_URI.buildUpon().appendPath(phone).build();
         }
-        public static Uri buildFarmaciasUriByName(String name) {
-            return CONTENT_URI.buildUpon().appendPath(name).build();
-        }
+//        public static Uri buildFarmaciasUriByName(String name) {
+//            return CONTENT_URI.buildUpon().appendPath(name).build();
+//        }
         public static Uri buildFarmaciasUriByNameQuickSearch(String name) {
             return CONTENT_URI_QUICK_SEARCH.buildUpon().appendPath(name).build();
         }

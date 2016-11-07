@@ -29,8 +29,11 @@ public class SnackBarWrapper {
 
     public void show() {
         snackbar.show();
-    }
 
+    }
+    public void dismiss(){
+        snackbar.dismiss();
+    }
     public void addCallback(SnackbarCallback snackbarCallback) {
         snackbar = builder.snackbarCallback(snackbarCallback).build();
     }

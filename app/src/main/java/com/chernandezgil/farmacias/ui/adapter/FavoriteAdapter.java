@@ -193,7 +193,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         if(mList.isEmpty()) {
             mClickHandler.onListEmpty();
         }
-
+        
     }
 
 

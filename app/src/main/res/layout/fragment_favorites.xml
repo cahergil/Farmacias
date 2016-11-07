@@ -25,7 +25,7 @@
 
     <include
         android:id="@+id/emptyView"
-        layout="@layout/emty_results_favorites"
+        layout="@layout/empty_results_favorites"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"

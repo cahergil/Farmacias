@@ -5,17 +5,21 @@
     android:id="@+id/card_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginTop="4dp"
     android:stateListAnimator="@animator/statelistanimator_pharmacy"
     card_view:cardBackgroundColor="@color/white"
-    card_view:cardCornerRadius="2dp">
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="1dp">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginRight="16dp"
         android:orientation="vertical">
 

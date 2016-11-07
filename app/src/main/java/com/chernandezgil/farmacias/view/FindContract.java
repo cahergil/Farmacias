@@ -19,7 +19,8 @@ public interface FindContract {
         public void showNoResults();
         public void showResultsQuickSearch(List<SuggestionsBean> list);
         public void showNoResultsQuickSearch();
-        public void hideNoResults();;
+        public void hideEmptyView();
+        public void showEmptyView();
         public void showLoading();
         public void hideLoading();
         public void hideQuickSearchRecyclerView();

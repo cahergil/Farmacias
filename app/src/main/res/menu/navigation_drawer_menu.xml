@@ -16,18 +16,19 @@
             android:id="@+id/item_navigation_favoritas"
             android:icon="@drawable/ic_heart"
             android:title="@string/nd_favorites" />
-        <item
-            android:id="@+id/item_navigation_opcion2"
 
-            android:title="Opcion 2" />
     </group>
 
-    <item android:title="Subheader">
+    <item android:title="Otras" >
         <menu>
             <item
                 android:id="@+id/item_navigation_drawer_settings"
                 android:icon="@drawable/ic_settings"
                 android:title="Settings" />
+            <item
+                android:id="@+id/item_navigation_donate"
+                android:icon="@drawable/ic_help"
+                android:title="Ayuda" />
             <item
                 android:id="@+id/item_navigation_drawer_help_and_feedback"
                 android:icon="@drawable/ic_donate"

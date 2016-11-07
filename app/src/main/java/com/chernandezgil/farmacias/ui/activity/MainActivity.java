@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements
     Drawable menuDrawable;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
+    @BindView(R.id.bottom_navigation)
+    BottomNavigationView bottomNavigationView;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -163,12 +165,12 @@ public class MainActivity extends AppCompatActivity implements
             buildGoogleApiClient();
         } else if(!isInPermission) {
             isInPermission = true;
-            ActivityCompat
-                    .requestPermissions(this,
+            ActivityCompat.requestPermissions(this,
                             netPermissions(getDesiredPermissions()),
                             REQUEST_PERMISSION);
         }
         setupNavigationDrawerContent(navigationView);
+        setupBottomNavigation();
 
 
     }
@@ -312,6 +314,9 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
 
     private void setupNavigationDrawerContent(NavigationView navigationView) {
 
@@ -330,8 +335,9 @@ public class MainActivity extends AppCompatActivity implements
                     case R.id.item_navigation_favoritas:
                         option = 2;
                         break;
-                    case R.id.item_navigation_opcion2:
-                        option = 3;
+
+                    case R.id.item_navigation_drawer_settings:
+                        option = 4;
                         break;
                     default:
                         return true;
@@ -351,6 +357,32 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private void setupBottomNavigation() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int option;
+                switch (item.getItemId()) {
+                    case R.id.bn_alrededor:
+                        option = 0;
+                        break;
+                    case R.id.bn_buscar:
+                        option = 1;
+                        break;
+                    case R.id.bn_favoritos:
+                        option = 2;
+                        break;
+                    default: return false;
+                }
+                launchFragment(option);
+                mCurrentFragment = option;
+                return false;
+            }
+        });
+
+        bottomNavigationView.setTranslationZ(6f);
+        bottomNavigationView.getChildAt(0).setSelected(true);
+    }
 
     private void launchFragment(int position) {
         Utils.logD(LOG_TAG, "launchFragment");
@@ -392,6 +424,12 @@ public class MainActivity extends AppCompatActivity implements
 
 
                 break;
+
+            case 4:
+                mRadio = mSharedPreferences.getRadio();
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(intent,REQUEST_CODE_SETTINGS);
+                overridePendingTransition(R.anim.slide_in,R.anim.stay_exit);
         }
     }
 

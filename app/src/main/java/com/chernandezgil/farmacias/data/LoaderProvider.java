@@ -36,23 +36,21 @@ public class LoaderProvider  {
 
     }
 
-    public Loader<Cursor> getPharmacies_limited(){
-
+    public  Loader<Cursor> getPharmaciesByName(String name) {
         return new CursorLoader(mContext,
                 DbContract.FarmaciasEntity.CONTENT_URI,
                 null,
-                null,
-                null,
-                DbContract.FarmaciasEntity.LOCALITY +  " ASC LIMIT 50" ) ;
-
+                DbContract.FarmaciasEntity.NAME + " like ?",
+                new String[]{"%"+ name + "%"},
+                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
+        );
     }
 
 
+     public Loader<Cursor> getPharmaciesByNameQuickSearch(String name) {
 
-    public Loader<Cursor> getPharmaciesByNameQuickSearch(String name) {
-        Uri uri =  DbContract.FarmaciasEntity.buildFarmaciasUriByNameQuickSearch(name);
         return new CursorLoader(mContext,
-                uri,
+                DbContract.FarmaciasEntity.buildFarmaciasUriByNameQuickSearch(name),
                 null,
                 DbContract.FarmaciasEntity.NAME + " like ?",
                 new String[]{"%"+ name + "%"},
@@ -60,15 +58,6 @@ public class LoaderProvider  {
         );
     }
 
-    public  Loader<Cursor> getPharmaciesByName(String name) {
-        return new CursorLoader(mContext,
-                DbContract.FarmaciasEntity.buildFarmaciasUriByName(name),
-                null,
-                DbContract.FarmaciasEntity.NAME + " like ?",
-                new String[]{"%"+ name + "%"},
-                DbContract.FarmaciasEntity.NAME + " ASC LIMIT 50"
-        );
-    }
 
     public Loader<Cursor> getFavoritesPharmacies() {
         return new CursorLoader(mContext,

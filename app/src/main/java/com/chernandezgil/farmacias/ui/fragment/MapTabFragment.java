@@ -393,7 +393,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-    //this is method to help us add a Marker to the map
+    //this is method to ic_help us add a Marker to the map
     //BitmapDescriptorFactory.defaultMarker()
     //itmapDescriptorFactory.fromResource(R.drawable.ic_maps_position)
     @Override
@@ -434,7 +434,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             handleNoResults((cameraUpdate));
         } else {
             mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_COLLAPSED);
-            mMap.moveCamera(cameraUpdate.getmCameraUpdate());
+            mMap.animateCamera(cameraUpdate.getmCameraUpdate());
         }
 
 

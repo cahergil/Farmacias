@@ -562,8 +562,9 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         LatLngBounds bounds = b.build();
         mCameraUpdate = new CustomCameraUpdate();
         if (markerCounter == 1) {
-            mCameraUpdate.setmCameraUpdate(CameraUpdateFactory.newLatLng(new LatLng(mLocation.getLatitude(),
-                    mLocation.getLongitude())));
+//            mCameraUpdate.setmCameraUpdate(CameraUpdateFactory.newLatLng(new LatLng(mLocation.getLatitude(),
+//                    mLocation.getLongitude())));
+            mCameraUpdate.setmCameraUpdate(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             mCameraUpdate.setNoResultsPosition(true);
 
 

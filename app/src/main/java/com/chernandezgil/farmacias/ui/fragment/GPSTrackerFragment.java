@@ -75,6 +75,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     }
 
     private void requestLocationSettings(){
+        if(getGoogleApiClient() == null) return;
         Utils.logD(LOG_TAG, "requestLocationSettings");
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
         PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(getGoogleApiClient(), builder.build());

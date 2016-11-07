@@ -10,6 +10,7 @@
     <color name="gray100">#F5F5F5</color>
     <color name="gray300">#E0E0E0</color>
     <color name="gray400">#BDBDBD</color>
+    <color name="gray500">#9E9E9E</color>
     <color name="gray600">#757575</color>
     <color name="gray700">#616161</color>
     <color name="gray800">#424242</color>
@@ -35,6 +36,10 @@
     <color name="fav_color">@color/blue_mobile_web</color>
     <color name="suggestions_row">#6D6D6D</color>
     <color name="color_options">#000000</color>
+    <color name="bottom_navigation_background">#ff212121</color>
+    <color name="bottom_navigation_text">@color/gray500</color>
+    <color name="bottom_navigation_icon">@color/gray500</color>
+
     <array name="colors">
         <item>#3b5999</item>
         <item>#EF6C00</item>

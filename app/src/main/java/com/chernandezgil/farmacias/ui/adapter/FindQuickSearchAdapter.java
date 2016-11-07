@@ -61,6 +61,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_suggestions_bean,parent,false);
         ViewHolder holder = new ViewHolder(view);
         holder.tvText.setOnClickListener(this);
+        holder.ivClearItem.setOnClickListener(this);
         return holder;
     }
 
@@ -69,6 +70,8 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
    //     Utils.logD(LOG_TAG,"onBindViewHolderQuickSearch:position"+position);
         SuggestionsBean suggestionsBean = mList.get(position);
         holder.ivIcon.setImageDrawable(suggestionsBean.getImageId()==0? mHistory : mLupa);
+        holder.ivClearItem.setVisibility(suggestionsBean.getImageId()==0? View.VISIBLE:View.INVISIBLE);
+        holder.ivClearItem.setTag(position);
         String name = suggestionsBean.getName();
         int startIndex = name.toLowerCase().indexOf(mSearchString.toLowerCase());
 
@@ -97,18 +100,32 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
 
     @Override
     public void onClick(View view) {
-        TextView name= (TextView)view;
-        mCallback.onClickSuggestions(name.getText().toString());
+        int id= view.getId();
+        switch (id) {
+            case R.id.textView:
+                TextView name= (TextView)view;
+                mCallback.onClickSuggestions(name.getText().toString());
+                break;
+            case R.id.ivClearItem:
+                int position = (int) view.getTag();
+                String text = mList.get(position).getName();
+                mCallback.onClickClearHistoryItem(text);
+                break;
+        }
+
     }
 
     public static interface OnClickHandler {
         public  void onClickSuggestions(String a);
+        public  void onClickClearHistoryItem(String text);
     }
      static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.imageView)
         ImageView ivIcon;
         @BindView(R.id.textView)
         TextView tvText;
+        @BindView(R.id.ivClearItem)
+        ImageView ivClearItem;
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

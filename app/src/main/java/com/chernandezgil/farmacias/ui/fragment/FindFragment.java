@@ -1,6 +1,8 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 
+import android.animation.ObjectAnimator;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +10,7 @@ import android.database.MatrixCursor;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,10 +24,12 @@ import android.support.v4.app.Fragment;
 
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -33,6 +38,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -54,6 +60,7 @@ import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.model.SuggestionsBean;
 import com.chernandezgil.farmacias.presenter.FindPresenter;
+import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.FindQuickSearchAdapter;
 import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
@@ -114,7 +121,8 @@ public class FindFragment extends Fragment implements FindContract.View,
     private PreferencesManager mSharedPreferences;
     private String mQuickSearchText;
     private Drawable mDimDrawable;
-    private boolean isBackPressed=false; //half implemented functionality, only works on portrait
+    private Toolbar mActionBar;
+
 
 
     @Override
@@ -149,6 +157,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         setUpRecyclerView();
         setDimDrawable();
         mPresenter.setView(this);
+        mActionBar=((MainActivity)getActivity()).getToolbar();
 
 
         return view;
@@ -221,7 +230,10 @@ public class FindFragment extends Fragment implements FindContract.View,
         int id = item.getItemId();
         switch (id) {
             case R.id.action_search:
-               // isBackPressed = false;
+                mActionBar.animate().translationY(-mActionBar.getHeight())
+                        .setDuration(100)
+                        .start();
+
                 mFindQuickSearchAdapter.setmSearchString(Constants.EMPTY_STRING);
                 //with onInitLoaderQuickSearch if the user introduces a search string with cero results,
                 //and after closes the search. When opening again the Quick searach rv is going to show
@@ -303,16 +315,6 @@ public class FindFragment extends Fragment implements FindContract.View,
 
                     Utils.logD(LOG_TAG, "edit_text lost focus");
                     mRecyclerView.setVisibility(View.VISIBLE);
-                    //napa, backpressed funciona cuando no esta rotada la pantalla, no se porque, da un OOM exception
-//                    if(!mRotation) {
-//                        if (isBackPressed) {
-//                            isBackPressed = false;
-//                        } else {
-//                            hideQuickSearchRecyclerView();
-//                        }
-//                    } else {
-//                        hideQuickSearchRecyclerView();
-//                    }
                     hideQuickSearchRecyclerView();
                     unDimScren();
                 }
@@ -378,7 +380,9 @@ public class FindFragment extends Fragment implements FindContract.View,
         mImageSearchBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isBackPressed = true;
+                mActionBar.animate().translationY(0)
+                        .setDuration(300)
+                        .start();
                 SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
                 //put this variable here, so that clearSearchEditor() doesn't execute another search
                 mCardOnScreen = false;
@@ -393,6 +397,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         mClearSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 clearSearchEditor();
                 requestFocusOnSearchEditor();
             }
@@ -532,10 +537,13 @@ public class FindFragment extends Fragment implements FindContract.View,
     }
 
 
-
+    @Override
+    public void showEmptyView() {
+        mEmptyView.setVisibility(View.VISIBLE);
+    }
 
     @Override
-    public void hideNoResults() {
+    public void hideEmptyView() {
 
         mEmptyView.setVisibility(View.GONE);
     }
@@ -575,9 +583,28 @@ public class FindFragment extends Fragment implements FindContract.View,
         hideQuickSearchRecyclerView();
         mSearchEditor.setText(text);
         clearFocusFromSearchEditor();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mRecyclerView,"translationY",mRootLayout.getBottom(),
+                0f);
+        animator.setDuration(300);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
+        animator.start();
+
         mPresenter.onRestartLoader(text);
 
 
+    }
+
+    @Override
+    public void onClickClearHistoryItem(String text) {
+        Uri uri = RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath("suggestions").build();
+        //don't know why but for delete operation SearchManager.SUGGEST_COLUMN_QUERY(used in DbProvider is not
+        //working. Stetho to see the name of column
+        int deletedRows = getActivity().getContentResolver().delete(uri,
+                "display1" + " like ? ",
+                new String[]{text});
+        if(deletedRows>0) {
+             mPresenter.onRestartLoaderQuickSearch(mSearchEditor.getText().toString());
+        }
     }
 
     private void clearFocusFromSearchEditor() {

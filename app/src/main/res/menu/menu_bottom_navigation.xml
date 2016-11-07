@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <item
+
+            android:id="@+id/bn_alrededor"
+            android:icon="@drawable/nearby"
+            android:enabled="true"
+            app:showAsAction="ifRoom"
+            android:title="@string/nd_localizador" />
+        <item
+            android:id="@+id/bn_buscar"
+            android:enabled="true"
+            android:icon="@drawable/ic_lupa_suggestions"
+            app:showAsAction="ifRoom"
+            android:title="Buscar" />
+        <item
+            android:id="@+id/bn_favoritos"
+            android:icon="@drawable/ic_heart"
+            android:enabled="true"
+            app:showAsAction="ifRoom"
+            android:title="@string/nd_favorites" />
+
+
+</menu>

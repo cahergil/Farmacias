@@ -27,7 +27,7 @@
 
 
     <include
-        layout="@layout/emty_results_others"
+        layout="@layout/empty_results_find"
         android:id="@+id/emptyView"
         android:visibility="gone"
         tools:visibility="visible" />

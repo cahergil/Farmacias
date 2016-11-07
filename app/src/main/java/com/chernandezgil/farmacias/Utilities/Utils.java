@@ -247,6 +247,11 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Called on dismiss in favorite fragment
+     * @param phone
+     * @return
+     */
     public static int changeFavoriteInDb(String phone) {
         Context context = MyApplication.getContext();
         Uri uri = DbContract.FarmaciasEntity.buildFavoritesUriByPhone(phone);
@@ -276,9 +281,13 @@ public class Utils {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DbContract.FarmaciasEntity.FAVORITE, newFavoriteValue);
 
+//        int rowsUpdated = context.getContentResolver().update(uri, contentValues,
+//                DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
+//                null);
+
         int rowsUpdated = context.getContentResolver().update(uri, contentValues,
-                DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
-                null);
+                DbContract.FarmaciasEntity.PHONE + " LIKE ? " ,
+                new String[]{"%"+ phone + "%"});
 
         if (rowsUpdated == 1) {
             Utils.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);

@@ -61,7 +61,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     private Location mLocation;
     private ListTabPresenter mPresenter;
     private ListTabAdapter mAdapter;
-
+    private SnackBarWrapper mSnackBar;
     private String mAddress;
 
     private Unbinder unbinder;
@@ -287,14 +287,14 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         if (key.equals(mSharedPreferences.getLocationKey())) {
-            SnackBarWrapper snackBar;
+
             //anado isAdded porque me dio este npe
             // Process: com.chernandezgil.farmacias, PID: 8683
             //java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference
             if(isAdded()) {
-                snackBar = new SnackBarWrapper(getActivity());
-                snackBar.addCallback(createSnackbarCallback());
-                snackBar.show();
+                mSnackBar = new SnackBarWrapper(getActivity());
+                mSnackBar.addCallback(createSnackbarCallback());
+                mSnackBar.show();
             }
 
         }
@@ -363,7 +363,13 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         public void onUpdateFavorite(String phone, boolean fromListMap);
     }
 
-
+    @Override
+    public void onDestroyView() {
+        if(mSnackBar != null) {
+            mSnackBar.dismiss();
+        }
+        super.onDestroyView();
+    }
 
     @Override
     public void onDetach() {

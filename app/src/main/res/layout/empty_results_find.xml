@@ -12,17 +12,20 @@
         android:layout_centerInParent="true"
         app:srcCompat="@drawable/svg_house_pharmacy_"
         />
-    <TextView
-        android:paddingEnd="@dimen/activity_horizontal_margin"
+    <TextView android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:layout_below="@+id/ivImagen"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Lista vacia"/>
+        android:textSize="20sp"
+        android:text="@string/er_no_find"
+        android:textColor="@color/black"
+        android:alpha="0.34"
+        xmlns:android="http://schemas.android.com/apk/res/android" />
 
 </RelativeLayout>

@@ -58,12 +58,20 @@
     <string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>
     <string name="fca_distancia" translatable="true">Distancia:</string>
     <!-- Searchable configuration -->
-    <string name="sc_search_hint" translatable="true">buscar farmacias</string>
+    <string name="sc_search_hint" translatable="true">Buscar...</string>
     <string name="title_activity_main2">Main2Activity</string>
 
     <!-- Navitation Drawer -->
     <string name="nd_localizador" translatable="true">Alrededor</string>
     <string name="nd_buscar" translatable="true">Buscar Farmacia</string>
     <string name="nd_favorites" translatable="true">Favorites</string>
+
+    <!-- layout_toolbar_find.xml -->
+    <string name="ltf_hint_search">Buscar farmacia</string>
+
+    <!-- empty_results -->
+    <string name="er_no_favorites">No tienes ninguna farmacia en favoritos</string>
+    <string name="er_no_find">Búsqueda sin resultados</string>
+    <string name="er_no_around">No hay farmacias a tu alrededor</string>
 
 </resources>

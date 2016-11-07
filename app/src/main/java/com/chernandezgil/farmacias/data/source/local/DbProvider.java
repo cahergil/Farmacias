@@ -29,6 +29,7 @@ public class DbProvider extends ContentProvider {
 
     private static final int FARMACIAS = 100;
     private static final int FARMACIAS_ID = 101;
+    private static final int FARMACIAS_ID_PHONE = 102;
     private static final int QUICK_SEARCH = 200;
     private static final int FAVORITE_ID = 301;
     String[] suggestionsColumnNames = {DbContract.FarmaciasEntity._ID,
@@ -40,7 +41,8 @@ public class DbProvider extends ContentProvider {
     static UriMatcher buildUriMatcher() {
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = DbContract.CONTENT_AUTHORITY;
+        final String authority = DbContract.AUTHORITY;
+        matcher.addURI(authority, DbContract.PATH_FARMACIAS + "/#", FARMACIAS_ID_PHONE);
         matcher.addURI(authority, DbContract.PATH_FARMACIAS + "/*", FARMACIAS_ID);
         matcher.addURI(authority, DbContract.PATH_FARMACIAS, FARMACIAS);
 
@@ -52,6 +54,11 @@ public class DbProvider extends ContentProvider {
         return matcher;
 
     }
+    @Override
+    public boolean onCreate() {
+        mDbHelper = new DbHelper(getContext());
+        return true;
+    }
 
     @Nullable
     @Override
@@ -61,6 +68,7 @@ public class DbProvider extends ContentProvider {
         switch (match) {
 
             case FARMACIAS_ID:
+            case FARMACIAS_ID_PHONE:
                 return DbContract.FarmaciasEntity.CONTENT_ITEM_TYPE;
             case FARMACIAS:
                 return DbContract.FarmaciasEntity.CONTENT_TYPE;
@@ -70,11 +78,6 @@ public class DbProvider extends ContentProvider {
         }
     }
 
-    @Override
-    public boolean onCreate() {
-        mDbHelper = new DbHelper(getContext());
-        return true;
-    }
 
     @Nullable
     @Override
@@ -93,17 +96,7 @@ public class DbProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case FARMACIAS_ID:
-                retCursor = mDbHelper.getReadableDatabase().query(
-                        DbContract.FarmaciasEntity.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
 
-                break;
             case QUICK_SEARCH:
 
 
@@ -197,7 +190,6 @@ public class DbProvider extends ContentProvider {
             case FARMACIAS:
                 rowsDeleted = db.delete(DbContract.FarmaciasEntity.TABLE_NAME, selection, selectionArgs);
                 break;
-
             default:
                 throw new UnsupportedOperationException("Unknown ur:" + uri);
         }
@@ -208,17 +200,18 @@ public class DbProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         final int match = mUriMatcher.match(uri);
         int rowsUpdated;
         switch (match) {
-            case FARMACIAS_ID:
-                rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, s, strings);
 
-                break;
+            case FARMACIAS_ID_PHONE:
             case FAVORITE_ID:
-                rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, s, strings);
+                rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, selection, selectionArgs);
+                break;
+            case FARMACIAS:
+                rowsUpdated = db.update(DbContract.FarmaciasEntity.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

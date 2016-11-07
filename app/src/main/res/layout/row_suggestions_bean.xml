@@ -8,6 +8,7 @@
 
     <ImageView
         android:id="@+id/imageView"
+        android:layout_weight="0.1"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_gravity="center_vertical"
@@ -26,5 +27,18 @@
         android:padding="16dp"
         android:textColor="@color/suggestions_row"
         tools:text="Carlos La Puente"/>
+
+    <ImageView
+        android:id="@+id/ivClearItem"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_weight="0.1"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="center_vertical"
+        android:tint="@color/black"
+        android:alpha="0.20"
+        app:srcCompat="@drawable/ic_clear_24dp"
+
+        />
 
 </LinearLayout>

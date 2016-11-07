@@ -211,9 +211,10 @@ public class FindPresenter implements FindContract.Presenter<FindContract.View>,
             public void run() {
                 mView.hideLoading();
                 if(list !=null && list.size()>0) {
-                    mView.hideNoResults();
+                    mView.hideEmptyView();
                     mView.showResults(list);
                 } else {
+                    mView.showEmptyView();
                     mView.showNoResults();
                 }
             }
