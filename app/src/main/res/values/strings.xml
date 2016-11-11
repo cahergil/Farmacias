@@ -70,8 +70,13 @@
     <string name="ltf_hint_search">Buscar farmacia</string>
 
     <!-- empty_results -->
-    <string name="er_no_favorites">No tienes ninguna farmacia en favoritos</string>
-    <string name="er_no_find">Búsqueda sin resultados</string>
-    <string name="er_no_around">No hay farmacias a tu alrededor</string>
+    <string name="er_no_favorites" translatable="true">No tienes ninguna farmacia en favoritos</string>
+    <string name="er_no_find" translatable="true">Búsqueda sin resultados</string>
+    <string name="er_no_around" translatable="true">No hay farmacias a tu alrededor</string>
 
+    <!-- empty_results -->
+    <string name="ma_app_title_alrededor" translatable="true">Farmacias alrededor</string>
+    <string name="ma_app_title_buscar" translatable="true">Buscar farmacia</string>
+    <string name="ma_app_title_favoritos" translatable="true">Favoritos</string>
+    <string name="ma_app_title_default" translatable="true">Farmacias</string>
 </resources>

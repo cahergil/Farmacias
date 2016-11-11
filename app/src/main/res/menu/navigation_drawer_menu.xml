@@ -14,7 +14,7 @@
             android:title="@string/nd_buscar" />
         <item
             android:id="@+id/item_navigation_favoritas"
-            android:icon="@drawable/ic_heart"
+            android:icon="@drawable/ic_heart_outline"
             android:title="@string/nd_favorites" />
 
     </group>

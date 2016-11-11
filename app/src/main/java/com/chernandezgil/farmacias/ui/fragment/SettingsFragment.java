@@ -44,6 +44,18 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_delete_history_key)));
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Utils.logD(LOG_TAG,"onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Utils.logD(LOG_TAG,"onResume");
+    }
+
     private void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);

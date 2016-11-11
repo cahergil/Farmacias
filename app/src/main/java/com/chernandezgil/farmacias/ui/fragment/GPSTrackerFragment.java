@@ -129,10 +129,6 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         return ((MainActivity) getActivity()).getLocationApiClient();
     }
 
-    private void getCurrentFragmentInDrawer() {
-        ((MainActivity) getActivity()).getCurrentFragment();
-    }
-
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)

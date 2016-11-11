@@ -69,8 +69,7 @@ import icepick.State;
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        ListTabFragment.UpdateFavorite
-{
+        ListTabFragment.UpdateFavorite {
 // TouchableWrapper.UpdateMapUserClick
 
     private static final String DIALOG_ERROR = "dialog_error";
@@ -99,16 +98,15 @@ public class MainActivity extends AppCompatActivity implements
     private TabLayoutFragment mtabFragment;
 
 
-
     private int option = 0;
-    private static final String[] PERMS=
+    private static final String[] PERMS =
             {Manifest.permission.ACCESS_FINE_LOCATION};
     private static final int REQUEST_PERMISSION = 61125;
     //IcePick variables
     @State
     boolean isInPermission = false;
     @State
-    int mCurrentFragment =0;
+    int mCurrentFragment = 0;
     @State
     boolean mResolvingConnectionError;
 
@@ -126,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
-            int  action = bundle.getInt(GPSTrackerFragment.ACTION);
-            if(action == 0) {
+            int action = bundle.getInt(GPSTrackerFragment.ACTION);
+            if (action == 0) {
                 launchFragment(0);
             }
         }
@@ -141,12 +139,7 @@ public class MainActivity extends AppCompatActivity implements
         Utils.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(Build.VERSION.SDK_INT>Build.VERSION_CODES.LOLLIPOP) {
-//            TransitionInflater inflater = TransitionInflater.from(this);
-//            Transition transition = inflater.inflateTransition(R.transition.exit_from_main);
-//            getWindow().setExitTransition(transition);
-        }
-        mUnbinder=ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         mSharedPreferences = new PreferencesManagerImp(getApplicationContext());
         mMainActivityPresenter = new MainActivityPresenter(mSharedPreferences);
         mMainActivityPresenter.setView(this);
@@ -155,22 +148,18 @@ public class MainActivity extends AppCompatActivity implements
 
         // enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
-        if (savedInstanceState == null) {
 
-         //   checkGooglePlayServicesAvailability();
-         //   initilizeStetho();
-
-        }
         if (hasAllPermissions(getDesiredPermissions())) {
             buildGoogleApiClient();
-        } else if(!isInPermission) {
+        } else if (!isInPermission) {
             isInPermission = true;
             ActivityCompat.requestPermissions(this,
-                            netPermissions(getDesiredPermissions()),
-                            REQUEST_PERMISSION);
+                    netPermissions(getDesiredPermissions()),
+                    REQUEST_PERMISSION);
         }
         setupNavigationDrawerContent(navigationView);
         setupBottomNavigation();
+        getSupportActionBar().setTitle(getTitleForOption(mCurrentFragment));
 
 
     }
@@ -188,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
     }
-
 
 
     private void enableStrictModeForDebug() {
@@ -216,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements
         return mCurrentFragment;
     }
 
+    private void setCurrentFragment(int selectedOption) {
+        mCurrentFragment = selectedOption;
+    }
 
 
     @Override
@@ -242,9 +233,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        Utils.logD(LOG_TAG, "onResume");
         IntentFilter filter = new IntentFilter(GPSTrackerFragment.BROADCAST);
-        LocalBroadcastManager.getInstance(this).registerReceiver(launcherBroadcast,filter);
-        if(mRadioChanged) {
+        LocalBroadcastManager.getInstance(this).registerReceiver(launcherBroadcast, filter);
+        if (mRadioChanged) {
             mRadioChanged = false;
             launchFragment(0);
             getTrackFragment().restartTimeCounter();
@@ -262,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         Utils.logD(LOG_TAG, "onStop");
-        if(mGoogleApiClient != null ) {
+        if (mGoogleApiClient != null) {
 //            GPSTrackerFragment trackerFragment = getTrackFragment();
 //            if (trackerFragment != null) {
 //                trackerFragment.stopTracking();
@@ -293,9 +285,9 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, SettingsActivity.class);
 //            ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
 //            startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
-            startActivityForResult(intent,REQUEST_CODE_SETTINGS);
+            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
             overridePendingTransition(
-                    R.anim.slide_in,R.anim.stay_exit);
+                    R.anim.slide_in, R.anim.stay_exit);
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
@@ -314,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    public Toolbar getToolbar(){
+    public Toolbar getToolbar() {
         return toolbar;
     }
 
@@ -337,13 +329,13 @@ public class MainActivity extends AppCompatActivity implements
                         break;
 
                     case R.id.item_navigation_drawer_settings:
-                        option = 4;
+                        option = 3;
                         break;
                     default:
                         return true;
 
                 }
-                item.setChecked(true);
+
                 drawerLayout.closeDrawer(GravityCompat.START);
                 drawerLayout.postDelayed(new Runnable() {
                     @Override
@@ -351,7 +343,10 @@ public class MainActivity extends AppCompatActivity implements
                         launchFragment(option);
                     }
                 }, 300);
-                mCurrentFragment = option;
+                setCurrentFragment(option);
+                coordinateSelection(option);
+
+
                 return true;
             }
         });
@@ -372,16 +367,59 @@ public class MainActivity extends AppCompatActivity implements
                     case R.id.bn_favoritos:
                         option = 2;
                         break;
-                    default: return false;
+                    default:
+                        return false;
                 }
                 launchFragment(option);
-                mCurrentFragment = option;
-                return false;
+                setCurrentFragment(option);
+                coordinateSelection(option);
+                return true;
             }
         });
 
-        bottomNavigationView.setTranslationZ(6f);
-        bottomNavigationView.getChildAt(0).setSelected(true);
+        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
+            //  bottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
+            selectMenuItemBottomNavigation(mCurrentFragment);
+        }
+
+    }
+
+    private void coordinateSelection(int option) {
+        //set option BottomNavigation
+        selectMenuItemBottomNavigation(option);
+        //set option NavigationDrawer
+        Menu menu = navigationView.getMenu();
+        menu.getItem(option).setChecked(true);
+        // set app title
+        getSupportActionBar().setTitle(getTitleForOption(option));
+
+
+    }
+
+    private int getTitleForOption(int selectedOption) {
+        int title;
+        switch (selectedOption) {
+            case 0:
+                title = R.string.ma_app_title_alrededor;
+                break;
+            case 1:
+                title = R.string.ma_app_title_buscar;
+                break;
+            case 2:
+                title = R.string.ma_app_title_favoritos;
+                break;
+            default:
+                title = R.string.ma_app_title_default;
+        }
+
+        return title;
+    }
+
+    private void selectMenuItemBottomNavigation(int option) {
+        Menu menu = bottomNavigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(i == option);
+        }
     }
 
     private void launchFragment(int position) {
@@ -425,18 +463,13 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
 
-            case 4:
+            case 3:
                 mRadio = mSharedPreferences.getRadio();
                 Intent intent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(intent,REQUEST_CODE_SETTINGS);
-                overridePendingTransition(R.anim.slide_in,R.anim.stay_exit);
+                startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+                overridePendingTransition(R.anim.slide_in, R.anim.stay_exit);
         }
     }
-
-
-
-
-
 
 
     public GoogleApiClient getLocationApiClient() {
@@ -444,12 +477,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     private GPSTrackerFragment getTrackFragment() {
         return (GPSTrackerFragment) getSupportFragmentManager().findFragmentByTag(GPS_FRAG);
 
 
     }
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Utils.logD(LOG_TAG, "onConnected");
@@ -463,9 +496,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
 
-
-
-
     }
 
 
@@ -475,7 +505,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         if (mResolvingConnectionError) {
@@ -483,8 +512,8 @@ public class MainActivity extends AppCompatActivity implements
         } else if (connectionResult.hasResolution()) {
             try {
                 mResolvingConnectionError = true;
-                connectionResult.startResolutionForResult(this,REQUEST_RESOLVE_CONNECTION_ERROR);
-            } catch(IntentSender.SendIntentException e) {
+                connectionResult.startResolutionForResult(this, REQUEST_RESOLVE_CONNECTION_ERROR);
+            } catch (IntentSender.SendIntentException e) {
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
             }
@@ -513,7 +542,8 @@ public class MainActivity extends AppCompatActivity implements
 
     /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() { }
+        public ErrorDialogFragment() {
+        }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -540,9 +570,9 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Comunicates ListTabFragment with MapTabFragment
-     *
-    // * @param phone
-    // * @param flag
+     * <p>
+     * // * @param phone
+     * // * @param flag
      */
     @Override
     public void onUpdateFavorite(String phone, boolean flag) {
@@ -611,6 +641,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Permissions related methods
+     *
      * @param perms
      * @return
      */
@@ -629,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     protected String[] getDesiredPermissions() {
-        return(PERMS);
+        return (PERMS);
     }
 
     private String[] netPermissions(String[] wanted) {
@@ -652,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements
                 buildGoogleApiClient();
                 mGoogleApiClient.connect();
             } else {
-              //  handlePermissionDenied();
+                //  handlePermissionDenied();
             }
         }
     }
@@ -663,10 +694,10 @@ public class MainActivity extends AppCompatActivity implements
             if (resultCode == Activity.RESULT_CANCELED) {
                 finish();
             } else {
-                GPSTrackerFragment tracker =getTrackFragment();
+                GPSTrackerFragment tracker = getTrackFragment();
                 tracker.startTracking();
             }
-        } else if( requestCode == REQUEST_RESOLVE_CONNECTION_ERROR) {
+        } else if (requestCode == REQUEST_RESOLVE_CONNECTION_ERROR) {
             mResolvingConnectionError = false;
             if (resultCode == RESULT_OK) {
                 // Make sure the app is not already connected or attempting to connect
@@ -675,12 +706,12 @@ public class MainActivity extends AppCompatActivity implements
                     mGoogleApiClient.connect();
                 }
             }
-        } else if( requestCode == REQUEST_CODE_SETTINGS) {
+        } else if (requestCode == REQUEST_CODE_SETTINGS) {
             if (resultCode == RESULT_OK) {
 
-                if(mRadio != mSharedPreferences.getRadio() && mCurrentFragment==0) {
+                if (mRadio != mSharedPreferences.getRadio() && mCurrentFragment == 0) {
                     launchFragment(0);
-                    mRadioChanged =true;
+                    mRadioChanged = true;
                 }
             }
         }
