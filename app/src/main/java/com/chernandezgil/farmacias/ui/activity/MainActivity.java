@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -52,7 +51,6 @@ import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 
@@ -70,9 +68,18 @@ public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         ListTabFragment.UpdateFavorite {
-// TouchableWrapper.UpdateMapUserClick
 
+    // TouchableWrapper.UpdateMapUserClick
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final int REQUEST_RESOLVE_CONNECTION_ERROR = 1001;
+    private static final int REQUEST_CODE_SETTINGS = 2000;
+    private static final String GPS_FRAG = "gps_frag";
     private static final String DIALOG_ERROR = "dialog_error";
+    private static final String[] PERMS = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int REQUEST_CODE_PERMISSION = 61125;
+
+
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -85,23 +92,14 @@ public class MainActivity extends AppCompatActivity implements
     BottomNavigationView bottomNavigationView;
 
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
-
-
     private ActionBar actionBar;
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final int REQUEST_RESOLVE_CONNECTION_ERROR = 1001;
-    private static final int REQUEST_CODE_SETTINGS = 2000;
-    private static final String GPS_FRAG = "gps_frag";
     private MainActivityPresenter mMainActivityPresenter;
-    private TabLayoutFragment mtabFragment;
-
-
     private int option = 0;
-    private static final String[] PERMS =
-            {Manifest.permission.ACCESS_FINE_LOCATION};
-    private static final int REQUEST_PERMISSION = 61125;
+    private PreferencesManager mSharedPreferences;
+    private Unbinder mUnbinder;
+    private int mRadio;
+    private boolean mRadioChanged;
+
     //IcePick variables
     @State
     boolean isInPermission = false;
@@ -109,11 +107,6 @@ public class MainActivity extends AppCompatActivity implements
     int mCurrentFragment = 0;
     @State
     boolean mResolvingConnectionError;
-
-
-    private PreferencesManager mSharedPreferences;
-    private Unbinder mUnbinder;
-    ;
 
 
     static {
@@ -126,12 +119,10 @@ public class MainActivity extends AppCompatActivity implements
             Bundle bundle = intent.getExtras();
             int action = bundle.getInt(GPSTrackerFragment.ACTION);
             if (action == 0) {
-                launchFragment(0);
+                addFragment(0);
             }
         }
     };
-    private int mRadio;
-    private boolean mRadioChanged;
 
 
     @Override
@@ -155,57 +146,13 @@ public class MainActivity extends AppCompatActivity implements
             isInPermission = true;
             ActivityCompat.requestPermissions(this,
                     netPermissions(getDesiredPermissions()),
-                    REQUEST_PERMISSION);
+                    REQUEST_CODE_PERMISSION);
         }
-        setupNavigationDrawerContent(navigationView);
-        setupBottomNavigation();
+        setUpNavigationDrawerContent(navigationView);
+        setUpBottomNavigation();
         getSupportActionBar().setTitle(getTitleForOption(mCurrentFragment));
 
 
-    }
-
-    private void initilizeStetho() {
-        Stetho.initializeWithDefaults(this);
-
-    }
-
-    private void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addOnConnectionFailedListener(this)
-                .addConnectionCallbacks(this)
-                .addApi(LocationServices.API)
-                .build();
-
-    }
-
-
-    private void enableStrictModeForDebug() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectDiskReads()
-                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectLeakedSqlLiteObjects()
-                    .detectLeakedClosableObjects()
-                    .penaltyLog()
-                    .penaltyDeath()
-                    .build());
-        }
-    }
-
-
-    /**
-     * used in HandlerActivity
-     */
-    public int getCurrentFragment() {
-        return mCurrentFragment;
-    }
-
-    private void setCurrentFragment(int selectedOption) {
-        mCurrentFragment = selectedOption;
     }
 
 
@@ -238,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(launcherBroadcast, filter);
         if (mRadioChanged) {
             mRadioChanged = false;
-            launchFragment(0);
+            addFragment(0);
             getTrackFragment().restartTimeCounter();
         }
     }
@@ -274,17 +221,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+
         if (id == R.id.action_settings) {
             mRadio = mSharedPreferences.getRadio();
             Intent intent = new Intent(this, SettingsActivity.class);
-//            ActivityOptionsCompat options=ActivityOptionsCompat.makeSceneTransitionAnimation(this,null);
-//            startActivityForResult(intent,REQUEST_CODE_SETTINGS,options.toBundle());
             startActivityForResult(intent, REQUEST_CODE_SETTINGS);
             overridePendingTransition(
                     R.anim.slide_in, R.anim.stay_exit);
@@ -297,191 +240,6 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-
-    private void setUpToolBar() {
-
-        setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(menuDrawable);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-
-    private void setupNavigationDrawerContent(NavigationView navigationView) {
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-
-                switch (item.getItemId()) {
-
-                    case R.id.item_navigation_localizador:
-                        option = 0;
-                        break;
-                    case R.id.item_navigation_buscar:
-                        option = 1;
-                        break;
-                    case R.id.item_navigation_favoritas:
-                        option = 2;
-                        break;
-
-                    case R.id.item_navigation_drawer_settings:
-                        option = 3;
-                        break;
-                    default:
-                        return true;
-
-                }
-
-                drawerLayout.closeDrawer(GravityCompat.START);
-                drawerLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        launchFragment(option);
-                    }
-                }, 300);
-                setCurrentFragment(option);
-                coordinateSelection(option);
-
-
-                return true;
-            }
-        });
-    }
-
-    private void setupBottomNavigation() {
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int option;
-                switch (item.getItemId()) {
-                    case R.id.bn_alrededor:
-                        option = 0;
-                        break;
-                    case R.id.bn_buscar:
-                        option = 1;
-                        break;
-                    case R.id.bn_favoritos:
-                        option = 2;
-                        break;
-                    default:
-                        return false;
-                }
-                launchFragment(option);
-                setCurrentFragment(option);
-                coordinateSelection(option);
-                return true;
-            }
-        });
-
-        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
-            //  bottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
-            selectMenuItemBottomNavigation(mCurrentFragment);
-        }
-
-    }
-
-    private void coordinateSelection(int option) {
-        //set option BottomNavigation
-        selectMenuItemBottomNavigation(option);
-        //set option NavigationDrawer
-        Menu menu = navigationView.getMenu();
-        menu.getItem(option).setChecked(true);
-        // set app title
-        getSupportActionBar().setTitle(getTitleForOption(option));
-
-
-    }
-
-    private int getTitleForOption(int selectedOption) {
-        int title;
-        switch (selectedOption) {
-            case 0:
-                title = R.string.ma_app_title_alrededor;
-                break;
-            case 1:
-                title = R.string.ma_app_title_buscar;
-                break;
-            case 2:
-                title = R.string.ma_app_title_favoritos;
-                break;
-            default:
-                title = R.string.ma_app_title_default;
-        }
-
-        return title;
-    }
-
-    private void selectMenuItemBottomNavigation(int option) {
-        Menu menu = bottomNavigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setChecked(i == option);
-        }
-    }
-
-    private void launchFragment(int position) {
-        Utils.logD(LOG_TAG, "launchFragment");
-        FragmentManager fragmentManager;
-
-        switch (position) {
-            case 0:
-                try {
-
-                    fragmentManager = getSupportFragmentManager();
-                    mtabFragment = new TabLayoutFragment();
-                    FragmentTransaction ft = fragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment, mtabFragment)
-                            .commit();
-
-                } catch (IllegalStateException ignored) {
-                    Utils.logD(LOG_TAG, "IllegalStateException:" + ignored.getMessage());
-                }
-
-                break;
-            case 1:
-
-                fragmentManager = getSupportFragmentManager();
-                FindFragment findFragment = new FindFragment();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment, findFragment)
-                        .commit();
-
-
-                break;
-
-            case 2:
-
-                fragmentManager = getSupportFragmentManager();
-                FavoriteFragment favoriteFragment = new FavoriteFragment();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment, favoriteFragment)
-                        .commit();
-
-
-                break;
-
-            case 3:
-                mRadio = mSharedPreferences.getRadio();
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivityForResult(intent, REQUEST_CODE_SETTINGS);
-                overridePendingTransition(R.anim.slide_in, R.anim.stay_exit);
-        }
-    }
-
-
-    public GoogleApiClient getLocationApiClient() {
-        return mGoogleApiClient;
-    }
-
-
-    private GPSTrackerFragment getTrackFragment() {
-        return (GPSTrackerFragment) getSupportFragmentManager().findFragmentByTag(GPS_FRAG);
-
-
-    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -522,6 +280,313 @@ public class MainActivity extends AppCompatActivity implements
             showErrorDialog(connectionResult.getErrorCode());
             mResolvingConnectionError = true;
         }
+    }
+
+    /**
+     * Comunicates ListTabFragment with MapTabFragment
+     * <p>
+     * // * @param phone
+     * // * @param flag
+     */
+    @Override
+    public void onUpdateFavorite(String phone, boolean flag) {
+        MapTabFragment mapTabFragment = getMapTabFragment();
+        if (mapTabFragment != null) {
+            mapTabFragment.updateClickedPhoneToPresenter(phone);
+            mapTabFragment.removeMarkerInPresenter(phone);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Utils.logD(LOG_TAG, "onBackPressed");
+        int currentItem = getCurrentFragmentInTab();
+        if (currentItem != 1) super.onBackPressed();
+        MapTabFragment mapTabFragment = getMapTabFragment();
+        if (mapTabFragment != null) {
+
+            if (!mapTabFragment.collapseBottomSheet()) {
+                super.onBackPressed();
+            } else {
+                return;
+            }
+
+        }
+
+        super.onBackPressed();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        isInPermission = false;
+        if (requestCode == REQUEST_CODE_PERMISSION) {
+            if (hasAllPermissions(getDesiredPermissions())) {
+                buildGoogleApiClient();
+                mGoogleApiClient.connect();
+            } else {
+                //  handlePermissionDenied();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == GPSTrackerFragment.REQUEST_CHECK_SETTINGS) {
+            if (resultCode == Activity.RESULT_CANCELED) {
+                finish();
+            } else {
+                GPSTrackerFragment tracker = getTrackFragment();
+                tracker.startTracking();
+            }
+        } else if (requestCode == REQUEST_RESOLVE_CONNECTION_ERROR) {
+            mResolvingConnectionError = false;
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!mGoogleApiClient.isConnecting() &&
+                        !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        } else if (requestCode == REQUEST_CODE_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+
+                if (mRadio != mSharedPreferences.getRadio() && mCurrentFragment == 0) {
+                    addFragment(0);
+                    mRadioChanged = true;
+                }
+            }
+        }
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        Utils.logD(LOG_TAG, "onDestroy");
+        mUnbinder.unbind();
+        mMainActivityPresenter.detachView();
+        super.onDestroy();
+    }
+
+    private void initilizeStetho() {
+        Stetho.initializeWithDefaults(this);
+
+    }
+
+    private void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+
+    }
+
+
+    private void enableStrictModeForDebug() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build());
+        }
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    private void setUpToolBar() {
+
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(menuDrawable);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void setUpNavigationDrawerContent(NavigationView navigationView) {
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+
+                switch (item.getItemId()) {
+
+                    case R.id.item_navigation_localizador:
+                        option = 0;
+                        break;
+                    case R.id.item_navigation_buscar:
+                        option = 1;
+                        break;
+                    case R.id.item_navigation_favoritas:
+                        option = 2;
+                        break;
+
+                    case R.id.item_navigation_drawer_settings:
+                        option = 3;
+                        break;
+                    default:
+                        return true;
+
+                }
+
+                drawerLayout.closeDrawer(GravityCompat.START);
+                drawerLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (option<=2) {
+                            addFragment(option);
+                        } else {
+                            launchSettings();
+                        }
+
+                    }
+                }, 300);
+                setCurrentFragment(option);
+                coordinateSelection(option);
+
+
+                return true;
+            }
+        });
+    }
+
+    private void setUpBottomNavigation() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int option;
+                switch (item.getItemId()) {
+                    case R.id.bn_alrededor:
+                        option = 0;
+                        break;
+                    case R.id.bn_buscar:
+                        option = 1;
+                        break;
+                    case R.id.bn_favoritos:
+                        option = 2;
+                        break;
+                    default:
+                        return false;
+                }
+                addFragment(option);
+                setCurrentFragment(option);
+                coordinateSelection(option);
+                return true;
+            }
+        });
+
+        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
+            //  bottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
+            selectMenuItemBottomNavigation(mCurrentFragment);
+        }
+
+    }
+
+    private void coordinateSelection(int option) {
+        //set option BottomNavigation
+        selectMenuItemBottomNavigation(option);
+        //set option NavigationDrawer
+        Menu menu = navigationView.getMenu();
+        menu.getItem(option).setChecked(true);
+        // set app title
+        getSupportActionBar().setTitle(getTitleForOption(option));
+
+
+    }
+
+
+    private int getTitleForOption(int selectedOption) {
+        int title;
+        switch (selectedOption) {
+            case 0:
+                title = R.string.ma_app_title_alrededor;
+                break;
+            case 1:
+                title = R.string.ma_app_title_buscar;
+                break;
+            case 2:
+                title = R.string.ma_app_title_favoritos;
+                break;
+            default:
+                title = R.string.ma_app_title_default;
+        }
+
+        return title;
+    }
+
+    private void selectMenuItemBottomNavigation(int option) {
+        Menu menu = bottomNavigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(i == option);
+        }
+    }
+
+    private void addFragment(int position) {
+        Utils.logD(LOG_TAG, "addFragment");
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment;
+
+        switch (position) {
+            case 0:
+                 fragment = new TabLayoutFragment();
+                 break;
+            case 1:
+                fragment = new FindFragment();
+                break;
+
+            case 2:
+                fragment = new FavoriteFragment();
+                break;
+
+            default: return;
+
+
+
+        }
+        ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        ft.replace(R.id.fragment,fragment).commit();
+
+
+    }
+
+    private void launchSettings(){
+        mRadio = mSharedPreferences.getRadio();
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_SETTINGS);
+        overridePendingTransition(R.anim.slide_in, R.anim.stay_exit);
+    }
+
+    public GoogleApiClient getLocationApiClient() {
+        return mGoogleApiClient;
+    }
+
+
+    private GPSTrackerFragment getTrackFragment() {
+        return (GPSTrackerFragment) getSupportFragmentManager().findFragmentByTag(GPS_FRAG);
+
+
+    }
+
+    /**
+     * used in HandlerActivity
+     */
+    public int getCurrentFragment() {
+        return mCurrentFragment;
+    }
+
+    private void setCurrentFragment(int selectedOption) {
+        mCurrentFragment = selectedOption;
     }
 
     /* Creates a dialog for an error message */
@@ -568,20 +633,6 @@ public class MainActivity extends AppCompatActivity implements
 //        }
 //    }
 
-    /**
-     * Comunicates ListTabFragment with MapTabFragment
-     * <p>
-     * // * @param phone
-     * // * @param flag
-     */
-    @Override
-    public void onUpdateFavorite(String phone, boolean flag) {
-        MapTabFragment mapTabFragment = getMapTabFragment();
-        if (mapTabFragment != null) {
-            mapTabFragment.updateClickedPhoneToPresenter(phone);
-            mapTabFragment.removeMarkerInPresenter(phone);
-        }
-    }
 
     private MapTabFragment getMapTabFragment() {
         List<Fragment> list = getSupportFragmentManager().getFragments();
@@ -618,26 +669,6 @@ public class MainActivity extends AppCompatActivity implements
         return 0;
     }
 
-    @Override
-    public void onBackPressed() {
-
-        Utils.logD(LOG_TAG, "onBackPressed");
-        int currentItem = getCurrentFragmentInTab();
-        if (currentItem != 1) super.onBackPressed();
-        MapTabFragment mapTabFragment = getMapTabFragment();
-        if (mapTabFragment != null) {
-
-            if (!mapTabFragment.collapseBottomSheet()) {
-                super.onBackPressed();
-            } else {
-                return;
-            }
-
-        }
-
-        super.onBackPressed();
-
-    }
 
     /**
      * Permissions related methods
@@ -675,55 +706,8 @@ public class MainActivity extends AppCompatActivity implements
         return (result.toArray(new String[result.size()]));
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        isInPermission = false;
-        if (requestCode == REQUEST_PERMISSION) {
-            if (hasAllPermissions(getDesiredPermissions())) {
-                buildGoogleApiClient();
-                mGoogleApiClient.connect();
-            } else {
-                //  handlePermissionDenied();
-            }
-        }
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GPSTrackerFragment.REQUEST_CHECK_SETTINGS) {
-            if (resultCode == Activity.RESULT_CANCELED) {
-                finish();
-            } else {
-                GPSTrackerFragment tracker = getTrackFragment();
-                tracker.startTracking();
-            }
-        } else if (requestCode == REQUEST_RESOLVE_CONNECTION_ERROR) {
-            mResolvingConnectionError = false;
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!mGoogleApiClient.isConnecting() &&
-                        !mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.connect();
-                }
-            }
-        } else if (requestCode == REQUEST_CODE_SETTINGS) {
-            if (resultCode == RESULT_OK) {
-
-                if (mRadio != mSharedPreferences.getRadio() && mCurrentFragment == 0) {
-                    launchFragment(0);
-                    mRadioChanged = true;
-                }
-            }
-        }
-
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        Utils.logD(LOG_TAG, "onDestroy");
-        mUnbinder.unbind();
-        mMainActivityPresenter.detachView();
-        super.onDestroy();
+    private BottomNavigationView getBottomNavigationView(){
+        return bottomNavigationView;
     }
 }

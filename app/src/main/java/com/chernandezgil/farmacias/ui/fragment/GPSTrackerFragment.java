@@ -36,13 +36,13 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     private static final String LOG_TAG = GPSTrackerFragment.class.getSimpleName();
     private static long GPS_FATEST_INTERVAL = TimeUnit.SECONDS.toMillis(10);
     private static long GPS_INTERVAL = GPS_FATEST_INTERVAL;
-    private static long FRAG_MAP_REFRESH_INTERVAL = TimeUnit.MINUTES.toSeconds(4);
+    private static long FRAG_MAP_REFRESH_INTERVAL = TimeUnit.SECONDS.toSeconds(4);
     private static boolean mFirstRun = false;
     public static final String BROADCAST = "broadcast";
     public static final String ACTION = "launch_fragment_0";
     private long mElapsedTime;
     private long mStartTime;
-    private static boolean mColdStart;
+
     private PreferencesManager mSharedPreferences;
 
     public GPSTrackerFragment() {

@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-
         tools:context=".ui.activity.MainActivity">
         <!--white background for the reveal effect, so it doesn't show the red color-->
         <android.support.design.widget.AppBarLayout
@@ -43,7 +42,13 @@
         </android.support.design.widget.AppBarLayout>
 
         <include layout="@layout/content_main" />
+        <FrameLayout
+            android:id="@+id/mainFrame"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:visibility="gone">
 
+        </FrameLayout>
         <android.support.design.widget.BottomNavigationView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/bottom_navigation"

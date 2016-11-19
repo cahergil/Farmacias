@@ -2,7 +2,10 @@ package com.chernandezgil.farmacias.customwidget;
 
 import android.app.Activity;
 import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.widget.FrameLayout;
 
+import com.chernandezgil.farmacias.R;
 import com.github.andrewlord1990.snackbarbuilder.SnackbarBuilder;
 import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 
@@ -14,24 +17,28 @@ public class SnackBarWrapper {
     private Activity context;
     private Snackbar snackbar;
     SnackbarBuilder builder;
+    FrameLayout frameLayout;
 
     public SnackBarWrapper(Activity context) {
+
         this.context = context;
         builder = new SnackbarBuilder(context)
-                .message("Nuevas localizacion detectada")
-                .duration(Snackbar.LENGTH_INDEFINITE)
 
+                .message("Nueva localizacion detectada")
+                .duration(Snackbar.LENGTH_INDEFINITE)
                 .actionText("ACTUALIZAR");
 
-
+        frameLayout = (FrameLayout) context.findViewById(R.id.mainFrame);
 
     }
 
     public void show() {
+        frameLayout.setVisibility(View.VISIBLE);
         snackbar.show();
 
     }
     public void dismiss(){
+        frameLayout.setVisibility(View.GONE);
         snackbar.dismiss();
     }
     public void addCallback(SnackbarCallback snackbarCallback) {
