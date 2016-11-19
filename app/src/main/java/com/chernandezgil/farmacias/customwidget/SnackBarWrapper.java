@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.customwidget;
 
 import android.app.Activity;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -17,7 +18,7 @@ public class SnackBarWrapper {
     private Activity context;
     private Snackbar snackbar;
     SnackbarBuilder builder;
-    FrameLayout frameLayout;
+    CoordinatorLayout frameLayout;
 
     public SnackBarWrapper(Activity context) {
 
@@ -28,7 +29,7 @@ public class SnackBarWrapper {
                 .duration(Snackbar.LENGTH_INDEFINITE)
                 .actionText("ACTUALIZAR");
 
-        frameLayout = (FrameLayout) context.findViewById(R.id.mainFrame);
+        frameLayout = (CoordinatorLayout) context.findViewById(R.id.snackContainer);
 
     }
 

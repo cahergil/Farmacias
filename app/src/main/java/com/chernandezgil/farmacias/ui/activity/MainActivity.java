@@ -20,7 +20,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -33,6 +32,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.Utilities.Utils;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.bottom_navigation)
-    BottomNavigationView bottomNavigationView;
+    BottomNavigationView mBottomNavigationView;
 
     private GoogleApiClient mGoogleApiClient;
     private ActionBar actionBar;
@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setUpBottomNavigation() {
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int option;
@@ -482,17 +482,30 @@ public class MainActivity extends AppCompatActivity implements
                 addFragment(option);
                 setCurrentFragment(option);
                 coordinateSelection(option);
+         //       applyEffectsOnText(option);
                 return true;
             }
         });
 
         if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
-            //  bottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
+            //  mBottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
             selectMenuItemBottomNavigation(mCurrentFragment);
         }
-
+        applyEffectsOnText();
     }
 
+    private void applyEffectsOnText() {
+
+        Menu menu = mBottomNavigationView.getMenu();
+
+
+        for (int i = 0; i <menu.size() ; i++) {
+            MenuItem menuItem= menu.getItem(option);
+            menuItem.setActionView( R.layout.aaa);
+        }
+
+        //menuItem.
+    }
     private void coordinateSelection(int option) {
         //set option BottomNavigation
         selectMenuItemBottomNavigation(option);
@@ -526,9 +539,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void selectMenuItemBottomNavigation(int option) {
-        Menu menu = bottomNavigationView.getMenu();
+        Menu menu = mBottomNavigationView.getMenu();
         for (int i = 0; i < menu.size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setChecked(i == option);
+            mBottomNavigationView.getMenu().getItem(i).setChecked(i == option);
         }
     }
 
@@ -708,6 +721,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private BottomNavigationView getBottomNavigationView(){
-        return bottomNavigationView;
+        return mBottomNavigationView;
     }
 }

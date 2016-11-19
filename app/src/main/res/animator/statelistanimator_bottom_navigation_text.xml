@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:targetApi="21">
+
+    <item android:state_activated="true" android:animation="@animator/bottom_navigation_text_expand" />
+    <item android:animation="@animator/bottom_navigation_text_contract"/>
+
+
+</selector>
