@@ -1,6 +1,9 @@
 package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -33,9 +36,13 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.customwidget.CheckableImageView;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -60,6 +67,7 @@ import java.util.List;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import icepick.Icepick;
 import icepick.State;
@@ -80,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int REQUEST_CODE_PERMISSION = 61125;
 
 
+
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -88,8 +97,32 @@ public class MainActivity extends AppCompatActivity implements
     Drawable menuDrawable;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.bottom_navigation)
+//    @BindView(R.id.bottom_navigation)
     BottomNavigationView mBottomNavigationView;
+
+    //botomview controls
+//    @BindView(R.id.bnv_around)
+//    CheckableImageView mIvAround;
+//    @BindView(R.id.bnv_buscar)
+//    ImageView mIvBuscar;
+//    @BindView(R.id.bnv_favoritos)
+//    ImageView mIvFavoritos;
+//
+//    @BindView(R.id.text_around)
+//    TextView mTvAround;
+//    @BindView(R.id.text_buscar)
+//    TextView mTvBuscar;
+//    @BindView(R.id.text_favoritos)
+//    TextView mTvFavoritos;
+//
+//    @BindView(R.id.llAround)
+//    LinearLayout mLlAround;
+//    @BindView(R.id.llBuscar)
+//    LinearLayout mLlBuscar;
+//    @BindView(R.id.llFavorite)
+//    LinearLayout mLlFavorite;
+
+
 
     private GoogleApiClient mGoogleApiClient;
     private ActionBar actionBar;
@@ -240,6 +273,89 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+//    @Override
+//    public void onClick(View view) {
+//        int id = view.getId();
+//        switch (id) {
+//            case R.id.llAround:
+//                AnimatorSet set = new AnimatorSet();
+//                mIvAround.setChecked(true);
+//
+//                set.playTogether(
+//                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_X, 0, 1).setDuration(ANIMATION_DURATION),
+//                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_Y, 0, 1).setDuration(ANIMATION_DURATION),
+//                        ObjectAnimator.ofFloat(mIvAround,View.TRANSLATION_Y,-Utils.convertDpToPixel(10,this))
+//                        .setDuration(ANIMATION_DURATION)
+//                );
+//                 set.addListener(new Animator.AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animator) {
+//                        mTvAround.setVisibility(View.VISIBLE);
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animator) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animator) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animator) {
+//
+//                    }
+//                });
+//                set.start();
+//                //mTvAround.animate().
+//                break;
+//            case R.id.llBuscar:
+//                mIvAround.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+//                mTvAround.animate().scaleY(0).
+//                        scaleX(0).start();
+//
+////                AnimatorSet set1 = new AnimatorSet();
+////
+////
+////                set1.playTogether(
+//////                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_X, 1, 0).setDuration(300),
+//////                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_Y, 1, 0).setDuration(300),
+////                        ObjectAnimator.ofFloat(mIvAround,View.TRANSLATION_Y,Utils.convertDpToPixel(1,this))
+////                                .setDuration(300)
+////                );
+////                set1.addListener(new Animator.AnimatorListener() {
+////                    @Override
+////                    public void onAnimationStart(Animator animator) {
+////
+////                    }
+////
+////                    @Override
+////                    public void onAnimationEnd(Animator animator) {
+////                     //   mTvAround.setVisibility(View.INVISIBLE);
+////                    }
+////
+////                    @Override
+////                    public void onAnimationCancel(Animator animator) {
+////
+////                    }
+////
+////                    @Override
+////                    public void onAnimationRepeat(Animator animator) {
+////
+////                    }
+////                });
+////                set1.start();
+//                break;
+//            case R.id.llFavorite:
+//                break;
+//
+//            default: return;
+//
+//        }
+//
+//    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -462,50 +578,41 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setUpBottomNavigation() {
-        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int option;
-                switch (item.getItemId()) {
-                    case R.id.bn_alrededor:
-                        option = 0;
-                        break;
-                    case R.id.bn_buscar:
-                        option = 1;
-                        break;
-                    case R.id.bn_favoritos:
-                        option = 2;
-                        break;
-                    default:
-                        return false;
-                }
-                addFragment(option);
-                setCurrentFragment(option);
-                coordinateSelection(option);
-         //       applyEffectsOnText(option);
-                return true;
-            }
-        });
+//        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                int option;
+//                switch (item.getItemId()) {
+//                    case R.id.bn_alrededor:
+//                        option = 0;
+//                        break;
+//                    case R.id.bn_buscar:
+//                        option = 1;
+//                        break;
+//                    case R.id.bn_favoritos:
+//                        option = 2;
+//                        break;
+//                    default:
+//                        return false;
+//                }
+//                addFragment(option);
+//                setCurrentFragment(option);
+//                coordinateSelection(option);
+//                return true;
+//            }
+//        });
+//
+//        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
+//            //  mBottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
+//            selectMenuItemBottomNavigation(mCurrentFragment);
+//        }
+//            mLlAround.setOnClickListener(this);
+//            mLlBuscar.setOnClickListener(this);
+//            mLlFavorite.setOnClickListener(this);
 
-        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
-            //  mBottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
-            selectMenuItemBottomNavigation(mCurrentFragment);
-        }
-        applyEffectsOnText();
     }
 
-    private void applyEffectsOnText() {
 
-        Menu menu = mBottomNavigationView.getMenu();
-
-
-        for (int i = 0; i <menu.size() ; i++) {
-            MenuItem menuItem= menu.getItem(option);
-            menuItem.setActionView( R.layout.aaa);
-        }
-
-        //menuItem.
-    }
     private void coordinateSelection(int option) {
         //set option BottomNavigation
         selectMenuItemBottomNavigation(option);

@@ -378,6 +378,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+                            if(count>15) mCancelThread=true;
                         }
                         if(!mCancelThread) {
                             moveCamera(cu);

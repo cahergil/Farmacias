@@ -38,7 +38,8 @@
     <color name="color_options">#000000</color>
     <color name="bottom_navigation_background">#ff212121</color>
     <color name="bottom_navigation_text">@color/gray500</color>
-    <color name="bottom_navigation_icon">@color/gray500</color>
+    <color name="bottom_navigation_icon_selected">@color/white</color>
+    <color name="bottom_navigation_icon_unselected">@color/gray500</color>
 
     <array name="colors">
         <item>#3b5999</item>

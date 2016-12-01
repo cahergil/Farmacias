@@ -3,6 +3,7 @@ package com.chernandezgil.farmacias.ui.activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
@@ -15,6 +16,11 @@ import com.chernandezgil.farmacias.ui.fragment.SettingsFragment;
 public class SettingsActivity extends AppCompatActivity {
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
     private ActionBar actionBar;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

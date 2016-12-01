@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!--si no pongo bien ?android:color... no funciona
+ Normalmente se pone: ?android:colorControlHighlight pero aqui
+ prefiereo poner otro color.
+ si se usa compat library alguien dice:
+ android:background="?attr/selectableItemBackground"
+ http://stackoverflow.com/questions/38145853/ripple-effect-not-working-in-relative-layout-with-image
+ -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@android:color/white"
+    tools:targetApi="21">
+
+
+</ripple>
