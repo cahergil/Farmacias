@@ -31,8 +31,7 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
     private SparseArray<CheckableImageView> mHasMapImages;
     private SparseArray<TextView> mHasMapText;
     private int lastCheckedId = NONE;
-    private AnimatorSet animatorCheck = new AnimatorSet();
-    private AnimatorSet animatorUncheck = new AnimatorSet();
+
     private BottomNavigationListener mListener;
 
 
@@ -79,8 +78,8 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        animatorCheck = new AnimatorSet();
-        animatorUncheck = new AnimatorSet();
+//        animatorcheck = new animatorset();
+//        animatoruncheck = new animatorset();
         int id = view.getId();
 
         if(id == lastCheckedId) {
@@ -88,12 +87,32 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             return;
         }
         moveAnimations(id,true);
-
+        if(mListener != null ) {
+            mListener.onBottomNavigationClick(getOption(id));
+        }
 
 
     }
 
-    public void upDateStatus(int option) {
+    private int getOption(int id) {
+        int option;
+        switch (id) {
+            case R.id.llAround:
+                option = 0;
+                break;
+            case R.id.llBuscar:
+                option = 1;
+                break;
+            case R.id.llFavorite:
+                option = 2;
+                break;
+            default: option =0;
+        }
+        return option;
+
+    }
+
+    private int getId(int option) {
         int id;
         switch (option) {
             case 0:
@@ -107,22 +126,16 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
                 break;
             default: id =R.id.llAround;
         }
-        moveAnimations(id,false);
+
+        return id;
+    }
+    public void upDateStatus(int option) {
+
+        moveAnimations(getId(option),false);
     }
     private void moveAnimations(int id, boolean move) {
-        int option;
-        switch (id) {
-            case R.id.llAround:
-                option = 0;
-                break;
-            case R.id.llBuscar:
-                option = 1;
-                break;
-            case R.id.llFavorite:
-                option = 2;
-                break;
-            default:option=0;
-        }
+        AnimatorSet animatorCheck = new AnimatorSet();
+        AnimatorSet animatorUncheck = new AnimatorSet();
 
         ivAround.setChecked(id == R.id.llAround);
         ivBuscar.setChecked(id == R.id.llBuscar);
@@ -161,9 +174,7 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             animatorUncheck.start();
         }
         animatorCheck.start();
-        if(mListener != null) {
-            mListener.onBottomNavigationClick(option);
-        }
+
 
 
     }

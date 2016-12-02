@@ -91,31 +91,6 @@ public class MainActivity extends AppCompatActivity implements
     @BindView(R.id.bottom_navigation)
     BottomNavigation mBottomNavigationView;
 
-//    @BindView(R.id.bottom_navigation)
-  //  BottomNavigationView mBottomNavigationView;
-
-    //botomview controls
-//    @BindView(R.id.bnv_around)
-//    CheckableImageView mIvAround;
-//    @BindView(R.id.bnv_buscar)
-//    ImageView mIvBuscar;
-//    @BindView(R.id.bnv_favoritos)
-//    ImageView mIvFavoritos;
-//
-//    @BindView(R.id.text_around)
-//    TextView mTvAround;
-//    @BindView(R.id.text_buscar)
-//    TextView mTvBuscar;
-//    @BindView(R.id.text_favoritos)
-//    TextView mTvFavoritos;
-//
-//    @BindView(R.id.llAround)
-//    LinearLayout mLlAround;
-//    @BindView(R.id.llBuscar)
-//    LinearLayout mLlBuscar;
-//    @BindView(R.id.llFavorite)
-//    LinearLayout mLlFavorite;
-
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -163,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         mMainActivityPresenter.setView(this);
         mMainActivityPresenter.onStart();
         setUpToolBar();
-        setUpBottomNavigation();
+
         // enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
 
@@ -177,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         setUpNavigationDrawerContent(navigationView);
         getSupportActionBar().setTitle(getTitleForOption(mCurrentFragment));
-
+        setUpBottomNavigation();
 
     }
 
@@ -550,8 +525,9 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                     drawerLayout.closeDrawer(GravityCompat.START);
-                    postLaunchFragment(option);
-                coordinateSelection(option);
+                    coordinateSelection(option);
+                    //postLaunchFragment(option);
+
 
 
                 return true;
@@ -577,7 +553,9 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void setUpBottomNavigation() {
+        mBottomNavigationView.upDateStatus(mCurrentFragment);
         mBottomNavigationView.setOnClickBottomNavigationListener(this);
+
 
     }
 
