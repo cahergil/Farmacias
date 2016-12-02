@@ -1,9 +1,6 @@
 package com.chernandezgil.farmacias.ui.activity;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -18,7 +15,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -35,14 +31,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.Utilities.Utils;
-import com.chernandezgil.farmacias.customwidget.CheckableImageView;
+import com.chernandezgil.farmacias.customwidget.BottomNavigation;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
@@ -67,7 +59,6 @@ import java.util.List;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 import icepick.Icepick;
 import icepick.State;
@@ -75,7 +66,7 @@ import icepick.State;
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        ListTabFragment.UpdateFavorite {
+        ListTabFragment.UpdateFavorite,BottomNavigation.BottomNavigationListener {
 
     // TouchableWrapper.UpdateMapUserClick
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -97,8 +88,11 @@ public class MainActivity extends AppCompatActivity implements
     Drawable menuDrawable;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.bottom_navigation)
+    BottomNavigation mBottomNavigationView;
+
 //    @BindView(R.id.bottom_navigation)
-    BottomNavigationView mBottomNavigationView;
+  //  BottomNavigationView mBottomNavigationView;
 
     //botomview controls
 //    @BindView(R.id.bnv_around)
@@ -169,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
         mMainActivityPresenter.setView(this);
         mMainActivityPresenter.onStart();
         setUpToolBar();
-
+        setUpBottomNavigation();
         // enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
 
@@ -182,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements
                     REQUEST_CODE_PERMISSION);
         }
         setUpNavigationDrawerContent(navigationView);
-        setUpBottomNavigation();
         getSupportActionBar().setTitle(getTitleForOption(mCurrentFragment));
 
 
@@ -556,19 +549,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
 
-                drawerLayout.closeDrawer(GravityCompat.START);
-                drawerLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (option<=2) {
-                            addFragment(option);
-                        } else {
-                            launchSettings();
-                        }
-
-                    }
-                }, 300);
-                setCurrentFragment(option);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    postLaunchFragment(option);
                 coordinateSelection(option);
 
 
@@ -577,54 +559,63 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void setUpBottomNavigation() {
-//        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                int option;
-//                switch (item.getItemId()) {
-//                    case R.id.bn_alrededor:
-//                        option = 0;
-//                        break;
-//                    case R.id.bn_buscar:
-//                        option = 1;
-//                        break;
-//                    case R.id.bn_favoritos:
-//                        option = 2;
-//                        break;
-//                    default:
-//                        return false;
-//                }
-//                addFragment(option);
-//                setCurrentFragment(option);
-//                coordinateSelection(option);
-//                return true;
-//            }
-//        });
-//
-//        if (mCurrentFragment >= 0 && mCurrentFragment <= 3) {
-//            //  mBottomNavigationView.getChildAt(mCurrentFragment).setSelected(true); da npe
-//            selectMenuItemBottomNavigation(mCurrentFragment);
-//        }
-//            mLlAround.setOnClickListener(this);
-//            mLlBuscar.setOnClickListener(this);
-//            mLlFavorite.setOnClickListener(this);
+    private void postLaunchFragment(int option) {
+
+        drawerLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (option<=2) {
+                    addFragment(option);
+                } else {
+                    launchSettings();
+                }
+
+            }
+        }, 300);
 
     }
 
+
+    private void setUpBottomNavigation() {
+        mBottomNavigationView.setOnClickBottomNavigationListener(this);
+
+    }
+
+    @Override
+    public void onBottomNavigationClick(int option) {
+       
+                updateNavigationDrawerSelection(option);
+                updateToolBarTitle(option);
+                setCurrentFragment(option);
+                postLaunchFragment(option);
+    }
+
+    private void updateNavigationDrawerSelection(int option) {
+
+                Menu menu = navigationView.getMenu();
+                menu.getItem(option).setChecked(true);
+    }
 
     private void coordinateSelection(int option) {
-        //set option BottomNavigation
-        selectMenuItemBottomNavigation(option);
-        //set option NavigationDrawer
-        Menu menu = navigationView.getMenu();
-        menu.getItem(option).setChecked(true);
-        // set app title
-        getSupportActionBar().setTitle(getTitleForOption(option));
 
+                updateNavigationDrawerSelection(option);
+                updateToolBarTitle(option);
+                updateBottomNavigationStatus(option);
+                setCurrentFragment(option);
+                postLaunchFragment(option);
 
     }
 
+    private void updateToolBarTitle(int option) {
+
+        getSupportActionBar().setTitle(getTitleForOption(option));
+
+    }
+
+    private void updateBottomNavigationStatus(int option){
+                mBottomNavigationView.upDateStatus(option);
+
+    }
 
     private int getTitleForOption(int selectedOption) {
         int title;
@@ -645,12 +636,12 @@ public class MainActivity extends AppCompatActivity implements
         return title;
     }
 
-    private void selectMenuItemBottomNavigation(int option) {
-        Menu menu = mBottomNavigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            mBottomNavigationView.getMenu().getItem(i).setChecked(i == option);
-        }
-    }
+//    private void selectMenuItemBottomNavigation(int option) {
+//        Menu menu = mBottomNavigationView.getMenu();
+//        for (int i = 0; i < menu.size(); i++) {
+//            mBottomNavigationView.getMenu().getItem(i).setChecked(i == option);
+//        }
+//    }
 
     private void addFragment(int position) {
         Utils.logD(LOG_TAG, "addFragment");
@@ -827,7 +818,5 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private BottomNavigationView getBottomNavigationView(){
-        return mBottomNavigationView;
-    }
+
 }

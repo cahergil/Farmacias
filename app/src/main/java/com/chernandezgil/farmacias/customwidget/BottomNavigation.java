@@ -31,8 +31,14 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
     private SparseArray<CheckableImageView> mHasMapImages;
     private SparseArray<TextView> mHasMapText;
     private int lastCheckedId = NONE;
-    AnimatorSet animatorCheck = new AnimatorSet();
-    AnimatorSet animatorUncheck = new AnimatorSet();
+    private AnimatorSet animatorCheck = new AnimatorSet();
+    private AnimatorSet animatorUncheck = new AnimatorSet();
+    private BottomNavigationListener mListener;
+
+
+    public void setOnClickBottomNavigationListener(BottomNavigationListener mListener) {
+        this.mListener = mListener;
+    }
 
     public BottomNavigation(Context context) {
         super(context);
@@ -87,7 +93,37 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
 
     }
 
+    public void upDateStatus(int option) {
+        int id;
+        switch (option) {
+            case 0:
+                id = R.id.llAround;
+                break;
+            case 1:
+                id = R.id.llBuscar;
+                break;
+            case 2:
+                id = R.id.llFavorite;
+                break;
+            default: id =R.id.llAround;
+        }
+        moveAnimations(id,false);
+    }
     private void moveAnimations(int id, boolean move) {
+        int option;
+        switch (id) {
+            case R.id.llAround:
+                option = 0;
+                break;
+            case R.id.llBuscar:
+                option = 1;
+                break;
+            case R.id.llFavorite:
+                option = 2;
+                break;
+            default:option=0;
+        }
+
         ivAround.setChecked(id == R.id.llAround);
         ivBuscar.setChecked(id == R.id.llBuscar);
         ivFavorites.setChecked(id == R.id.llFavorite);
@@ -125,6 +161,11 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             animatorUncheck.start();
         }
         animatorCheck.start();
+        if(mListener != null) {
+            mListener.onBottomNavigationClick(option);
+        }
+
+
     }
     @Override
     protected Parcelable onSaveInstanceState() {
@@ -226,6 +267,10 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
                     }
                 };
 
+    }
+
+    public interface BottomNavigationListener {
+        public void onBottomNavigationClick(int option);
     }
 
 }
