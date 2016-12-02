@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
@@ -79,7 +81,13 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             //implement scroll up in recyclerviews
             return;
         }
+        moveAnimations(id,true);
 
+
+
+    }
+
+    private void moveAnimations(int id, boolean move) {
         ivAround.setChecked(id == R.id.llAround);
         ivBuscar.setChecked(id == R.id.llBuscar);
         ivFavorites.setChecked(id == R.id.llFavorite);
@@ -97,16 +105,18 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
                 textViewScaleYUpAnimator,
                 imageViewTranslateUpAnimator
         );
+
         animatorCheck.addListener(new CheckedAnimatorListener(id));
         animatorCheck.setInterpolator(new DecelerateInterpolator());
 
-        //play reverse animation for last checked AppCompatImageView
-        ObjectAnimator textViewScaleXDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_X, 1, 0).setDuration(ANIMATION_DURATION);
-        ObjectAnimator textViewScaleYDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_Y, 1, 0).setDuration(ANIMATION_DURATION);
-        ObjectAnimator imageViewTranslateDownAnimator = ObjectAnimator.ofFloat(mHasMapImages.get(lastCheckedId), View.TRANSLATION_Y, Utils.convertDpToPixel(1, getContext()))
-                .setDuration(ANIMATION_DURATION);
+
 
         if (lastCheckedId != NONE) {
+            //play reverse animation for last checked AppCompatImageView
+            ObjectAnimator textViewScaleXDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_X, 1, 0).setDuration(move?ANIMATION_DURATION:0);
+            ObjectAnimator textViewScaleYDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_Y, 1, 0).setDuration(move?ANIMATION_DURATION:0);
+            ObjectAnimator imageViewTranslateDownAnimator = ObjectAnimator.ofFloat(mHasMapImages.get(lastCheckedId), View.TRANSLATION_Y, Utils.convertDpToPixel(1, getContext()))
+                    .setDuration(move?ANIMATION_DURATION:0);
             animatorUncheck.playTogether(textViewScaleXDownpAnimator,
                     textViewScaleYDownpAnimator,
                     imageViewTranslateDownAnimator
@@ -115,9 +125,31 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             animatorUncheck.start();
         }
         animatorCheck.start();
+    }
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState ss = new SavedState(superState);
+        ss.lastCheckedId = this.lastCheckedId;
+        return ss;
+    }
 
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if(!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+        SavedState ss = (SavedState)state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        this.lastCheckedId = ss.lastCheckedId;
+        moveAnimations(this.lastCheckedId,false);
 
     }
+
+
+
+
 
     private void setTextVisibility(int id, int visibility) {
         switch (id) {
@@ -162,6 +194,38 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
         public void onAnimationRepeat(Animator animator) {
 
         }
+    }
+
+    static class SavedState extends BaseSavedState {
+        int lastCheckedId;
+
+         SavedState(Parcelable superState) {
+            super(superState);
+        }
+        private SavedState(Parcel in) {
+            super(in);
+            this.lastCheckedId = in.readInt();
+        }
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeInt(this.lastCheckedId);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>(){
+
+                    @Override
+                    public SavedState createFromParcel(Parcel parcel) {
+                        return new SavedState(parcel);
+                    }
+
+                    @Override
+                    public SavedState[] newArray(int i) {
+                        return new SavedState[i];
+                    }
+                };
+
     }
 
 }

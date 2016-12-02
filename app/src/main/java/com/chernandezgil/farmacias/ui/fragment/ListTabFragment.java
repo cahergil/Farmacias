@@ -191,7 +191,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
         mAdapter = new ListTabAdapter(getActivity(),this,mRecyclerView,customItemAnimator);
        // SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
-
         mRecyclerView.setItemAnimator(customItemAnimator);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
