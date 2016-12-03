@@ -29,10 +29,6 @@
                 android:id="@+id/item_navigation_donate"
                 android:icon="@drawable/ic_help"
                 android:title="Ayuda" />
-            <item
-                android:id="@+id/item_navigation_drawer_help_and_feedback"
-                android:icon="@drawable/ic_donate"
-                android:title="Donar" />
         </menu>
     </item>
 
