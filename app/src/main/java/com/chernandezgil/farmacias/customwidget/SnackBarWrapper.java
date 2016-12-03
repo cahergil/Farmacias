@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.chernandezgil.farmacias.R;
 import com.github.andrewlord1990.snackbarbuilder.SnackbarBuilder;
@@ -15,31 +14,38 @@ import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
  */
 
 public class SnackBarWrapper {
-    private Activity context;
     private Snackbar snackbar;
     SnackbarBuilder builder;
-    CoordinatorLayout frameLayout;
+    CoordinatorLayout rootLayout;
 
     public SnackBarWrapper(Activity context) {
-
-        this.context = context;
         builder = new SnackbarBuilder(context)
-
                 .message("Nueva localizacion detectada")
                 .duration(Snackbar.LENGTH_INDEFINITE)
                 .actionText("ACTUALIZAR");
 
-        frameLayout = (CoordinatorLayout) context.findViewById(R.id.snackContainer);
-
+        setRootLayout(context);
     }
 
+    public SnackBarWrapper(Activity context, String message,int duration) {
+
+        snackbar = new SnackbarBuilder(context)
+                .message(message)
+                .duration(duration)
+                .build();
+        setRootLayout(context);
+    }
+
+    private void setRootLayout(Activity context) {
+        rootLayout = (CoordinatorLayout) context.findViewById(R.id.snackContainer);
+    }
     public void show() {
-        frameLayout.setVisibility(View.VISIBLE);
+        rootLayout.setVisibility(View.VISIBLE);
         snackbar.show();
 
     }
     public void dismiss(){
-        frameLayout.setVisibility(View.GONE);
+        rootLayout.setVisibility(View.GONE);
         snackbar.dismiss();
     }
     public void addCallback(SnackbarCallback snackbarCallback) {

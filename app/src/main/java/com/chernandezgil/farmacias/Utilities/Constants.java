@@ -15,6 +15,7 @@ public class Constants {
     public static final String CR = "\n";
     public static final String EMPTY_STRING = "";
     public static final String SEMI_COLON=":";
+    public static final int BOTTOM_NAVIGATION_HEIGHT=168;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({SCROLL_DOWN, SCROLL_UP})

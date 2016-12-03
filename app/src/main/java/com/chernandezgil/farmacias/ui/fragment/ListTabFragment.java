@@ -53,7 +53,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     RelativeLayout mEmptyView;
-    @BindView(R.id.frame)
+    @BindView(R.id.frameRoot)
     FrameLayout mRootView;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -276,7 +276,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT).show();
             }
         }, 30);

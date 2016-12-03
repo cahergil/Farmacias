@@ -2,7 +2,6 @@ package com.chernandezgil.farmacias.ui.fragment;
 
 
 import android.animation.ObjectAnimator;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,12 +18,12 @@ import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,13 +46,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
@@ -81,6 +80,8 @@ import butterknife.Unbinder;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
+import static com.chernandezgil.farmacias.Utilities.Constants.BOTTOM_NAVIGATION_HEIGHT;
+
 
 /**
  * Created by Carlos on 10/07/2016.
@@ -98,8 +99,12 @@ public class FindFragment extends Fragment implements FindContract.View,
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     RelativeLayout mEmptyView;
-    @BindView(R.id.frame)
-    FrameLayout mRootLayout;
+    @BindView(R.id.frameRoot)
+    FrameLayout mRootView;
+
+
+    private CoordinatorLayout mActivityCoordinator;
+    private CoordinatorLayout mSnackCoordinator;
 
     //Activity UI elements
     private RecyclerView mQuickSearchRecyclerView;
@@ -145,6 +150,8 @@ public class FindFragment extends Fragment implements FindContract.View,
         mRecentSearchSuggestions = new SearchRecentSuggestions(getContext(),
                 RecentSuggestionsProvider.AUTHORITY, RecentSuggestionsProvider.MODE);
         mCompositeSubscription = new CompositeSubscription();
+        mActivityCoordinator = (CoordinatorLayout) getActivity().findViewById(R.id.coordinator);
+        mSnackCoordinator = (CoordinatorLayout) getActivity().findViewById(R.id.snackContainer);
     }
 
 
@@ -409,13 +416,13 @@ public class FindFragment extends Fragment implements FindContract.View,
         mDimDrawable =ContextCompat.getDrawable(getContext(),R.drawable.dim_drawable);
     }
     private void dimScreen(){
-        mRootLayout.setForeground(mDimDrawable);
-        mRootLayout.getForeground().setAlpha(180);
+        mRootView.setForeground(mDimDrawable);
+        mRootView.getForeground().setAlpha(180);
     }
     private void unDimScren() {
         //this way the vertical separators in locality, adress etc are shown
-        mRootLayout.setForeground(null);
-        //mRootLayout.getForeground().setAlpha(0);
+        mRootView.setForeground(null);
+        //mRootView.getForeground().setAlpha(0);
     }
     private void showClearSearchIcon() {
         mClearSearch.setVisibility(View.VISIBLE);
@@ -583,7 +590,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         hideQuickSearchRecyclerView();
         mSearchEditor.setText(text);
         clearFocusFromSearchEditor();
-        ObjectAnimator animator = ObjectAnimator.ofFloat(mRecyclerView,"translationY",mRootLayout.getBottom(),
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mRecyclerView,"translationY", mRootView.getBottom(),
                 0f);
         animator.setDuration(300);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -612,7 +619,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         //Note: When a View clears focus the framework is trying to give focus to the first focusable View from the top. Hence, if this View is the first from the top that can take focus, then all callbacks related to clearing focus will be invoked after which the framework will give focus to this view.
         //the solution is make another element focusable and request its focus, in this case I chose mRecyclerview
     //    mRecyclerView.requestFocus();
-        mRootLayout.requestFocus();
+        mRootView.requestFocus();
     }
 
     private void getSoftKeyboardState() {
@@ -640,11 +647,21 @@ public class FindFragment extends Fragment implements FindContract.View,
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                //another way instead of using a dummy coordinator in main_activity
+                Snackbar snack = Snackbar.make(mActivityCoordinator,message, Snackbar.LENGTH_SHORT);
 
-                Snackbar.make(mRootLayout, message, Snackbar.LENGTH_SHORT).show();
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)
+                        snack.getView().getLayoutParams();
+                params.bottomMargin =BOTTOM_NAVIGATION_HEIGHT;
+                snack.getView().setLayoutParams(params);
+                View view = snack.getView();
+                view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.bottom_navigation_background));
+                snack.show();
+
             }
         }, 30);
     }
+
 
     @Override
     public void onClickGo(Pharmacy pharmacy) {
