@@ -19,6 +19,8 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
     Bitmap markerImage;
     boolean isFavorite;
 
+
+
     public String getPhoneFormatted() {
         return phoneFormatted;
     }
@@ -157,6 +159,19 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
         this.markerImage = in.readParcelable(Bitmap.class.getClassLoader());
         this.isFavorite = in.readByte() != 0;
     }
+
+    public static final Creator<PharmacyObjectMap> CREATOR = new Creator<PharmacyObjectMap>() {
+        @Override
+        public PharmacyObjectMap createFromParcel(Parcel in) {
+            return new PharmacyObjectMap(in);
+        }
+
+        @Override
+        public PharmacyObjectMap[] newArray(int size) {
+            return new PharmacyObjectMap[size];
+        }
+    };
+
 
     @Override
     public String toString() {

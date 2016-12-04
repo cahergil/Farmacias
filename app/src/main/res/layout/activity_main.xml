@@ -52,9 +52,9 @@
             <android.support.design.widget.CoordinatorLayout
                 android:id="@+id/snackContainer"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="150dp"
                 android:layout_above="@+id/bottom_navigation"
-                android:visibility="gone">
+                android:visibility="visible">
 
             </android.support.design.widget.CoordinatorLayout>
 
@@ -63,6 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"/>
+
         </RelativeLayout>
 
     </android.support.design.widget.CoordinatorLayout>

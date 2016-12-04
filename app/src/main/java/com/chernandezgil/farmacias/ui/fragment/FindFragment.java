@@ -46,12 +46,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.customwidget.BottomNavigation;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -99,7 +101,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     RecyclerView mRecyclerView;
     @BindView(R.id.emptyView)
     RelativeLayout mEmptyView;
-    @BindView(R.id.frameRoot)
+    @BindView(R.id.frame)
     FrameLayout mRootView;
 
 
@@ -647,16 +649,21 @@ public class FindFragment extends Fragment implements FindContract.View,
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                //another way instead of using a dummy coordinator in main_activity
-                Snackbar snack = Snackbar.make(mActivityCoordinator,message, Snackbar.LENGTH_SHORT);
 
-                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)
-                        snack.getView().getLayoutParams();
-                params.bottomMargin =BOTTOM_NAVIGATION_HEIGHT;
-                snack.getView().setLayoutParams(params);
-                View view = snack.getView();
-                view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.bottom_navigation_background));
+                //another way instead of using a dummy coordinator in main_activity
+                Snackbar snack = Snackbar.make(mRootView,message, Snackbar.LENGTH_SHORT);
                 snack.show();
+          //      SnackBarWrapper snack= new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
+           //     snack.show();
+//                Snackbar snack = Snackbar.make(mActivityCoordinator,message, Snackbar.LENGTH_SHORT);
+//
+//                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)
+//                        snack.getView().getLayoutParams();
+//                params.bottomMargin =BOTTOM_NAVIGATION_HEIGHT;
+//                snack.getView().setLayoutParams(params);
+//                View view = snack.getView();
+//                view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.bottom_navigation_background));
+//                snack.show();
 
             }
         }, 30);

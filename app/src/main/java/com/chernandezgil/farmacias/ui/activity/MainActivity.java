@@ -333,6 +333,8 @@ public class MainActivity extends AppCompatActivity implements
             getSupportFragmentManager().beginTransaction()
                     .add(new GPSTrackerFragment(), GPS_FRAG)
                     .commit();
+
+
         } else {
             trackerFragment.startTracking();
         }
@@ -759,20 +761,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    /**
-     * Permissions related methods
-     *
-     * @param perms
-     * @return
-     */
+
     private boolean hasAllPermissions(String[] perms) {
         for (String perm : perms) {
             if (!hasPermission(perm)) {
-                return (false);
+                return false;
             }
         }
-
-        return (true);
+        return true;
     }
 
     private boolean hasPermission(String perm) {

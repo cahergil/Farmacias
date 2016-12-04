@@ -62,6 +62,19 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         requestLocationSettings();
     }
 
+
+    @Override
+    public void onStart() {
+        Utils.logD(LOG_TAG, "onStart");
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        Utils.logD(LOG_TAG, "onResume");
+        super.onResume();
+    }
+
     @Override
     public void onPause() {
         Utils.logD(LOG_TAG, "onPause");
@@ -71,14 +84,17 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     @Override
     public void onStop() {
+        Utils.logD(LOG_TAG, "onStop");
         super.onStop();
     }
 
     private void requestLocationSettings(){
         if(getGoogleApiClient() == null) return;
         Utils.logD(LOG_TAG, "requestLocationSettings");
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(getGoogleApiClient(), builder.build());
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi
+                .checkLocationSettings(getGoogleApiClient(), builder.build());
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(@NonNull LocationSettingsResult result) {

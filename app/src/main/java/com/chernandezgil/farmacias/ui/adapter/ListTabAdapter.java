@@ -10,6 +10,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.RequiresApi;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.transition.AutoTransition;
 import android.transition.Transition;
@@ -290,13 +291,17 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     }
     public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
-        //create vector drawable and tint it
-        VectorDrawableCompat drawable=VectorDrawableCompat.create(mContext.getResources(),drawableResId,null);
-        if(drawable==null) return;
-        drawable.setTint(color);
-        //convert tinted vector drawable to bitmap
-        Bitmap bitmap= Utils.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
-        imageView.setImageBitmap(bitmap);
+      //option1. create vector drawable and tint it(this method resize the image
+      //  VectorDrawableCompat drawable=VectorDrawableCompat.create(mContext.getResources(),drawableResId,null);
+      //  if(drawable==null) return;
+      //  drawable.setTint(color);
+      //  convert tinted vector drawable to bitmap
+      //  Bitmap bitmap= Utils.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
+      //  imageView.setImageBitmap(bitmap);
+
+
+      // option2: much better, reduce stuttering when scrolling
+        DrawableCompat.setTint(imageView.getDrawable(),color);
 
 
 
