@@ -35,7 +35,7 @@
                 android:layout_height="30dp"
                 android:layout_weight="0.3"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/shape_circle_order"
+                android:background="@drawable/shape_circle_order_open"
                 android:gravity="center"
                 android:textColor="@color/white"
                 tools:text="A" />

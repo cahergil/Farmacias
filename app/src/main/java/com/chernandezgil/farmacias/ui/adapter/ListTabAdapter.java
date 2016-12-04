@@ -251,15 +251,14 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         GradientDrawable gradientDrawable;
         if(isOpen) {
             color=getColor(R.color.pharmacy_open);
-         //   holder.tvOpen.setTextColor(ContextCompat.getColor(mContext,R.color.green_800));
             gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_open);
         } else {
             color=getColor(R.color.pharmacy_close);
-         //   holder.tvOpen.setTextColor(color);
+            //   holder.tvOpen.setTextColor(color);
             gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_close);
         }
         holder.tvOpen.setTextColor(color);
-        //     holder.tvDistance.setBackground(gradientDrawable);
+
 
         int favDraResid;
         if(pharmacy.isFavorite()) {
@@ -280,6 +279,9 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             setExpanded(holder, true);
         }
 
+
+        holder.tvOrder.setBackgroundResource(isOpen?R.drawable.shape_circle_order_open:
+            R.drawable.shape_circle_order_close);
 
         holder.tvOrder.setText(pharmacy.getOrder());
 
