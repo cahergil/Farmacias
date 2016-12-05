@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     private static final String EXPANDABLE_STATE_KEY = "state_key";
     public static final String NEW_LOCATION = "new_location";
     private Parcelable mLayoutManagerState;
-    private UpdateFavorite mCallback;
+    private Callbacks mCallback;
     private boolean[] mSpandState;
     private boolean mRotation;
     private PreferencesManager mSharedPreferences;
@@ -82,10 +83,10 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mCallback = (UpdateFavorite) context;
+            mCallback = (Callbacks) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().getClass().getName()
-                    + " must implement UpdateFavorite");
+                    + " must implement Callbacks");
         }
     }
 
@@ -171,6 +172,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         Utils.logD(LOG_TAG, "onResume");
         super.onResume();
         mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
@@ -200,6 +202,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     private ListTabAdapter getAdapter(){
        return (ListTabAdapter)  mRecyclerView.getAdapter();
     }
+
+
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Utils.logD(LOG_TAG, "showResults");
@@ -224,13 +228,18 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void hideLoading() {
-        mProgressBar.setVisibility(View.INVISIBLE);
+//        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setAddress(String address) {
 
         mAddress = address;
+        if(address!=null && !address.equals("")) {
+            mCallback.onAddressUpdated(address);
+        } else {
+            mCallback.onAddressUpdated("");
+        }
     }
 
     @Override
@@ -357,8 +366,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 //        }
 //
 //    }
-    public interface UpdateFavorite {
+    public interface Callbacks {
         public void onUpdateFavorite(String phone, boolean fromListMap);
+        public void onAddressUpdated(String address);
     }
 
     @Override

@@ -174,6 +174,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             switch (position) {
                 case 0:
                      return new ListTabFragment();
+
                 case 1:
                      return new MapTabFragment();
                 default: return null;

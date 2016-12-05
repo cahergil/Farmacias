@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.chernandezgil.farmacias.BuildConfig;
 import com.chernandezgil.farmacias.Utilities.Utils;
@@ -66,7 +67,7 @@ import icepick.State;
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        ListTabFragment.UpdateFavorite,BottomNavigation.BottomNavigationListener {
+        ListTabFragment.Callbacks,BottomNavigation.BottomNavigationListener {
 
     // TouchableWrapper.UpdateMapUserClick
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -384,6 +385,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onAddressUpdated(String address) {
+
+    //    ActionBar ab=getSupportActionBar();
+  //      ab.setTitle("carloshernandez");
+        //not working
+        Toast.makeText(this,"subtitle:"+address,Toast.LENGTH_SHORT).show();
+        toolbar.setSubtitle(address);
+    }
+
+    @Override
     public void onBackPressed() {
 
         Utils.logD(LOG_TAG, "onBackPressed");
@@ -498,6 +509,7 @@ public class MainActivity extends AppCompatActivity implements
         actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(menuDrawable);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE);
     }
 
     private void setUpNavigationDrawerContent(NavigationView navigationView) {

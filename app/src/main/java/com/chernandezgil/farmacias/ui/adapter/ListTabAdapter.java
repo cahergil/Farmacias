@@ -280,7 +280,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         }
 
 
-        holder.tvOrder.setBackgroundResource(isOpen?R.drawable.shape_circle_order_open:
+        holder.tvOrder.setBackgroundResource(isOpen ? R.drawable.shape_circle_order_open:
             R.drawable.shape_circle_order_close);
 
         holder.tvOrder.setText(pharmacy.getOrder());
