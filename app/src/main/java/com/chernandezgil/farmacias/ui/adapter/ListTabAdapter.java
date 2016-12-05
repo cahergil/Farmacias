@@ -2,7 +2,6 @@ package com.chernandezgil.farmacias.ui.adapter;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
@@ -266,11 +265,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         } else {
             favDraResid=R.drawable.ic_heart_outline;
         }
-        setBitmapFromVectorDrawable(holder.ivClock,R.drawable.clock,color);
-        setBitmapFromVectorDrawable(holder.ivFavorite,favDraResid,color);
-        setBitmapFromVectorDrawable(holder.ivGo,R.drawable.directions,color);
-        setBitmapFromVectorDrawable(holder.ivShare,R.drawable.share,color);
-        setBitmapFromVectorDrawable(holder.ivPhone,R.drawable.phone,color);
+        setFavoriteIcon(holder.ivFavorite,favDraResid,color);
+        setTintedVectorDrawable(holder.ivClock,color);
+        setTintedVectorDrawable(holder.ivGo,color);
+        setTintedVectorDrawable(holder.ivShare,color);
+        setTintedVectorDrawable(holder.ivPhone,color);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             final boolean isExpanded = position == expandedPosition;
@@ -279,20 +278,22 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             setExpanded(holder, true);
         }
 
-
         holder.tvOrder.setBackgroundResource(isOpen ? R.drawable.shape_circle_order_open:
             R.drawable.shape_circle_order_close);
-
         holder.tvOrder.setText(pharmacy.getOrder());
-
-
 
         //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
         //  holder.ivArrow.setImageDrawable(drawableCompat);
-
     }
-    public void setBitmapFromVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
+
+    private void setFavoriteIcon(ImageView imageView,int favDraResid,int color){
+
+        imageView.setImageResource(favDraResid);
+        setTintedVectorDrawable(imageView,color);
+    }
+
+    private void setTintedVectorDrawable(ImageView imageView, int color) {
       //option1. create vector drawable and tint it(this method resize the image
       //  VectorDrawableCompat drawable=VectorDrawableCompat.create(mContext.getResources(),drawableResId,null);
       //  if(drawable==null) return;
@@ -301,8 +302,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
       //  Bitmap bitmap= Utils.createScaledBitMapFromVectorDrawable(mContext,drawable,40f);
       //  imageView.setImageBitmap(bitmap);
 
-
       // option2: much better, reduce stuttering when scrolling
+
         DrawableCompat.setTint(imageView.getDrawable(),color);
 
 

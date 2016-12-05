@@ -228,7 +228,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void hideLoading() {
-//        mProgressBar.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
