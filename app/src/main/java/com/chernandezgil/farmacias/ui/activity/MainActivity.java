@@ -242,89 +242,7 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public void onClick(View view) {
-//        int id = view.getId();
-//        switch (id) {
-//            case R.id.llAround:
-//                AnimatorSet set = new AnimatorSet();
-//                mIvAround.setChecked(true);
-//
-//                set.playTogether(
-//                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_X, 0, 1).setDuration(ANIMATION_DURATION),
-//                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_Y, 0, 1).setDuration(ANIMATION_DURATION),
-//                        ObjectAnimator.ofFloat(mIvAround,View.TRANSLATION_Y,-Utils.convertDpToPixel(10,this))
-//                        .setDuration(ANIMATION_DURATION)
-//                );
-//                 set.addListener(new Animator.AnimatorListener() {
-//                    @Override
-//                    public void onAnimationStart(Animator animator) {
-//                        mTvAround.setVisibility(View.VISIBLE);
-//                    }
-//
-//                    @Override
-//                    public void onAnimationEnd(Animator animator) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationCancel(Animator animator) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onAnimationRepeat(Animator animator) {
-//
-//                    }
-//                });
-//                set.start();
-//                //mTvAround.animate().
-//                break;
-//            case R.id.llBuscar:
-//                mIvAround.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
-//                mTvAround.animate().scaleY(0).
-//                        scaleX(0).start();
-//
-////                AnimatorSet set1 = new AnimatorSet();
-////
-////
-////                set1.playTogether(
-//////                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_X, 1, 0).setDuration(300),
-//////                        ObjectAnimator.ofFloat(mTvAround, View.SCALE_Y, 1, 0).setDuration(300),
-////                        ObjectAnimator.ofFloat(mIvAround,View.TRANSLATION_Y,Utils.convertDpToPixel(1,this))
-////                                .setDuration(300)
-////                );
-////                set1.addListener(new Animator.AnimatorListener() {
-////                    @Override
-////                    public void onAnimationStart(Animator animator) {
-////
-////                    }
-////
-////                    @Override
-////                    public void onAnimationEnd(Animator animator) {
-////                     //   mTvAround.setVisibility(View.INVISIBLE);
-////                    }
-////
-////                    @Override
-////                    public void onAnimationCancel(Animator animator) {
-////
-////                    }
-////
-////                    @Override
-////                    public void onAnimationRepeat(Animator animator) {
-////
-////                    }
-////                });
-////                set1.start();
-//                break;
-//            case R.id.llFavorite:
-//                break;
-//
-//            default: return;
-//
-//        }
-//
-//    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -509,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements
         actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(menuDrawable);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE);
+
     }
 
     private void setUpNavigationDrawerContent(NavigationView navigationView) {
