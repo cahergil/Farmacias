@@ -1,7 +1,9 @@
 package com.chernandezgil.farmacias.presenter;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -62,6 +64,38 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
     public void onRestartLoader() {
         mLoaderManager.restartLoader(LOADER,null,this);
     }
+
+
+
+    @Override
+    public void onClickPhone(String phone) {
+        String uri = "tel:" + phone;
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(uri));
+        mView.launchActivity(intent);
+
+    }
+
+    @Override
+    public void onClickGo(Pharmacy pharmacy) {
+        String currentAddress = String.valueOf(mLocation.getLatitude()+"," + mLocation.getLongitude());
+        Intent intent = Utils.getGoodleDirectionsIntent(new LatLng(mLocation.getLatitude(),
+                        mLocation.getLongitude() ),currentAddress,
+                new LatLng(pharmacy.getLat(),pharmacy.getLon()),pharmacy.getAddressFormatted() );
+        mView.launchActivity(intent);
+    }
+
+    @Override
+    public void onClickShare(Pharmacy pharmacy) {
+        String name = pharmacy.getName();
+        double distance = pharmacy.getDistance() ;
+        String address = pharmacy.getAddressFormatted();
+        String phone = pharmacy.getPhone();
+        Intent intent = Utils.getShareIntent(name, distance, address, phone);
+        mView.launchActivity(intent);
+    }
+
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

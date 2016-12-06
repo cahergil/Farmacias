@@ -305,11 +305,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onAddressUpdated(String address) {
 
-    //    ActionBar ab=getSupportActionBar();
-  //      ab.setTitle("carloshernandez");
-        //not working
-        Toast.makeText(this,"subtitle:"+address,Toast.LENGTH_SHORT).show();
-        toolbar.setSubtitle(address);
+//        Toast.makeText(this,"subtitle:"+address,Toast.LENGTH_SHORT).show();
+//        toolbar.setSubtitle(address);
     }
 
     @Override
@@ -458,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements
 
                     drawerLayout.closeDrawer(GravityCompat.START);
                     coordinateSelection(option);
-                    //postLaunchFragment(option);
+
 
 
 
@@ -546,12 +543,7 @@ public class MainActivity extends AppCompatActivity implements
         return title;
     }
 
-//    private void selectMenuItemBottomNavigation(int option) {
-//        Menu menu = mBottomNavigationView.getMenu();
-//        for (int i = 0; i < menu.size(); i++) {
-//            mBottomNavigationView.getMenu().getItem(i).setChecked(i == option);
-//        }
-//    }
+
 
     private void addFragment(int position) {
         Utils.logD(LOG_TAG, "addFragment");
@@ -599,9 +591,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    /**
-     * used in HandlerActivity
-     */
+
     public int getCurrentFragment() {
         return mCurrentFragment;
     }

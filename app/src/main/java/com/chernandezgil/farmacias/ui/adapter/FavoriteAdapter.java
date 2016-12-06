@@ -271,7 +271,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         holder.ivPhone.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivClock.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivShare.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-        holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+  //      holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
     }
     @Override
     public void onBindViewHolder(FavoriteAdapter.MyViewHolder holder, int position, List<Object> payloads) {
@@ -392,7 +392,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             } else {
                 favDraResid = R.drawable.ic_heart_outline;
             }
-            holder.ivFavorite.setImageResource(favDraResid);
+//            holder.ivFavorite.setImageResource(favDraResid);
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
                 final boolean isExpanded = position == expandedPosition;
@@ -471,8 +471,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         public ImageView ivPhone;
         @BindView(R.id.ivShare)
         public ImageView ivShare;
-        @BindView(R.id.ivFavorite)
-        public ImageView ivFavorite;
         @BindView(R.id.ivGo)
         public ImageView ivGo;
         @BindView(R.id.optionsRow)
@@ -491,7 +489,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
             ivPhone.setOnClickListener(this);
             ivShare.setOnClickListener(this);
-            ivFavorite.setOnClickListener(this);
             ivGo.setOnClickListener(this);
             ivClock.setOnClickListener(this);
 
@@ -514,9 +511,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                 case R.id.ivShare:
                     mClickHandler.onClickShare(mList.get(position));
                     break;
-                case R.id.ivFavorite:
-                    mClickHandler.onClickFavorite(mList.get(position));
-                    break;
 
             }
         }
@@ -535,7 +529,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     public static interface FavoriteAdapterOnClickHandler {
         void onClickGo(Pharmacy pharmacy);
-        void onClickFavorite(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
         void onListEmpty();

@@ -254,9 +254,9 @@ public class FindFragment extends Fragment implements FindContract.View,
                 return true;
 
 
-            case R.id.action_filter:
-                Toast.makeText(getContext(), "onclick filter", Toast.LENGTH_SHORT).show();
-                return true;
+//            case R.id.action_filter:
+//                Toast.makeText(getContext(), "onclick filter", Toast.LENGTH_SHORT).show();
+//                return true;
 
         }
         return super.onOptionsItemSelected(item);

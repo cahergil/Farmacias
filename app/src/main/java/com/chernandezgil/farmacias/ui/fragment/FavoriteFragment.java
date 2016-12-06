@@ -167,7 +167,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
     @Override
     public void launchActivity(Intent intent) {
-
+        startActivity(intent);
     }
 
     @Override
@@ -177,23 +177,19 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
     @Override
     public void onClickGo(Pharmacy pharmacy) {
-
-    }
-
-    @Override
-    public void onClickFavorite(Pharmacy pharmacy) {
-
+        mPresenter.onClickGo(pharmacy);
     }
 
     @Override
     public void onClickPhone(String phone) {
-
+        mPresenter.onClickPhone(phone);
     }
 
     @Override
     public void onClickShare(Pharmacy pharmacy) {
-
+        mPresenter.onClickShare(pharmacy);
     }
+
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
    //     viewHolder.itemView.setBackgroundColor(Utils.modifyAlpha(ContextCompat.getColor(getActivity(),R.color.red_200),0.40f));

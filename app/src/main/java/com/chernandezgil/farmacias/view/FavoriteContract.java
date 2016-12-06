@@ -38,6 +38,9 @@ public interface FavoriteContract {
 
         public void onInitLoader();
         public void onRestartLoader();
+        public void onClickPhone(String phone);
+        public void onClickGo(Pharmacy pharmacy);
+        public void onClickShare(Pharmacy pharmacy);
 
 
     }

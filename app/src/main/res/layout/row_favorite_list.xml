@@ -117,7 +117,7 @@
 
         <include
 
-            layout="@layout/layout_options"
+            layout="@layout/layout_options_without_heart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/llHorizontal"
