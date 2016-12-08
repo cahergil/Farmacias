@@ -95,7 +95,11 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
         mView.launchActivity(intent);
     }
 
+    @Override
+    public void onClickClock(String hour) {
 
+        mView.showSchedule(Utils.is24Hours(hour));
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

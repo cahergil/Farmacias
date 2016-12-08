@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -166,6 +167,27 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     }
 
     @Override
+    public void showSchedule(boolean flag24h) {
+        int layoutId;
+        if(flag24h) {
+            layoutId = R.layout.schedule_24_hours;
+        } else {
+            layoutId = R.layout.schedule_normal;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View v = inflater.inflate(layoutId, null);
+        builder.setView(v);
+        builder.setPositiveButton("ok",null);
+        builder.setTitle("horarios");
+        builder.setMessage("este es el mensaje");
+        AlertDialog ad=builder.create();
+        ad.show();
+    }
+
+    @Override
     public void launchActivity(Intent intent) {
         startActivity(intent);
     }
@@ -188,6 +210,13 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     @Override
     public void onClickShare(Pharmacy pharmacy) {
         mPresenter.onClickShare(pharmacy);
+    }
+
+
+    @Override
+    public void onClickClock(String hour) {
+        mPresenter.onClickClock(hour);
+
     }
 
     @Override

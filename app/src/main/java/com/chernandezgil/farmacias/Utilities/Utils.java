@@ -1,7 +1,6 @@
 package com.chernandezgil.farmacias.Utilities;
 
 
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -46,6 +45,7 @@ import java.util.Locale;
 public class Utils {
     static int screenHeight = 0;
     static int oldStatusBarFlags;
+
     public static void logD(final String tag, String message) {
         if (BuildConfig.DEBUG) {
             Log.d(tag, message);
@@ -62,7 +62,7 @@ public class Utils {
     }
 
     public static CustomSupporMapFragment handleMapFragmentRecreation(FragmentManager fragmentManager, int fragmentId,
-                                                                 String fragmentTag) {
+                                                                      String fragmentTag) {
         CustomSupporMapFragment mapFragment = (CustomSupporMapFragment) fragmentManager.findFragmentByTag("mapFragment");
         if (mapFragment == null) {
             mapFragment = new CustomSupporMapFragment();
@@ -78,24 +78,24 @@ public class Utils {
     //  address, postalCode City, Province
     public static String formatAddress(String address, String postalCode, String city, String province) {
 
-        return  address
+        return address
                 + Constants.COMMA + Constants.SPACE + postalCode + Constants.SPACE + city
                 + Constants.COMMA + Constants.SPACE + province;
     }
 
     public static String formatPhoneNumber(String phoneNumber) {
 
-        return phoneNumber.substring(0,3) + Constants.SPACE + phoneNumber.substring(3,5)
-                                               + Constants.SPACE + phoneNumber.substring(5,7)
-                                               + Constants.SPACE + phoneNumber.substring(7,9);
+        return phoneNumber.substring(0, 3) + Constants.SPACE + phoneNumber.substring(3, 5)
+                + Constants.SPACE + phoneNumber.substring(5, 7)
+                + Constants.SPACE + phoneNumber.substring(7, 9);
 
 
     }
 
-    public static float convertDpToPixel(float dp, Context context){
+    public static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return px;
     }
 
@@ -123,11 +123,18 @@ public class Utils {
         return calendar;
     }
 
-    public static  boolean isPharmacyOpen(String hours) {
+    public static boolean is24Hours(String hours) {
+
+        if (hours == null) return false;
+        return hours.equals("24H");
+    }
+
+    public static boolean isPharmacyOpen(String hours) {
         Date now = new Date();
         Calendar date = Calendar.getInstance();
         date.setTime(now);
         int day = date.get(Calendar.DAY_OF_WEEK);
+
         if (hours.equals("24H")) {
             return true;
         } else if (Calendar.SATURDAY == day) {
@@ -155,8 +162,9 @@ public class Utils {
 
     }
 
-    public static Intent startPhoneIntent(Context context,String telephone) {
-        String uri="tel:" + telephone;;
+    public static Intent startPhoneIntent(Context context, String telephone) {
+        String uri = "tel:" + telephone;
+        ;
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(uri));
         return intent;
@@ -164,15 +172,15 @@ public class Utils {
 
     public static Intent getShareIntent(String name, double dist, String aformatted, String tel) {
         Context context = MyApplication.getContext();
-        final String nombre="Farmacia:";
-        final String distancia="distancia:";
-        final String direccion="direccion:";
-        final String telefono="tef:";
+        final String nombre = "Farmacia:";
+        final String distancia = "distancia:";
+        final String direccion = "direccion:";
+        final String telefono = "tef:";
 
-        String textToShare=nombre +  name + Constants.CR
-                + distancia + context.getString(R.string.format_distance,dist) + Constants.CR
+        String textToShare = nombre + name + Constants.CR
+                + distancia + context.getString(R.string.format_distance, dist) + Constants.CR
                 + direccion + aformatted + Constants.CR
-                + telefono  + tel;
+                + telefono + tel;
 
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
@@ -181,33 +189,41 @@ public class Utils {
         return sendIntent;
 
     }
+
     public static Intent getGoodleDirectionsIntent(LatLng sourceLatLng,
                                                    String sourceAddress,
                                                    LatLng destinationLatLng,
-                                                   String destinationAddress){
+                                                   String destinationAddress) {
 
         String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?saddr=%f,%f(%s)&daddr=%f,%f (%s)",
-                sourceLatLng.latitude,sourceLatLng.longitude , sourceAddress,
-                destinationLatLng.latitude, destinationLatLng.longitude,destinationAddress);
+                sourceLatLng.latitude, sourceLatLng.longitude, sourceAddress,
+                destinationLatLng.latitude, destinationLatLng.longitude, destinationAddress);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
         return intent;
     }
 
-    public static Bitmap getBitmapFromVectorDrawable(Context context, @DrawableRes int drawableResId){
+    public static Bitmap getBitmapFromVectorDrawable(Context context, @DrawableRes int drawableResId) {
 
 
-        Drawable drawable = VectorDrawableCompat.create(context.getResources(),drawableResId,null);
+        Drawable drawable = VectorDrawableCompat.create(context.getResources(), drawableResId, null);
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         Bitmap bitmap = BitmapUtil.toBitmap(drawable, metrics, 48f, 0);
         return bitmap;
     }
 
-    public static Bitmap createScaledBitMapFromVectorDrawable(Context context,VectorDrawableCompat vd,float dimension) {
+    public static Bitmap createScaledBitMapFromVectorDrawable(Context context, VectorDrawableCompat vd, float dimension) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return BitmapUtil.toBitmap(vd, metrics, dimension, 0);
 
 
+    }
+
+    public static int getTextSize() {
+
+        Context context = MyApplication.getContext();
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int)(14*scale);
     }
 
     public static String getStreetFromAddress(String address) {
@@ -215,7 +231,7 @@ public class Utils {
         boolean found = false;
         int n = 0;
         int cont = 0;
-        if(address==null) return null;
+        if (address == null) return null;
         while (n != -1) {
             cont++;
             n = address.indexOf(Constants.COMMA, n);
@@ -234,9 +250,9 @@ public class Utils {
 
     }
 
-    public static int getColor(@ColorRes int resId){
+    public static int getColor(@ColorRes int resId) {
 
-        int color= ContextCompat.getColor(MyApplication.getContext(),resId);
+        int color = ContextCompat.getColor(MyApplication.getContext(), resId);
         return color;
     }
 
@@ -249,6 +265,7 @@ public class Utils {
 
     /**
      * Called on dismiss in favorite fragment
+     *
      * @param phone
      * @return
      */
@@ -256,7 +273,7 @@ public class Utils {
         Context context = MyApplication.getContext();
         Uri uri = DbContract.FarmaciasEntity.buildFavoritesUriByPhone(phone);
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DbContract.FarmaciasEntity.FAVORITE,0);
+        contentValues.put(DbContract.FarmaciasEntity.FAVORITE, 0);
         int rowsUpdated = context.getContentResolver().update(uri, contentValues,
                 DbContract.FarmaciasEntity.PHONE + " LIKE '%" + phone + "%'",
                 null);
@@ -266,7 +283,8 @@ public class Utils {
         }
         return rowsUpdated;
     }
-    public static String changeFavoriteInDb(boolean oldFavoriteValue,String phone) {
+
+    public static String changeFavoriteInDb(boolean oldFavoriteValue, String phone) {
         String snackMessage;
         Context context = MyApplication.getContext();
         if (oldFavoriteValue) {
@@ -286,8 +304,8 @@ public class Utils {
 //                null);
 
         int rowsUpdated = context.getContentResolver().update(uri, contentValues,
-                DbContract.FarmaciasEntity.PHONE + " LIKE ? " ,
-                new String[]{"%"+ phone + "%"});
+                DbContract.FarmaciasEntity.PHONE + " LIKE ? ",
+                new String[]{"%" + phone + "%"});
 
         if (rowsUpdated == 1) {
             Utils.logD("changeFavoriteinDb", "rows updates: " + rowsUpdated);
@@ -311,17 +329,17 @@ public class Utils {
         return screenHeight;
     }
 
-    public static void setLightStatusBar(View view,Activity activity){
+    public static void setLightStatusBar(View view, Activity activity) {
 
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                View decor = activity.getWindow().getDecorView();
-                oldStatusBarFlags = decor.getSystemUiVisibility();
-                int flags = view.getSystemUiVisibility();
-                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                view.setSystemUiVisibility(flags);
-               activity.getWindow().setStatusBarColor(Color.WHITE);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View decor = activity.getWindow().getDecorView();
+            oldStatusBarFlags = decor.getSystemUiVisibility();
+            int flags = view.getSystemUiVisibility();
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            view.setSystemUiVisibility(flags);
+            activity.getWindow().setStatusBarColor(Color.WHITE);
+        }
 
 
     }
@@ -330,12 +348,11 @@ public class Utils {
     public static void clearLightStatusBar(Activity activity) {
 
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             View decor = activity.getWindow().getDecorView();
             decor.setSystemUiVisibility(oldStatusBarFlags);
             Window window = activity.getWindow();
-            window.setStatusBarColor(ContextCompat.getColor(activity,R.color.colorPrimaryDark));
+            window.setStatusBarColor(ContextCompat.getColor(activity, R.color.colorPrimaryDark));
 
 
         }
@@ -349,8 +366,9 @@ public class Utils {
             view.setSystemUiVisibility(flags);
         }
     }
+
     //extracted from materials-intro, not working as expected
-    public static void anotherMethod(Activity activity,View someView){
+    public static void anotherMethod(Activity activity, View someView) {
 //        int systemUiVisibility =activity.getWindow().getDecorView().getSystemUiVisibility();
 //        int flagLightStatusBar = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
 //        if (flag) {
@@ -361,8 +379,8 @@ public class Utils {
 //            systemUiVisibility &= ~flagLightStatusBar;
 //        }
 //        activity.getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
-      //  someView.setSystemUiVisibility(0); not working
-      //  rootView.setSystemUiVisibility(rootView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR); not working
+        //  someView.setSystemUiVisibility(0); not working
+        //  rootView.setSystemUiVisibility(rootView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR); not working
 //        View decorView = activity.getWindow().getDecorView();
 //        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
 //        decorView.setSystemUiVisibility(uiOptions);
@@ -377,33 +395,27 @@ public class Utils {
     }
 
 
-    public static boolean contains(LatLng location,ArrayList<LatLng> polyLoc)
-    {
-        if (location==null)
+    public static boolean contains(LatLng location, ArrayList<LatLng> polyLoc) {
+        if (location == null)
             return false;
 
-        LatLng lastPoint = polyLoc.get(polyLoc.size()-1);
+        LatLng lastPoint = polyLoc.get(polyLoc.size() - 1);
         boolean isInside = false;
         double x = location.longitude;
 
-        for(LatLng point: polyLoc)
-        {
+        for (LatLng point : polyLoc) {
             double x1 = lastPoint.longitude;
             double x2 = point.longitude;
             double dx = x2 - x1;
 
-            if (Math.abs(dx) > 180.0)
-            {
+            if (Math.abs(dx) > 180.0) {
                 // we have, most likely, just jumped the dateline (could do further validation to this effect if needed).  normalise the numbers.
-                if (x > 0)
-                {
+                if (x > 0) {
                     while (x1 < 0)
                         x1 += 360;
                     while (x2 < 0)
                         x2 += 360;
-                }
-                else
-                {
+                } else {
                     while (x1 > 0)
                         x1 -= 360;
                     while (x2 > 0)
@@ -412,8 +424,7 @@ public class Utils {
                 dx = x2 - x1;
             }
 
-            if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x))
-            {
+            if ((x1 <= x && x2 > x) || (x1 >= x && x2 < x)) {
                 double grad = (point.latitude - lastPoint.latitude) / dx;
                 double intersectAtLat = lastPoint.latitude + ((x - x1) * grad);
 
@@ -428,7 +439,7 @@ public class Utils {
 
 
     public static Drawable getDrawable(@DrawableRes int drawableResId) {
-        Drawable d=ContextCompat.getDrawable(MyApplication.getContext(), drawableResId);
+        Drawable d = ContextCompat.getDrawable(MyApplication.getContext(), drawableResId);
         return d;
     }
 

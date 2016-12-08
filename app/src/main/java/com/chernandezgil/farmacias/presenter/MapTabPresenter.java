@@ -90,7 +90,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         mGeocoder = checkNotNull(geocoder, "geocoder cannot be null");
         this.preferencesManager = preferencesManager;
         mRadio = this.preferencesManager.retrieveRadioBusquedaFromSp() * 1000;
-    //    mCameraUpdate = new CustomCameraUpdate();
+        //    mCameraUpdate = new CustomCameraUpdate();
         mainHandler = new Handler(Looper.getMainLooper());
 
 
@@ -159,7 +159,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     public void handleClickShare() {
         //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
         String name = mLastMarkerClicked.getName();
-        double distance = mLastMarkerClicked.getDistance() ;
+        double distance = mLastMarkerClicked.getDistance();
         String address = mLastMarkerClicked.getAddressFormatted();
         String phone = mLastMarkerClicked.getPhone();
         Intent intent = Utils.getShareIntent(name, distance, address, phone);
@@ -183,7 +183,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             return;
         }
         // por el momento no lo pongo
-     //   mView.showSnackBar(snackMessage);
+        //   mView.showSnackBar(snackMessage);
 
 
     }
@@ -193,7 +193,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
         PharmacyObjectMap pharmacy = (PharmacyObjectMap) mMarkersHashMap.get(marker);
         if (!pharmacy.getName().equals(MapTabFragment.USER_LOCATION)) {
-            if(!mView.isBottomSheetExpanded()) {
+            if (!mView.isBottomSheetExpanded()) {
                 mView.setStateBottomSheet(3);
             }
             mView.showPharmacyInBottomSheet(pharmacy);
@@ -332,33 +332,51 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         matrix.setSaturation(saturation);
         ColorFilter paintColorFilter = new ColorMatrixColorFilter(matrix);
 
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(144, 144, conf);
+
+        Bitmap bmp = Bitmap.createBitmap(markerBitmap.getWidth(),
+                markerBitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(bmp);
-        Paint paint = new Paint();
-        paint.setTextSize(38);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(Utils.getTextSize());
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-
         paint.setColor(Color.parseColor("#FFCDD2"));
         paint.setColorFilter(paintColorFilter);
 
+
+
+//        if (boundsText.width() > 40) {
+//            paint.setTextSize(25);
+//        }
+
+
+        canvas.drawBitmap(markerBitmap, 0, 0, paint);
+
+        //make the drawings independent from pixels
+        float factor = 0.80f;
+        switch (order.length()) {
+            case 1:
+                break;
+            case 2:
+                //70% of original size and reduce the margin with the bottom
+                paint.setTextSize(Utils.getTextSize()*0.7f);
+                factor = 0.75f;
+                break;
+            case 3:
+                //50% of original size and reduce the margin with the bottom
+                paint.setTextSize(Utils.getTextSize()*0.5f);
+                factor = 0.60f;
+                break;
+            default:
+                factor = 0.60f;
+        }
         Rect boundsText = new Rect();
         paint.getTextBounds(order, 0, order.length(), boundsText);
-        if (boundsText.width() > 40) {
-            paint.setTextSize(25);
-        }
-        paint.getTextBounds(order, 0, order.length(), boundsText);
         int x = (bmp.getWidth() - boundsText.width()) / 2;
-        //    int y=(bmp.getHeight()- boundsText.height())/2;
-        //    Log.d(LOG_TAG,"boundsText.width()"+boundsText.width()+",bmp.with()"+bmp.getWidth());
-        //    Log.d(LOG_TAG,"letra:"+order);
 
-        //  canvas.drawBitmap(BitmapFactory.decodeResource(getResources(),
-        //          R.drawable.ic_maps_position), 0,0, paint);
-        canvas.drawBitmap(markerBitmap, 0, 0, paint);
-        //  canvas.drawText(order, x-4,69, paint);
-        canvas.drawText(order, x, 115, paint);
+
+        canvas.drawText(order, x, factor * markerBitmap.getHeight(), paint);
 
         return bmp;
     }
@@ -388,8 +406,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 double lonDest = data.getDouble(data.getColumnIndex(DbContract.FarmaciasEntity.LON));
                 //float dist=calculateDistance(latDest,lonDest,mLocation);
                 //Utils.meterDistanceBetweenPoints(latDest, lonDest, mLocation.getLatitude(), mLocation.getLongitude());
-                double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest,lonDest),
-                        new LatLng(mLocation.getLatitude(),mLocation.getLongitude()));
+                double distance = SphericalUtil.computeDistanceBetween(new LatLng(latDest, lonDest),
+                        new LatLng(mLocation.getLatitude(), mLocation.getLongitude()));
 
 
                 farmacia.setLat(latDest);

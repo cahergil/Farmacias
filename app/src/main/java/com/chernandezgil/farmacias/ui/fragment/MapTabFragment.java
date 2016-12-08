@@ -72,11 +72,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
+    private static final int STATE_COLLAPSED=0;
+    private static final int STATE_EXPANDED=1;
+    public static final String USER_LOCATION = "userLocation";
+
+
     private GoogleMap mMap;
     private Location mLocation;
-    TimeMeasure mTm;
-
-
+    private TimeMeasure mTm;
 
     private BottomSheetBehavior mBottomSheetBehavior;
     private CustomSupporMapFragment mMapFragment;
@@ -140,14 +143,13 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private PharmacyObjectMap mLastMarkerClicked;
     private Bitmap  markerBitmap;
     private Unbinder unbinder;
-    private static final int STATE_COLLAPSED=0;
-    private static final int STATE_EXPANDED=1;
+
     private int mBottomSheetState;
     private boolean mFromListTab;
     private CustomSupporMapFragment mapFragment;
     private PreferencesManager mSharedPreferences;
     private SnackBarWrapper mSnackBar;
-    public static final String USER_LOCATION = "userLocation";
+
     private boolean mCancelThread;
 
 

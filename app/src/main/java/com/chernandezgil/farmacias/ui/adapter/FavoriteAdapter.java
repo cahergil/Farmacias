@@ -511,7 +511,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                 case R.id.ivShare:
                     mClickHandler.onClickShare(mList.get(position));
                     break;
-
+                case R.id.ivSchedule:
+                    mClickHandler.onClickClock(mList.get(position).getHorario());
             }
         }
 
@@ -531,6 +532,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         void onClickGo(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
+        void onClickClock(String hour);
         void onListEmpty();
     }
 }

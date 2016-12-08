@@ -365,8 +365,7 @@ public class MainActivity extends AppCompatActivity implements
             if (resultCode == RESULT_OK) {
 
                 if (mRadio != mSharedPreferences.getRadio() && mCurrentFragment == 0) {
-                    addFragment(0);
-                    mRadioChanged = true;
+                      mRadioChanged = true;
                 }
             }
         }

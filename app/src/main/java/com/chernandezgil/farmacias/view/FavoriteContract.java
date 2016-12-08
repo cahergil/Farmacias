@@ -20,7 +20,7 @@ public interface FavoriteContract {
 
         public void showLoading();
         public void hideLoading();
-
+        public void showSchedule(boolean flag24h);
         public void launchActivity(Intent intent);
         public void showSnackBar(String message);
 
@@ -41,7 +41,7 @@ public interface FavoriteContract {
         public void onClickPhone(String phone);
         public void onClickGo(Pharmacy pharmacy);
         public void onClickShare(Pharmacy pharmacy);
-
+        public void onClickClock(String hour);
 
     }
 }

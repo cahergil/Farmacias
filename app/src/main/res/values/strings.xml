@@ -79,4 +79,13 @@
     <string name="ma_app_title_buscar" translatable="true">Buscar farmacia</string>
     <string name="ma_app_title_favoritos" translatable="true">Favoritos</string>
     <string name="ma_app_title_default" translatable="true">Farmacias</string>
+
+    <!-- schedule_normal.xml -->
+    <string name="sn_lunes" translatable="true">Lunes:</string>
+    <string name="sn_martes" translatable="true">Martes:</string>
+    <string name="sn_miercoles" translatable="true">Miercoles:</string>
+    <string name="sn_jueves" translatable="true">Jueves:</string>
+    <string name="sn_viernes" translatable="true">Viernes:</string>
+    <string name="sn_sabado" translatable="true">Sábado:</string>
+    <string name="sn_domingo" translatable="true">Domingo:</string>
 </resources>
