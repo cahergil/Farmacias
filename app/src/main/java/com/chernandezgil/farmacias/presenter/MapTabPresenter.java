@@ -339,33 +339,26 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
         Canvas canvas = new Canvas(bmp);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextSize(Utils.getTextSize());
+        paint.setTextSize(Utils.getDefaultBitmapTextSize());
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setColor(Color.parseColor("#FFCDD2"));
         paint.setColorFilter(paintColorFilter);
 
-
-
-//        if (boundsText.width() > 40) {
-//            paint.setTextSize(25);
-//        }
-
-
         canvas.drawBitmap(markerBitmap, 0, 0, paint);
 
-        //make the drawings independent from pixels
+        //make  drawing text independent from pixels
         float factor = 0.80f;
         switch (order.length()) {
             case 1:
                 break;
             case 2:
                 //70% of original size and reduce the margin with the bottom
-                paint.setTextSize(Utils.getTextSize()*0.7f);
+                paint.setTextSize(Utils.getDefaultBitmapTextSize()*0.7f);
                 factor = 0.75f;
                 break;
             case 3:
                 //50% of original size and reduce the margin with the bottom
-                paint.setTextSize(Utils.getTextSize()*0.5f);
+                paint.setTextSize(Utils.getDefaultBitmapTextSize()*0.5f);
                 factor = 0.60f;
                 break;
             default:

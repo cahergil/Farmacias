@@ -219,7 +219,7 @@ public class Utils {
 
     }
 
-    public static int getTextSize() {
+    public static int getDefaultBitmapTextSize() {
 
         Context context = MyApplication.getContext();
         float scale = context.getResources().getDisplayMetrics().density;

@@ -31,12 +31,12 @@
 
             <TextView
                 android:id="@+id/tvOrder"
-                android:layout_width="15dp"
-                android:layout_height="30dp"
-                android:layout_weight="0.3"
+                android:layout_width="39dp"
+                android:layout_height="39dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/shape_circle_order_open"
                 android:gravity="center"
+                android:textSize="18sp"
                 android:textColor="@color/white"
                 tools:text="A" />
 
