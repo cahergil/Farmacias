@@ -123,7 +123,7 @@ public class Utils {
         return calendar;
     }
 
-    public static boolean is24Hours(String hours) {
+    public static boolean is24HoursPharmacy(String hours) {
 
         if (hours == null) return false;
         return hours.equals("24H");

@@ -5,9 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.RequiresApi;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
@@ -341,7 +339,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         public TextView tvDistance;
         @BindView(R.id.tvOpen)
         public TextView tvOpen;
-        @BindView(R.id.ivSchedule)
+        @BindView(R.id.ivOpeningHours)
         public ImageView ivClock;
         @BindView(R.id.ivPhone)
         public ImageView ivPhone;
@@ -375,19 +373,23 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         public void onClick(View view) {
             int id= view.getId();
             int position = getAdapterPosition();
+            Pharmacy pharmacy=mPharmacyList.get(position);
             switch (id) {
 
                 case R.id.ivPhone:
-                    mClickHandler.onClickPhone(mPharmacyList.get(position).getPhone());
+                    mClickHandler.onClickPhone(pharmacy.getPhone());
                     break;
                 case R.id.ivGo:
-                    mClickHandler.onClickGo(mPharmacyList.get(position));
+                    mClickHandler.onClickGo(pharmacy);
                     break;
                 case R.id.ivShare:
-                    mClickHandler.onClickShare(mPharmacyList.get(position));
+                    mClickHandler.onClickShare(pharmacy);
                     break;
                 case R.id.ivFavorite:
-                    mClickHandler.onClickFavorite(mPharmacyList.get(position));
+                    mClickHandler.onClickFavorite(pharmacy);
+                    break;
+                case R.id.ivOpeningHours:
+                    mClickHandler.onClickOpeningHours(pharmacy.getHours());
                     break;
 
             }
@@ -402,5 +404,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         void onClickFavorite(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
+        void onClickOpeningHours(String oh);
     }
 }

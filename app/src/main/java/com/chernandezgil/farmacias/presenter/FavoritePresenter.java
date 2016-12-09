@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -96,9 +97,12 @@ public class FavoritePresenter implements FavoriteContract.Presenter<FavoriteCon
     }
 
     @Override
-    public void onClickClock(String hour) {
+    public void onClickOpeningHours(String hour) {
 
-        mView.showSchedule(Utils.is24Hours(hour));
+        int layoutId = Utils.is24HoursPharmacy(hour)? R.layout.dialog_opening_hours_24_hours
+                :R.layout.dialog_opening_hours_normal;
+
+        mView.showOpeningHours(layoutId);
     }
 
     @Override

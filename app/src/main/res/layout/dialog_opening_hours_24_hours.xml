@@ -8,5 +8,5 @@
     android:layout_centerInParent="true"
     android:gravity="center"
     android:textSize="20sp"
-    android:text="Abierto 24 horas"/>
+    android:text="@string/doh_24h_open"/>
 </RelativeLayout>

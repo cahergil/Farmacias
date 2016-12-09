@@ -465,7 +465,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         public TextView tvDistance;
         @BindView(R.id.tvOpen)
         public TextView tvOpen;
-        @BindView(R.id.ivSchedule)
+        @BindView(R.id.ivOpeningHours)
         public ImageView ivClock;
         @BindView(R.id.ivPhone)
         public ImageView ivPhone;
@@ -511,8 +511,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                 case R.id.ivShare:
                     mClickHandler.onClickShare(mList.get(position));
                     break;
-                case R.id.ivSchedule:
-                    mClickHandler.onClickClock(mList.get(position).getHorario());
+                case R.id.ivOpeningHours:
+                    mClickHandler.onClickOpeningHours(mList.get(position).getHorario());
             }
         }
 
@@ -532,7 +532,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         void onClickGo(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
-        void onClickClock(String hour);
+        void onClickOpeningHours(String hour);
         void onListEmpty();
     }
 }

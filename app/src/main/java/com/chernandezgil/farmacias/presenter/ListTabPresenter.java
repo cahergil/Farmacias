@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -154,6 +156,14 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
             return;
         }
         mView.showSnackBar(snackMessage);
+    }
+
+    @Override
+    public void onClickOpeningHours(String hour) {
+        int layoutId = Utils.is24HoursPharmacy(hour)? R.layout.dialog_opening_hours_24_hours
+                :R.layout.dialog_opening_hours_normal;
+
+        mView.showOpeningHours(layoutId);
     }
 
     private void bindView(Cursor data) {

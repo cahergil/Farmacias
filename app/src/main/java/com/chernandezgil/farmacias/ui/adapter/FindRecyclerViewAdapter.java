@@ -156,7 +156,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         holder.ivPhone.setOnClickListener(this);
         holder.ivGo.setOnClickListener(this);
         holder.ivShare.setOnClickListener(this);
-        holder.ivSchedule.setOnClickListener(this);
+        holder.ivOpeningHours.setOnClickListener(this);
         holder.ivFavorite.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -202,9 +202,10 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
             case R.id.ivShare:
                 mCallback.onClickShare(pharmacy);
                 break;
-            case R.id.ivSchedule:
-
+            case R.id.ivOpeningHours:
+                mCallback.onClickClock(pharmacy.getHorario());
                 break;
+
             case R.id.ivFavorite:
                 mCallback.onClickFavorite(pharmacy);
                 break;
@@ -318,7 +319,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         holder.ivPhone.setTag(holder);
         holder.ivGo.setTag(holder);
         holder.ivShare.setTag(holder);
-        holder.ivSchedule.setTag(holder);
+        holder.ivOpeningHours.setTag(holder);
         holder.ivFavorite.setTag(holder);
     }
 
@@ -336,7 +337,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         holder.llOptionsRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivGo.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivPhone.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-        holder.ivSchedule.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivOpeningHours.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivShare.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
     }
@@ -375,8 +376,8 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         ImageView ivPhone;
         @BindView(R.id.ivShare)
         ImageView ivShare;
-        @BindView(R.id.ivSchedule)
-        ImageView ivSchedule;
+        @BindView(R.id.ivOpeningHours)
+        ImageView ivOpeningHours;
         @BindView(R.id.ivFavorite)
         ImageView ivFavorite;
         @BindView(R.id.optionsRow)
@@ -397,5 +398,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         void onClickPhone(String phone);
 
         void onClickShare(Pharmacy pharmacy);
+
+        void onClickClock(String oh);
     }
 }

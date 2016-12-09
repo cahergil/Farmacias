@@ -45,7 +45,7 @@
         <ImageView
             android:background="?selectableItemBackgroundBorderless"
             android:visibility="gone"
-            android:id="@+id/ivSchedule"
+            android:id="@+id/ivOpeningHours"
             style="@style/ImageViewOptions"
             app:srcCompat="@drawable/clock" />
 

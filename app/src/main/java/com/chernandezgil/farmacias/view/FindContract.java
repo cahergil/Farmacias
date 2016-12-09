@@ -26,6 +26,7 @@ public interface FindContract {
         public void hideQuickSearchRecyclerView();
         public void launchActivity(Intent intent);
         public void showSnackBar(String message);
+        public void showOpeningHours(int layout);
 
 
 
@@ -47,6 +48,7 @@ public interface FindContract {
         public void onClickFavorite(Pharmacy pharmacy);
         public void onClickPhone(String phone);
         public void onClickShare(Pharmacy pharmacy);
+        public void onClickOpeningHours(String hour);
 
 
     }

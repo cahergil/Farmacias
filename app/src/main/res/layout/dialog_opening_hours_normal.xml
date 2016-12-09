@@ -18,18 +18,14 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_lunes"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
             android:id="@+id/textView1" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_normal_hour"
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -39,18 +35,15 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_martes"
             android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
             android:id="@+id/textView2" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_normal_hour"
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -60,18 +53,15 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_miercoles"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
+
             android:id="@+id/textView3" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_normal_hour"
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -81,18 +71,16 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_jueves"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
+
             android:id="@+id/textView4" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_normal_hour"
+
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -102,18 +90,16 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_viernes"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
+
             android:id="@+id/textView5" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_normal_hour"
+
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -123,18 +109,16 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_sabado"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
+
             android:id="@+id/textView6" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_sabado_hour"
+
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -144,18 +128,15 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Hours"
             android:text="@string/sn_domingo"
-            android:gravity="right"
-            android:paddingRight="5dp"
-            android:layout_weight="1"
+
             android:id="@+id/textView7" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hola"
+            android:text="@string/sn_na_hour"
             android:layout_weight="1"/>
 
     </LinearLayout>

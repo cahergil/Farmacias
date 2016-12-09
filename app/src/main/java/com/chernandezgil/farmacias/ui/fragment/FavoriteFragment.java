@@ -10,7 +10,6 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -21,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.FavoritePresenter;
@@ -167,24 +167,10 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     }
 
     @Override
-    public void showSchedule(boolean flag24h) {
-        int layoutId;
-        if(flag24h) {
-            layoutId = R.layout.schedule_24_hours;
-        } else {
-            layoutId = R.layout.schedule_normal;
-        }
+    public void showOpeningHours(int layoutId) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        View v = inflater.inflate(layoutId, null);
-        builder.setView(v);
-        builder.setPositiveButton("ok",null);
-        builder.setTitle("horarios");
-        builder.setMessage("este es el mensaje");
-        AlertDialog ad=builder.create();
-        ad.show();
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId);
+        dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
     }
 
     @Override
@@ -214,8 +200,8 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
 
     @Override
-    public void onClickClock(String hour) {
-        mPresenter.onClickClock(hour);
+    public void onClickOpeningHours(String hour) {
+        mPresenter.onClickOpeningHours(hour);
 
     }
 

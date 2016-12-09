@@ -31,8 +31,8 @@
 
             <TextView
                 android:id="@+id/tvOrder"
-                android:layout_width="39dp"
-                android:layout_height="39dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/shape_circle_order_open"
                 android:gravity="center"

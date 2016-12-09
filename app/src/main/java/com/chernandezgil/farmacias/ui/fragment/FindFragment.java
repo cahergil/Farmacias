@@ -54,6 +54,7 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.BottomNavigation;
+import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -688,6 +689,18 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public void onClickShare(Pharmacy pharmacy) {
         mPresenter.onClickShare(pharmacy);
+    }
+
+    @Override
+    public void onClickClock(String oh) {
+        mPresenter.onClickOpeningHours(oh);
+    }
+
+    @Override
+    public void showOpeningHours(int layoutId) {
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId);
+        dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
+
     }
 
     @Override

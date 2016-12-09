@@ -132,7 +132,9 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     }
 
     public void stopTracking() {
-        stopLocationUpdates(getGoogleApiClient());
+        //
+        if(getGoogleApiClient().isConnected())
+            stopLocationUpdates(getGoogleApiClient());
         Utils.logD(LOG_TAG, "stopLocationUpdates");
     }
 

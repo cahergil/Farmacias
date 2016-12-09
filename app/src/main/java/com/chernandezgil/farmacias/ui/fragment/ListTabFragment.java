@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
@@ -248,6 +249,13 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
 
     @Override
+    public void showOpeningHours(int layoutId) {
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId);
+        dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
+
+    }
+
+    @Override
     public void onClickGo(Pharmacy pharmacy) {
         Utils.logD(LOG_TAG, "onClickGo");
 
@@ -278,6 +286,11 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public void onClickShare(Pharmacy pharmacy) {
         mPresenter.handleClickShare(pharmacy);
+    }
+
+    @Override
+    public void onClickOpeningHours(String oh) {
+        mPresenter.onClickOpeningHours(oh);
     }
 
     @Override
