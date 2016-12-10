@@ -512,7 +512,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                     mClickHandler.onClickShare(mList.get(position));
                     break;
                 case R.id.ivOpeningHours:
-                    mClickHandler.onClickOpeningHours(mList.get(position).getHorario());
+                    mClickHandler.onClickOpeningHours(mList.get(position).getHours());
             }
         }
 
@@ -528,7 +528,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         }
     }
 
-    public static interface FavoriteAdapterOnClickHandler {
+    public  interface FavoriteAdapterOnClickHandler {
         void onClickGo(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);

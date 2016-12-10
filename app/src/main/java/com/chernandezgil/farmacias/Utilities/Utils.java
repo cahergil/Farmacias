@@ -32,6 +32,7 @@ import com.chernandezgil.farmacias.MyApplication;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
+import com.chernandezgil.farmacias.model.Pharmacy;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -447,5 +448,11 @@ public class Utils {
         return MyApplication.getContext().getResources().getDimension(dimensionResId);
     }
 
+
+    public static int getStatusPharmacyColor(Pharmacy pharmacy) {
+        Context context =MyApplication.getContext();
+        return pharmacy.isOpen()? ContextCompat.getColor(context,R.color.pharmacy_open):
+                ContextCompat.getColor(context,R.color.pharmacy_close);
+    }
 
 }

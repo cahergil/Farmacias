@@ -389,7 +389,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                     mClickHandler.onClickFavorite(pharmacy);
                     break;
                 case R.id.ivOpeningHours:
-                    mClickHandler.onClickOpeningHours(pharmacy.getHours());
+                    mClickHandler.onClickOpeningHours(pharmacy);
                     break;
 
             }
@@ -399,11 +399,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
 
     }
 
-    public static interface ListTabAdapterOnClickHandler {
+    public interface ListTabAdapterOnClickHandler {
         void onClickGo(Pharmacy pharmacy);
         void onClickFavorite(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);
-        void onClickOpeningHours(String oh);
+        void onClickOpeningHours(Pharmacy pharmacy);
     }
 }

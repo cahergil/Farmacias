@@ -249,8 +249,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
 
     @Override
-    public void showOpeningHours(int layoutId) {
-        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId);
+    public void showOpeningHours(int layoutId,int backgroundColor) {
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId,backgroundColor);
         dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
 
     }
@@ -289,8 +289,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
 
     @Override
-    public void onClickOpeningHours(String oh) {
-        mPresenter.onClickOpeningHours(oh);
+    public void onClickOpeningHours(Pharmacy pharmacy) {
+        mPresenter.onClickOpeningHours(pharmacy);
     }
 
     @Override

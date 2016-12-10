@@ -159,11 +159,12 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     }
 
     @Override
-    public void onClickOpeningHours(String hour) {
-        int layoutId = Utils.is24HoursPharmacy(hour)? R.layout.dialog_opening_hours_24_hours
+    public void onClickOpeningHours(Pharmacy pharmacy) {
+        int layoutId = Utils.is24HoursPharmacy(pharmacy.getHours())? R.layout.dialog_opening_hours_24_hours
                 :R.layout.dialog_opening_hours_normal;
+        int titleBackgroundColor=Utils.getStatusPharmacyColor(pharmacy);
 
-        mView.showOpeningHours(layoutId);
+        mView.showOpeningHours(layoutId,titleBackgroundColor);
     }
 
     private void bindView(Cursor data) {

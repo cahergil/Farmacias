@@ -21,7 +21,7 @@ public interface ListTabContract {
         public void hideLoading();
         public void setAddress(String address);
         public void launchActivity(Intent intent);
-        public void showOpeningHours(int layout);
+        public void showOpeningHours(int layout,int titleBackgroundColor);
 
 
     }
@@ -39,7 +39,7 @@ public interface ListTabContract {
         public void handleClickCall(String phone);
         public void handleClickShare(Pharmacy pharmacy);
         public void handleClickFavorite(Pharmacy pharmacy);
-        public void onClickOpeningHours(String hour);
+        public void onClickOpeningHours(Pharmacy pharmacy);
 
 
 
