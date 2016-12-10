@@ -18,7 +18,12 @@
         <item name="windowNoTitle">true</item>
         <!--if false it draws the status bar with color black-->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <!--transparent so that the drawer can be seen behind the status bar-->
+        <!--transparent so that the drawer can be seen behind the status bar
+          <item name="android:statusBarColor">@android:color/transparent</item>
+          It appears a shadow effect at the bottom of the statusbar, don't know why: by commenting
+          this line can get rid of that effect. But there is a effectiver method, that is set to
+          false the fitsystemwindows in Coordinatorlayout in activity_main.xml
+        -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:colorControlHighlight">@color/colorAccent</item>
         <!--enable content transitions-->

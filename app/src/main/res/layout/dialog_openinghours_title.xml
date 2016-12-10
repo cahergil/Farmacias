@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="30dp"
+    android:layout_height="50dp"
+    android:id="@+id/titleDialog"
     android:background="@color/gray700"
     android:orientation="horizontal">
 
@@ -10,18 +11,20 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="12dp"
         android:id="@+id/imageClock"
+        android:layout_height="32dp"
         android:layout_width="32dp"
         app:srcCompat="@drawable/clock"
         android:tint="@color/white"
-        android:layout_height="32dp" />
+         />
 
     <TextView
         android:layout_toRightOf="@+id/imageClock"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/dialog_title"
-        android:textSize="30sp"
+        android:textSize="24sp"
         android:layout_alignTop="@+id/imageClock"
         android:textColor="@color/white"
         android:layout_marginLeft="15dp"
-        android:layout_height="wrap_content" />
+         />
 </RelativeLayout>

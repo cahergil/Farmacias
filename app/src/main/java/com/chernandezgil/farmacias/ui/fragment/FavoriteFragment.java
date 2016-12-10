@@ -57,7 +57,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     private FavoriteAdapter mAdapter;
     private Unbinder mUnbinder;
     private ItemTouchHelper mItemTouchHelper;
-
+    private AppBarLayout mAppBarLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,20 +110,17 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mAppBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setAppBarElevation(R.dimen.appbar_elevation);
+            float elevation =getActivity().getResources().getDimension(R.dimen.appbar_elevation);
+            setAppBarElevation(elevation);
         }
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void setAppBarElevation(int elevation) {
-        AppBarLayout appBarLayout= (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
-        if(elevation!=0) {
-            appBarLayout.setElevation(getResources().getDimension(R.dimen.appbar_elevation));
-        } else {
-            appBarLayout.setElevation(0);
-        }
+    private void setAppBarElevation(float elevation) {
+            mAppBarLayout.setElevation(elevation);
     }
 
     private void setUpRecyclerView(){

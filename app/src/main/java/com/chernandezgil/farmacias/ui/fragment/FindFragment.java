@@ -46,16 +46,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
-import com.chernandezgil.farmacias.customwidget.BottomNavigation;
 import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
-import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
@@ -83,15 +79,13 @@ import butterknife.Unbinder;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
-import static com.chernandezgil.farmacias.Utilities.Constants.BOTTOM_NAVIGATION_HEIGHT;
-
 
 /**
  * Created by Carlos on 10/07/2016.
  */
 public class FindFragment extends Fragment implements FindContract.View,
-        FindQuickSearchAdapter.OnClickHandler,FindRecyclerViewAdapter.OnClickHandler,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        FindQuickSearchAdapter.OnClickHandler, FindRecyclerViewAdapter.OnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private static final String LOG_TAG = FindFragment.class.getSimpleName();
@@ -130,7 +124,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     private String mQuickSearchText;
     private Drawable mDimDrawable;
     private Toolbar mActionBar;
-
+    private AppBarLayout mAppBarLayout;
 
 
     @Override
@@ -147,7 +141,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         LoaderManager loaderManager = getLoaderManager();
         Geocoder geocoder = new Geocoder(getActivity());
         // loaderManager.enableDebugLogging(true);
-        mPresenter = new FindPresenter(mLocation, loaderManager, loaderProvider,geocoder);
+        mPresenter = new FindPresenter(mLocation, loaderManager, loaderProvider, geocoder);
 
         setHasOptionsMenu(true);
         mRecentSearchSuggestions = new SearchRecentSuggestions(getContext(),
@@ -167,7 +161,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         setUpRecyclerView();
         setDimDrawable();
         mPresenter.setView(this);
-        mActionBar=((MainActivity)getActivity()).getToolbar();
+        mActionBar = ((MainActivity) getActivity()).getToolbar();
 
 
         return view;
@@ -177,8 +171,10 @@ public class FindFragment extends Fragment implements FindContract.View,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        mAppBarLayout = (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setAppBarElevation(R.dimen.appbar_elevation);
+            float elevation = getActivity().getResources().getDimension(R.dimen.appbar_elevation);
+            setAppBarElevation(elevation);
         }
         initializeSearchUiWidgets();
         if (savedInstanceState == null) {
@@ -189,23 +185,23 @@ public class FindFragment extends Fragment implements FindContract.View,
             mCardOnScreen = savedInstanceState.getBoolean("card_on_screen_key");
             String searchText = savedInstanceState.getString("last_search_editor_key");
             if (mCardOnScreen) {
-                int quickSearchRecyclerViewVisibility=savedInstanceState.getInt("quickSearchRecyclerViewState");
+                int quickSearchRecyclerViewVisibility = savedInstanceState.getInt("quickSearchRecyclerViewState");
                 mPresenter.onInitLoader();
                 mSearchCardView.setVisibility(View.VISIBLE);
-              //  int options = mSearchEditor.getImeOptions();
-             //   mSearchEditor.setImeOptions(options | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                //  int options = mSearchEditor.getImeOptions();
+                //   mSearchEditor.setImeOptions(options | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
                 mSearchEditor.setImeOptions(mSearchEditor.getImeOptions() | EditorInfo.IME_ACTION_SEARCH |
                         EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN);
                 //if quickSearchRecyclerView was visible before rotation, that means that the user
                 //was searching-> restore state of searching
                 if (quickSearchRecyclerViewVisibility == View.VISIBLE) {
-                    Utils.setLightStatusBar(mSearchCardView,getActivity());
+                    Utils.setLightStatusBar(mSearchCardView, getActivity());
                     mQuickSearchRecyclerView.setVisibility(View.VISIBLE);
                     //don't know why always get the mSearchEditor.getText()=""
                     //although in the view appears the characters.
                     //for that reason save the last search string
                     mFindQuickSearchAdapter.setmSearchString(searchText);
-                    if(searchText.length()>0) {
+                    if (searchText.length() > 0) {
                         showClearSearchIcon();
                     }
                     //LoaderManager retains the state of the cursor of the last search
@@ -250,7 +246,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 //the previous results. This way always present the recent searches
                 mPresenter.onRestartLoaderQuickSearch("");
                 initializeSearchCardView();
-                Utils.setLightStatusBar(mSearchCardView,getActivity());
+                Utils.setLightStatusBar(mSearchCardView, getActivity());
 
                 return true;
 
@@ -290,20 +286,17 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     private void initializeSearchCardView() {
         SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
-        //if we haben removed the focus before this is necessary. If it is the first click not.
+        //if we habe removed the focus before this is necessary. If it is the first click not.
         requestFocusOnSearchEditor();
         mCardOnScreen = true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void setAppBarElevation(int elevation) {
-        AppBarLayout appBarLayout= (AppBarLayout) getActivity().findViewById(R.id.appBarLayout);
-        if(elevation!=0) {
-            appBarLayout.setElevation(getResources().getDimension(R.dimen.appbar_elevation));
-        } else {
-            appBarLayout.setElevation(0);
-        }
+    private void setAppBarElevation(float elevation) {
+
+        mAppBarLayout.setElevation(elevation);
     }
+
     private void initializeSearchUiWidgets() {
 
         setUpQuickSearchRecyclerView();
@@ -347,14 +340,14 @@ public class FindFragment extends Fragment implements FindContract.View,
 
             @Override
             public void afterTextChanged(Editable editable) {
-              //  String text = mSearchEditor.getText().toString();
-                  String text =  editable.toString();
+                //  String text = mSearchEditor.getText().toString();
+                String text = editable.toString();
 
                 if (mQuickSearchText != null && mQuickSearchText.equals(text)) {
                     //after having selected a suggestion:
                     //set text of suggestions in SearchEditor -> gets the focus again
                     //use get the data again to be ready for the next time we click on searchEditor
-                    startQuickSearch(text,false);
+                    startQuickSearch(text, false);
                     return;
                 }
                 if (!mCardOnScreen) return;
@@ -365,7 +358,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                     return;
                 }
 
-                startQuickSearch(text,true);
+                startQuickSearch(text, true);
             }
         });
         //https://kotlin.link/articles/RxAndroid-and-Kotlin-Part-1.html
@@ -401,7 +394,6 @@ public class FindFragment extends Fragment implements FindContract.View,
                 clearFocusFromSearchEditor();
 
 
-
             }
         });
         mClearSearch.setOnClickListener(new View.OnClickListener() {
@@ -415,28 +407,33 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     }
 
-    private void setDimDrawable(){
-        mDimDrawable =ContextCompat.getDrawable(getContext(),R.drawable.dim_drawable);
+    private void setDimDrawable() {
+        mDimDrawable = ContextCompat.getDrawable(getContext(), R.drawable.dim_drawable);
     }
-    private void dimScreen(){
+
+    private void dimScreen() {
         mRootView.setForeground(mDimDrawable);
         mRootView.getForeground().setAlpha(180);
     }
+
     private void unDimScren() {
         //this way the vertical separators in locality, adress etc are shown
         mRootView.setForeground(null);
         //mRootView.getForeground().setAlpha(0);
     }
+
     private void showClearSearchIcon() {
         mClearSearch.setVisibility(View.VISIBLE);
     }
+
     private void hideClearSearchIcon() {
         mClearSearch.setVisibility(View.INVISIBLE);
     }
-    private void startQuickSearch(String s,boolean flagShowQuickSearchRecyclerView) {
+
+    private void startQuickSearch(String s, boolean flagShowQuickSearchRecyclerView) {
         Utils.logD(LOG_TAG, "startQuickSearch");
 
-        if(flagShowQuickSearchRecyclerView) {
+        if (flagShowQuickSearchRecyclerView) {
             showQuickSearchRecyclerView();
 
         }
@@ -460,7 +457,6 @@ public class FindFragment extends Fragment implements FindContract.View,
     }
 
 
-
     private void showQuickSearchRecyclerView() {
         mQuickSearchRecyclerView.setVisibility(View.VISIBLE);
 
@@ -480,20 +476,21 @@ public class FindFragment extends Fragment implements FindContract.View,
         mQuickSearchRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
     }
+
     private void setUpRecyclerView() {
 
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        mAdapter = new FindRecyclerViewAdapter(getContext(),mRecyclerView, customItemAnimator, this);
+        mAdapter = new FindRecyclerViewAdapter(getContext(), mRecyclerView, customItemAnimator, this);
         mRecyclerView.setItemAnimator(customItemAnimator);
-    //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
+        //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
 
 
         mRecyclerView.setAdapter(mAdapter);
-       // mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        // mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
-        Utils.logD(LOG_TAG,"prueba");
+        Utils.logD(LOG_TAG, "prueba");
 
     }
 
@@ -514,7 +511,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void showResultsQuickSearch(List<SuggestionsBean> list) {
-        Utils.logD(LOG_TAG,"showResultsQuickSearch");
+        Utils.logD(LOG_TAG, "showResultsQuickSearch");
 
         mFindQuickSearchAdapter.swapData(list);
     }
@@ -583,6 +580,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     /**
      * Initialize a search for the recyclerview and a search for the QuickSearchRecyclerview( just after
      * mSearchEditor.setText(text)), that way the QuickSearchRecyclerview is always updated
+     *
      * @param text
      */
     @Override
@@ -593,7 +591,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         hideQuickSearchRecyclerView();
         mSearchEditor.setText(text);
         clearFocusFromSearchEditor();
-        ObjectAnimator animator = ObjectAnimator.ofFloat(mRecyclerView,"translationY", mRootView.getBottom(),
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mRecyclerView, "translationY", mRootView.getBottom(),
                 0f);
         animator.setDuration(300);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -612,16 +610,16 @@ public class FindFragment extends Fragment implements FindContract.View,
         int deletedRows = getActivity().getContentResolver().delete(uri,
                 "display1" + " like ? ",
                 new String[]{text});
-        if(deletedRows>0) {
-             mPresenter.onRestartLoaderQuickSearch(mSearchEditor.getText().toString());
+        if (deletedRows > 0) {
+            mPresenter.onRestartLoaderQuickSearch(mSearchEditor.getText().toString());
         }
     }
 
     private void clearFocusFromSearchEditor() {
-     //   mSearchEditor.clearFocus();
+        //   mSearchEditor.clearFocus();
         //Note: When a View clears focus the framework is trying to give focus to the first focusable View from the top. Hence, if this View is the first from the top that can take focus, then all callbacks related to clearing focus will be invoked after which the framework will give focus to this view.
         //the solution is make another element focusable and request its focus, in this case I chose mRecyclerview
-    //    mRecyclerView.requestFocus();
+        //    mRecyclerView.requestFocus();
         mRootView.requestFocus();
     }
 
@@ -641,8 +639,8 @@ public class FindFragment extends Fragment implements FindContract.View,
         hideSoftKeyBoard(); // task done when back in search editor
         hideSearchCardView(); // task done when back in search editor
         hideQuickSearchRecyclerView(); // task done when back in search editor
-     //   clearSearchEditor();
-     //   clearFocusFromSearchEditor();
+        //   clearSearchEditor();
+        //   clearFocusFromSearchEditor();
     }
 
     @Override
@@ -652,10 +650,10 @@ public class FindFragment extends Fragment implements FindContract.View,
             public void run() {
 
                 //another way instead of using a dummy coordinator in main_activity
-                Snackbar snack = Snackbar.make(mRootView,message, Snackbar.LENGTH_SHORT);
+                Snackbar snack = Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT);
                 snack.show();
-          //      SnackBarWrapper snack= new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
-           //     snack.show();
+                //      SnackBarWrapper snack= new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
+                //     snack.show();
 //                Snackbar snack = Snackbar.make(mActivityCoordinator,message, Snackbar.LENGTH_SHORT);
 //
 //                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)
@@ -673,7 +671,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     @Override
     public void onClickGo(Pharmacy pharmacy) {
-        mPresenter.onClickGo(pharmacy,mLocation);
+        mPresenter.onClickGo(pharmacy, mLocation);
     }
 
     @Override
@@ -699,7 +697,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public void showOpeningHours(int layoutId) {
         DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId);
-        dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
+        dialog.show(getActivity().getSupportFragmentManager(), "DIALOG");
 
     }
 
