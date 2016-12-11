@@ -32,20 +32,23 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
     private SparseArray<TextView> mHasMapText;
     private int lastCheckedId = NONE;
 
-    private BottomNavigationListener mListener;
+    private OnClickListener mOnClickListener;
+    private OnTapActiveActionListener mOnReClickListener;
 
-
-    public void setOnClickBottomNavigationListener(BottomNavigationListener mListener) {
-        this.mListener = mListener;
-    }
 
     public BottomNavigation(Context context) {
         super(context);
-        //   init();
+        init(context);
     }
 
     public BottomNavigation(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+
+    }
+
+    private void init(Context context) {
+
         inflate(context, R.layout.customview_bottom_navigation, this);
         llAround = (LinearLayout) findViewById(R.id.llAround);
         llBuscar = (LinearLayout) findViewById(R.id.llBuscar);
@@ -75,20 +78,31 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
 
     }
 
+    public void setOnClickBottomNavigationListener(OnClickListener mListener) {
+        this.mOnClickListener = mListener;
+    }
+
+    public void setOnReClickListener(OnTapActiveActionListener mReClickListener) {
+        this.mOnReClickListener = mReClickListener;
+    }
+
 
     @Override
     public void onClick(View view) {
-//        animatorcheck = new animatorset();
-//        animatoruncheck = new animatorset();
+
         int id = view.getId();
 
-        if(id == lastCheckedId) {
-            //implement scroll up in recyclerviews
+        if (id == lastCheckedId) {
+            //implement scroll first in recyclerviews
+            if (mOnReClickListener != null) {
+                mOnReClickListener.onTapActiveAction(getOption(id));
+            }
             return;
+
         }
-        moveAnimations(id,true);
-        if(mListener != null ) {
-            mListener.onBottomNavigationClick(getOption(id));
+        moveAnimations(id, true);
+        if (mOnClickListener != null) {
+            mOnClickListener.onBottomNavigationClick(getOption(id));
         }
 
 
@@ -106,7 +120,8 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             case R.id.llFavorite:
                 option = 2;
                 break;
-            default: option =0;
+            default:
+                option = 0;
         }
         return option;
 
@@ -124,15 +139,18 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
             case 2:
                 id = R.id.llFavorite;
                 break;
-            default: id =R.id.llAround;
+            default:
+                id = R.id.llAround;
         }
 
         return id;
     }
+
     public void upDateStatus(int option) {
 
-        moveAnimations(getId(option),false);
+        moveAnimations(getId(option), false);
     }
+
     private void moveAnimations(int id, boolean move) {
         AnimatorSet animatorCheck = new AnimatorSet();
         AnimatorSet animatorUncheck = new AnimatorSet();
@@ -159,13 +177,12 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
         animatorCheck.setInterpolator(new DecelerateInterpolator());
 
 
-
         if (lastCheckedId != NONE) {
             //play reverse animation for last checked AppCompatImageView
-            ObjectAnimator textViewScaleXDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_X, 1, 0).setDuration(move?ANIMATION_DURATION:0);
-            ObjectAnimator textViewScaleYDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_Y, 1, 0).setDuration(move?ANIMATION_DURATION:0);
+            ObjectAnimator textViewScaleXDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_X, 1, 0).setDuration(move ? ANIMATION_DURATION : 0);
+            ObjectAnimator textViewScaleYDownpAnimator = ObjectAnimator.ofFloat(mHasMapText.get(lastCheckedId), View.SCALE_Y, 1, 0).setDuration(move ? ANIMATION_DURATION : 0);
             ObjectAnimator imageViewTranslateDownAnimator = ObjectAnimator.ofFloat(mHasMapImages.get(lastCheckedId), View.TRANSLATION_Y, Utils.convertDpToPixel(1, getContext()))
-                    .setDuration(move?ANIMATION_DURATION:0);
+                    .setDuration(move ? ANIMATION_DURATION : 0);
             animatorUncheck.playTogether(textViewScaleXDownpAnimator,
                     textViewScaleYDownpAnimator,
                     imageViewTranslateDownAnimator
@@ -176,8 +193,8 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
         animatorCheck.start();
 
 
-
     }
+
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -188,19 +205,16 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if(!(state instanceof SavedState)) {
+        if (!(state instanceof SavedState)) {
             super.onRestoreInstanceState(state);
             return;
         }
-        SavedState ss = (SavedState)state;
+        SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
         this.lastCheckedId = ss.lastCheckedId;
-        moveAnimations(this.lastCheckedId,false);
+        moveAnimations(this.lastCheckedId, false);
 
     }
-
-
-
 
 
     private void setTextVisibility(int id, int visibility) {
@@ -251,13 +265,15 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
     static class SavedState extends BaseSavedState {
         int lastCheckedId;
 
-         SavedState(Parcelable superState) {
+        SavedState(Parcelable superState) {
             super(superState);
         }
+
         private SavedState(Parcel in) {
             super(in);
             this.lastCheckedId = in.readInt();
         }
+
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
@@ -265,7 +281,7 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>(){
+                new Parcelable.Creator<SavedState>() {
 
                     @Override
                     public SavedState createFromParcel(Parcel parcel) {
@@ -280,8 +296,13 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
 
     }
 
-    public interface BottomNavigationListener {
-        public void onBottomNavigationClick(int option);
+    public interface OnClickListener {
+        void onBottomNavigationClick(int option);
+    }
+
+    public interface OnTapActiveActionListener {
+        void onTapActiveAction(int option);
+
     }
 
 }

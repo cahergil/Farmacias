@@ -67,7 +67,8 @@ import icepick.State;
 public class MainActivity extends AppCompatActivity implements
         MainActivityContract.View, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        ListTabFragment.Callbacks,BottomNavigation.BottomNavigationListener {
+        ListTabFragment.Callbacks, BottomNavigation.OnClickListener,
+        BottomNavigation.OnTapActiveActionListener {
 
     // TouchableWrapper.UpdateMapUserClick
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements
     private static final int REQUEST_CODE_PERMISSION = 61125;
 
 
-
     @BindView(R.id.navigation_drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements
     Toolbar toolbar;
     @BindView(R.id.bottom_navigation)
     BottomNavigation mBottomNavigationView;
-
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -243,7 +242,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Utils.logD(LOG_TAG, "onConnected");
@@ -365,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements
             if (resultCode == RESULT_OK) {
 
                 if (mRadio != mSharedPreferences.getRadio() && mCurrentFragment == 0) {
-                      mRadioChanged = true;
+                    mRadioChanged = true;
                 }
             }
         }
@@ -452,10 +450,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
 
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                    coordinateSelection(option);
-
-
+                drawerLayout.closeDrawer(GravityCompat.START);
+                coordinateSelection(option);
 
 
                 return true;
@@ -468,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements
         drawerLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (option<=2) {
+                if (option <= 2) {
                     addFragment(option);
                 } else {
                     launchSettings();
@@ -483,33 +479,49 @@ public class MainActivity extends AppCompatActivity implements
     private void setUpBottomNavigation() {
         mBottomNavigationView.upDateStatus(mCurrentFragment);
         mBottomNavigationView.setOnClickBottomNavigationListener(this);
+        mBottomNavigationView.setOnReClickListener(this);
 
 
     }
 
     @Override
+    public void onTapActiveAction(int option) {
+
+        List<Fragment> list = getSupportFragmentManager().getFragments();
+        for (int i = 0; i < list.size(); i++) {
+            Fragment f = list.get(i);
+            if (option == 0 && (f instanceof TabLayoutFragment)) {
+                List<Fragment> childList = ((TabLayoutFragment) f).getChildFragmentManager().getFragments();
+                for (int j = 0; j < childList.size(); j++) {
+                    Fragment cf = childList.get(j);
+                    if (cf instanceof ListTabFragment) {
+                        ((ListTabFragment) cf).moveSmoothToTop();
+                    }
+                }
+            } else if (option == 1 && (f instanceof FindFragment)) {
+                ((FindFragment) f).moveSmoothToTop();
+            } else if (option == 2 && (f instanceof FavoriteFragment)) {
+                 ((FavoriteFragment) f).moveSmoothToTop();
+            } else {
+
+            }
+        }
+
+    }
+
+    @Override
     public void onBottomNavigationClick(int option) {
-       
-                updateNavigationDrawerSelection(option);
-                updateToolBarTitle(option);
-                setCurrentFragment(option);
-                postLaunchFragment(option);
+
+        updateNavigationDrawerSelection(option);
+        updateToolBarTitle(option);
+        setCurrentFragment(option);
+        postLaunchFragment(option);
     }
 
     private void updateNavigationDrawerSelection(int option) {
 
-                Menu menu = navigationView.getMenu();
-                menu.getItem(option).setChecked(true);
-    }
-
-    private void coordinateSelection(int option) {
-
-                updateNavigationDrawerSelection(option);
-                updateToolBarTitle(option);
-                updateBottomNavigationStatus(option);
-                setCurrentFragment(option);
-                postLaunchFragment(option);
-
+        Menu menu = navigationView.getMenu();
+        menu.getItem(option).setChecked(true);
     }
 
     private void updateToolBarTitle(int option) {
@@ -518,8 +530,19 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void updateBottomNavigationStatus(int option){
-                mBottomNavigationView.upDateStatus(option);
+    private void coordinateSelection(int option) {
+
+        updateNavigationDrawerSelection(option);
+        updateToolBarTitle(option);
+        updateBottomNavigationStatus(option);
+        setCurrentFragment(option);
+        postLaunchFragment(option);
+
+    }
+
+
+    private void updateBottomNavigationStatus(int option) {
+        mBottomNavigationView.upDateStatus(option);
 
     }
 
@@ -543,7 +566,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     private void addFragment(int position) {
         Utils.logD(LOG_TAG, "addFragment");
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -551,8 +573,8 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (position) {
             case 0:
-                 fragment = new TabLayoutFragment();
-                 break;
+                fragment = new TabLayoutFragment();
+                break;
             case 1:
                 fragment = new FindFragment();
                 break;
@@ -561,18 +583,18 @@ public class MainActivity extends AppCompatActivity implements
                 fragment = new FavoriteFragment();
                 break;
 
-            default: return;
-
+            default:
+                return;
 
 
         }
         ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        ft.replace(R.id.fragment,fragment).commit();
+        ft.replace(R.id.fragment, fragment).commit();
 
 
     }
 
-    private void launchSettings(){
+    private void launchSettings() {
         mRadio = mSharedPreferences.getRadio();
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivityForResult(intent, REQUEST_CODE_SETTINGS);
@@ -615,6 +637,7 @@ public class MainActivity extends AppCompatActivity implements
         mResolvingConnectionError = false;
     }
 
+
     /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
         public ErrorDialogFragment() {
@@ -651,7 +674,7 @@ public class MainActivity extends AppCompatActivity implements
             for (int i = 0; i < list.size(); i++) {
                 Fragment tabs = list.get(i);
                 if (tabs instanceof TabLayoutFragment) {
-
+                    //         List<Fragment> lista=tabs.getChildFragmentManager().getFragments();
                     SparseArray<Fragment> registeredFragments = ((TabLayoutFragment) tabs).getFragments();
                     MapTabFragment mapTabFragment = (MapTabFragment) registeredFragments.get(1);
                     return mapTabFragment;
@@ -678,7 +701,6 @@ public class MainActivity extends AppCompatActivity implements
         }
         return 0;
     }
-
 
 
     private boolean hasAllPermissions(String[] perms) {
@@ -709,7 +731,6 @@ public class MainActivity extends AppCompatActivity implements
 
         return (result.toArray(new String[result.size()]));
     }
-
 
 
 }

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+    <!--http://stackoverflow.com/questions/33726318/android-appbarlayout-elevation-appears-in-status-bar
+    in relation to android:fitsSystemWindows="false" in Coordinator-->
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_drawer_layout"
@@ -13,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false"
-        tools:context=".ui.activity.MainActivity">
+        tools:mContext=".ui.activity.MainActivity">
 
 
         <!--white background for the reveal effect, so it doesn't show the red color-->

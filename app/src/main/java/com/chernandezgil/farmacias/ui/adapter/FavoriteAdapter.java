@@ -35,6 +35,7 @@ import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperAdapter;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.ItemTouchHelperViewHolder;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
+import com.chernandezgil.farmacias.ui.fragment.FavoriteFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     private List<Pharmacy> mList;
     private Context mContext;
-    private FavoriteAdapterOnClickHandler mClickHandler;
+    private OnClickCallbacks mCallbacks;
     private static final String LOG_TAG=FavoriteAdapter.class.getSimpleName();
     private CustomItemAnimator mCustomItemAnimator;
     private int expandedPosition = RecyclerView.NO_POSITION;
@@ -70,22 +71,23 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     //swipe dismiss
     private static final int PENDING_REMOVAL_TIMEOUT = 3000; // 3sec
     private List<Pharmacy> itemsPendingRemoval;
-    private Handler handler = new Handler(); // hanlder for running delayed runnables
+    private Handler handler = new Handler(); // handler for running delayed runnables
     private HashMap<Pharmacy, Runnable> pendingRunnables = new HashMap<>(); // map of items to pending runnables, so we can cancel a removal if need be
     private PreferencesManager mSharedPreferences;
     private boolean mDismissCanceled;
     ColorMap mColorMap;
 
 
-    public FavoriteAdapter(Context context, FavoriteAdapterOnClickHandler clickHandler,
-                          RecyclerView recyclerView, CustomItemAnimator customItemAnimator,
-                           OnStartDragListener dragStartListener, PreferencesManager preferencesManager){
-        mContext=context;
-        mClickHandler=clickHandler;
+    public FavoriteAdapter(FavoriteFragment fragment,
+                           RecyclerView recyclerView,
+                           CustomItemAnimator customItemAnimator,
+                           PreferencesManager preferencesManager){
+        mContext=fragment.getActivity();
+        mCallbacks =fragment;
         mRecyclerView = recyclerView;
         mTm=new TimeMeasure("start FavoriteAdapter");
         mCustomItemAnimator = customItemAnimator;
-        mDragStartListener = dragStartListener;
+        mDragStartListener =  fragment;
         mSharedPreferences = preferencesManager;
         itemsPendingRemoval = new ArrayList<>();
         initColorMap();
@@ -157,6 +159,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     }
 
+
+
     private void initColorMap() {
         mColorMap = new ColorMap();
         HashMap<String,Integer> storedHashMap = mSharedPreferences.getColorMap();
@@ -191,7 +195,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         //in order to show the animation call this also
         notifyItemRangeChanged(position, getItemCount());
         if(mList.isEmpty()) {
-            mClickHandler.onListEmpty();
+            mCallbacks.onListEmpty();
         }
         
     }
@@ -503,16 +507,16 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             switch (id) {
 
                 case R.id.ivPhone:
-                    mClickHandler.onClickPhone(mList.get(position).getPhone());
+                    mCallbacks.onClickPhone(mList.get(position).getPhone());
                     break;
                 case R.id.ivGo:
-                    mClickHandler.onClickGo(mList.get(position));
+                    mCallbacks.onClickGo(mList.get(position));
                     break;
                 case R.id.ivShare:
-                    mClickHandler.onClickShare(mList.get(position));
+                    mCallbacks.onClickShare(mList.get(position));
                     break;
                 case R.id.ivOpeningHours:
-                    mClickHandler.onClickOpeningHours(mList.get(position).getHours());
+                    mCallbacks.onClickOpeningHours(mList.get(position).getHours());
             }
         }
 
@@ -528,7 +532,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         }
     }
 
-    public  interface FavoriteAdapterOnClickHandler {
+    public  interface OnClickCallbacks {
         void onClickGo(Pharmacy pharmacy);
         void onClickPhone(String phone);
         void onClickShare(Pharmacy pharmacy);

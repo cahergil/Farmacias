@@ -51,7 +51,8 @@ import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
-import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
+import com.chernandezgil.farmacias.customwidget.ScrollerLinearLayoutManager;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
@@ -65,6 +66,7 @@ import com.chernandezgil.farmacias.ui.adapter.FindRecyclerViewAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.view.FindContract;
+import com.chernandezgil.farmacias.view.MoveListToTop;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
 
@@ -84,8 +86,8 @@ import rx.subscriptions.CompositeSubscription;
  * Created by Carlos on 10/07/2016.
  */
 public class FindFragment extends Fragment implements FindContract.View,
-        FindQuickSearchAdapter.OnClickHandler, FindRecyclerViewAdapter.OnClickHandler,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        FindQuickSearchAdapter.OnClickHandler, FindRecyclerViewAdapter.OnClickCallbacks,
+        SharedPreferences.OnSharedPreferenceChangeListener,MoveListToTop {
 
 
     private static final String LOG_TAG = FindFragment.class.getSimpleName();
@@ -480,14 +482,10 @@ public class FindFragment extends Fragment implements FindContract.View,
     private void setUpRecyclerView() {
 
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        mAdapter = new FindRecyclerViewAdapter(getContext(), mRecyclerView, customItemAnimator, this);
+        mRecyclerView.setLayoutManager(new ScrollerLinearLayoutManager(getActivity()));
+        mAdapter = new FindRecyclerViewAdapter(this, mRecyclerView, customItemAnimator);
         mRecyclerView.setItemAnimator(customItemAnimator);
-        //    SlideInBottomAnimatorAdapter slideAdapter = new SlideInBottomAnimatorAdapter(mAdapter,mRecyclerView);
-
-
         mRecyclerView.setAdapter(mAdapter);
-        // mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
         Utils.logD(LOG_TAG, "prueba");
@@ -715,6 +713,13 @@ public class FindFragment extends Fragment implements FindContract.View,
             mPresenter.setLocation(mLocation);
 
 
+        }
+    }
+
+    @Override
+    public void moveSmoothToTop() {
+        if(mAdapter.getItemCount()!=0) {
+            mRecyclerView.smoothScrollToPosition(0);
         }
     }
 

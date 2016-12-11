@@ -10,7 +10,6 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -20,7 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.chernandezgil.farmacias.R;
-import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
+import com.chernandezgil.farmacias.customwidget.ScrollerLinearLayoutManager;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.presenter.FavoritePresenter;
@@ -31,6 +31,7 @@ import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.OnStartDragListener;
 import com.chernandezgil.farmacias.ui.adapter.touch_helper.SimpleItemTouchHelperCallback;
 import com.chernandezgil.farmacias.view.FavoriteContract;
+import com.chernandezgil.farmacias.view.MoveListToTop;
 
 import java.util.List;
 
@@ -43,7 +44,8 @@ import butterknife.Unbinder;
  */
 
 public class FavoriteFragment extends Fragment implements FavoriteContract.View,
-        FavoriteAdapter.FavoriteAdapterOnClickHandler, OnStartDragListener {
+        FavoriteAdapter.OnClickCallbacks, OnStartDragListener,
+        MoveListToTop{
 
     private FavoritePresenter mPresenter;
     private PreferencesManager mSharedPreferences;
@@ -125,13 +127,11 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
 
     private void setUpRecyclerView(){
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        ScrollerLinearLayoutManager layoutManager = new ScrollerLinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new FavoriteAdapter(getActivity().getApplicationContext(),
-                this,
+        mAdapter = new FavoriteAdapter(this,
                 mRecyclerView,
                 customItemAnimator,
-                this,
                 mSharedPreferences);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
@@ -200,6 +200,13 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     public void onClickOpeningHours(String hour) {
         mPresenter.onClickOpeningHours(hour);
 
+    }
+
+    @Override
+    public void moveSmoothToTop() {
+        if (mAdapter.getItemCount()!=0) {
+            mRecyclerView.smoothScrollToPosition(0);
+        }
     }
 
     @Override

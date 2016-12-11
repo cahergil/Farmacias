@@ -10,7 +10,7 @@
     android:id="@+id/coordinator"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".ui.fragment.MapTabFragment">
+    tools:mContext=".ui.fragment.MapTabFragment">
 
 
 

@@ -29,6 +29,7 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
+import com.chernandezgil.farmacias.ui.fragment.FindFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private int mColorSpan;
     private int mColorSpanData;
     private CustomItemAnimator mCustomItemAnimator;
-    private OnClickHandler mCallback;
+    private OnClickCallbacks mCallback;
     private float offset;
     private static int firstVisibleInRecyclerViw;
 
@@ -63,12 +64,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     @Constants.ScrollDirection
     int scrollDirection;
 
-    public FindRecyclerViewAdapter(Context context, RecyclerView recyclerview, CustomItemAnimator customItemAnimator,
-                                   OnClickHandler callback) {
+    public FindRecyclerViewAdapter(FindFragment context,
+                                   RecyclerView recyclerview,
+                                   CustomItemAnimator customItemAnimator) {
         mRecyclerView = recyclerview;
-        mContext = context;
+        mContext = context.getActivity();
         mCustomItemAnimator = customItemAnimator;
-        mCallback = callback;
+        mCallback = context;
         offset = mContext.getResources().getDimensionPixelSize(R.dimen.offset_y);
 
         scrollDirection = Constants.SCROLL_UP;
@@ -344,7 +346,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
 
     @Override
     public int getItemCount() {
-        //     Utils.logD(LOG_TAG,"getItemCount:");
+
         if (mList == null) return 0;
         return mList.size();
     }
@@ -390,7 +392,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
     }
 
-    public interface OnClickHandler {
+    public interface OnClickCallbacks {
         void onClickGo(Pharmacy pharmacy);
 
         void onClickFavorite(Pharmacy pharmacy);

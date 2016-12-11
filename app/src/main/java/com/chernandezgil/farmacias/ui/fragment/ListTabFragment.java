@@ -13,20 +13,19 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
-import com.chernandezgil.farmacias.customwidget.DialogOpeningHoursPharmacy;
+import com.chernandezgil.farmacias.customwidget.ScrollerLinearLayoutManager;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.Pharmacy;
@@ -36,6 +35,7 @@ import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
+import com.chernandezgil.farmacias.view.MoveListToTop;
 import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 
 import java.lang.reflect.Field;
@@ -49,7 +49,9 @@ import butterknife.Unbinder;
  * Created by Carlos on 06/08/2016.
  */
 public class ListTabFragment extends Fragment implements ListTabContract.View,
-        ListTabAdapter.ListTabAdapterOnClickHandler, SharedPreferences.OnSharedPreferenceChangeListener {
+        ListTabAdapter.ListTabAdapterOnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        MoveListToTop {
 
     @BindView(R.id.pharmaciesRecyclerView)
     RecyclerView mRecyclerView;
@@ -77,7 +79,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     private boolean[] mSpandState;
     private boolean mRotation;
     private PreferencesManager mSharedPreferences;
-
 
 
     @Override
@@ -111,7 +112,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         Utils.logD(LOG_TAG, "onCreateView");
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
-
         if (savedInstanceState == null) {
             mPresenter.onGetAddressFromLocation(mLocation);
         } else {
@@ -129,25 +129,27 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
         }
 
-        //in both fragment, since map fragment could be the currentItem in TabLayout
 
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG,"onViewCreated");
+        Utils.logD(LOG_TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         mPresenter.onStartLoader();
-      //  setUserVisibleHint(true); setting it here doen't work
-      // I opted for setting this value in the instantiation of
-      //  the fragment in FragmentPagerAdapter. solution not valid after 24.0.0
+        //  setUserVisibleHint(true); solution not valid after 24.0.0 SL
+        //  I opted for setting this value in the instantiation of
+        //  the fragments in FragmentPagerAdapter.
     }
+
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Utils.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -192,28 +194,22 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     private void setUpRecyclerView() {
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        mAdapter = new ListTabAdapter(getActivity(),this,mRecyclerView,customItemAnimator);
-       // SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
+        mAdapter = new ListTabAdapter(getActivity(), this, mRecyclerView, customItemAnimator);
+        // SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
         mRecyclerView.setItemAnimator(customItemAnimator);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new ScrollerLinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    private ListTabAdapter getAdapter(){
-       return (ListTabAdapter)  mRecyclerView.getAdapter();
-    }
-
-
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Utils.logD(LOG_TAG, "showResults");
-
         mAdapter.swapData(pharmacyList);
         if (mLayoutManagerState != null) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerState);
         }
-
 
     }
 
@@ -236,10 +232,10 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void setAddress(String address) {
 
         mAddress = address;
-        if(address!=null && !address.equals("")) {
+        if (address != null && !address.equals(Constants.EMPTY_STRING)) {
             mCallback.onAddressUpdated(address);
         } else {
-            mCallback.onAddressUpdated("");
+            mCallback.onAddressUpdated(Constants.EMPTY_STRING);
         }
     }
 
@@ -249,9 +245,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     }
 
     @Override
-    public void showOpeningHours(int layoutId,int backgroundColor) {
-        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId,backgroundColor);
-        dialog.show(getActivity().getSupportFragmentManager(),"DIALOG");
+    public void showOpeningHours(int layoutId, int backgroundColor) {
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId, backgroundColor);
+        dialog.show(getActivity().getSupportFragmentManager(), "DIALOG");
 
     }
 
@@ -259,7 +255,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onClickGo(Pharmacy pharmacy) {
         Utils.logD(LOG_TAG, "onClickGo");
 
-        mPresenter.handleClickGo(pharmacy,mLocation,mAddress);
+        mPresenter.handleClickGo(pharmacy, mLocation, mAddress);
 
 
     }
@@ -272,9 +268,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         mPresenter.handleClickFavorite(pharmacy);
 
 
-
     }
-
 
 
     @Override
@@ -311,7 +305,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             //anado isAdded porque me dio este npe
             // Process: com.chernandezgil.farmacias, PID: 8683
             //java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference
-            if(isAdded()) {
+            if (isAdded()) {
                 mSnackBar = new SnackBarWrapper(getActivity());
                 mSnackBar.addCallback(createSnackbarCallback());
                 mSnackBar.show();
@@ -324,7 +318,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         return new SnackbarCallback() {
             @Override
             public void onSnackbarActionPressed(Snackbar snackbar) {
-                Toast.makeText(getActivity(), "Presionado action", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), "", Toast.LENGTH_LONG).show();
                 //update location variable
                 mLocation = mSharedPreferences.getLocation();
                 //get the new address
@@ -348,45 +342,23 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         };
     }
 
-    //    private static class ToastThread extends Thread {
-//        private boolean mRunning = false;
-//        private Toast toast;
-//        public ToastThread(Toast toast) {
-//            this.toast = toast;
-//        }
-//
-//
-//        Handler handler= new Handler(Looper.getMainLooper());
-//        @Override
-//        public void run() {
-//            int count =0;
-//            while (count<10) {
-//                count++;
-//               // SystemClock.sleep(1000);
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        toast.show();
-//                    }
-//                });
-//
-//
-//            }
-//        }
-//
-//        public void close() {
-//            mRunning = false;
-//        }
-//
-//    }
+    @Override
+    public void moveSmoothToTop() {
+        if (mAdapter.getItemCount() != 0) {
+            mRecyclerView.smoothScrollToPosition(0);
+        }
+    }
+
+
     public interface Callbacks {
-        public void onUpdateFavorite(String phone, boolean fromListMap);
-        public void onAddressUpdated(String address);
+        void onUpdateFavorite(String phone, boolean fromListMap);
+
+        void onAddressUpdated(String address);
     }
 
     @Override
     public void onDestroyView() {
-        if(mSnackBar != null) {
+        if (mSnackBar != null) {
             mSnackBar.dismiss();
         }
         super.onDestroyView();

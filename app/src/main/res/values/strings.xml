@@ -100,4 +100,10 @@
 
     <!-- dialog_opening_hours_24_hours-->
     <string name="doh_24h_open" translatable="true">Abierta 24 horas</string>
+
+    <!-- customview_bottom_navigation.xml-->
+    <string name="cbn_alrededor" translatable="true">Cerca</string>
+    <string name="cbn_buscar" translatable="true">Buscar</string>
+    <string name="cbn_favoritos" translatable="true">Favoritos</string>
+
 </resources>
