@@ -524,6 +524,7 @@ public class MainActivity extends AppCompatActivity implements
         menu.getItem(option).setChecked(true);
     }
 
+
     private void updateToolBarTitle(int option) {
 
         getSupportActionBar().setTitle(getTitleForOption(option));
@@ -544,6 +545,10 @@ public class MainActivity extends AppCompatActivity implements
     private void updateBottomNavigationStatus(int option) {
         mBottomNavigationView.upDateStatus(option);
 
+    }
+
+    public BottomNavigation getBottomNavigationView(){
+        return mBottomNavigationView;
     }
 
     private int getTitleForOption(int selectedOption) {

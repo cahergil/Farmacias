@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
@@ -37,6 +38,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -241,7 +243,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 mActionBar.animate().translationY(-mActionBar.getHeight())
                         .setDuration(100)
                         .start();
-
+                setBottomNavigationVisibility(View.GONE);
                 mFindQuickSearchAdapter.setmSearchString(Constants.EMPTY_STRING);
                 //with onInitLoaderQuickSearch if the user introduces a search string with cero results,
                 //and after closes the search. When opening again the Quick searach rv is going to show
@@ -268,7 +270,7 @@ public class FindFragment extends Fragment implements FindContract.View,
         outState.putString("last_search_editor_key", mSearchEditor.getText().toString());
         outState.putBoolean("card_on_screen_key", mCardOnScreen);
         outState.putInt("quickSearchRecyclerViewState", mQuickSearchRecyclerView.getVisibility());
-        //0 visible; 8 gone; 4 invisible
+
 
     }
 
@@ -288,7 +290,7 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     private void initializeSearchCardView() {
         SearchUtils.setUpAnimations(getActivity(), mSearchCardView, mViewSearch, mQuickSearchRecyclerView);
-        //if we habe removed the focus before this is necessary. If it is the first click not.
+        //if we have removed the focus before this is necessary. If it is the first click not.
         requestFocusOnSearchEditor();
         mCardOnScreen = true;
     }
@@ -378,7 +380,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                     }
                 });
 
-        //    mCompositeSubscription.add(editorAterTextChangeEvent);
+
         mCompositeSubscription.add(editorActionEvent);
 
 
@@ -394,6 +396,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 //delete current text so that in the next appearance don't show
                 clearSearchEditor();
                 clearFocusFromSearchEditor();
+                setBottomNavigationVisibility(View.VISIBLE);
 
 
             }
@@ -409,6 +412,19 @@ public class FindFragment extends Fragment implements FindContract.View,
 
     }
 
+
+    private void setBottomNavigationVisibility(int visibility){
+        ((MainActivity)getActivity()).getBottomNavigationView().setVisibility(visibility);
+        //remove bottom margin of the rootview or add it when necessary
+        if(visibility == View.GONE) {
+            FrameLayout.LayoutParams params= (FrameLayout.LayoutParams) mRootView.getLayoutParams();
+            params.bottomMargin=0;
+        } else if(visibility == View.VISIBLE) {
+            FrameLayout.LayoutParams params= (FrameLayout.LayoutParams) mRootView.getLayoutParams();
+            params.bottomMargin=(int)Utils.convertDpToPixel(56,getContext());
+        }
+
+    }
     private void setDimDrawable() {
         mDimDrawable = ContextCompat.getDrawable(getContext(), R.drawable.dim_drawable);
     }
@@ -632,6 +648,8 @@ public class FindFragment extends Fragment implements FindContract.View,
             ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+
 
     private void restoreToolbarActivityUiState() {
         hideSoftKeyBoard(); // task done when back in search editor
