@@ -6,7 +6,6 @@
             android:checked="true"
             android:id="@+id/item_navigation_localizador"
             android:icon="@drawable/nearby"
-
             android:title="@string/nd_localizador" />
         <item
             android:id="@+id/item_navigation_buscar"

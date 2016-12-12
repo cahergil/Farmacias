@@ -62,7 +62,7 @@
     <string name="title_activity_main2">Main2Activity</string>
 
     <!-- Navitation Drawer -->
-    <string name="nd_localizador" translatable="true">Alrededor</string>
+    <string name="nd_localizador" translatable="true">Cerca</string>
     <string name="nd_buscar" translatable="true">Buscar Farmacia</string>
     <string name="nd_favorites" translatable="true">Favorites</string>
 

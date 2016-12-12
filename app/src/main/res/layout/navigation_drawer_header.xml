@@ -1,23 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="192dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="bottom"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:background="@color/colorPrimary">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        android:background="@color/colorPrimary" />
-
-    <ImageView
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="50dp"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:scaleType="centerCrop"
+        app:layout_widthPercent="100%"
+        app:layout_aspectRatio="@fraction/header_aspectRatio"
+        android:scaleType="fitCenter"
         android:src="@drawable/farmacia_logo" />
 
     <LinearLayout
@@ -38,14 +31,7 @@
             android:text="Farmacias de Extremadura"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:text="thedahnark@gmail.com"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     </LinearLayout>
 
-</FrameLayout>
+</android.support.percent.PercentFrameLayout>

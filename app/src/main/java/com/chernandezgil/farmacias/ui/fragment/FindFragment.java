@@ -435,7 +435,7 @@ public class FindFragment extends Fragment implements FindContract.View,
     }
 
     private void unDimScren() {
-        //this way the vertical separators in locality, adress etc are shown
+        //this way the vertical separators in locality, address etc are shown
         mRootView.setForeground(null);
         //mRootView.getForeground().setAlpha(0);
     }
