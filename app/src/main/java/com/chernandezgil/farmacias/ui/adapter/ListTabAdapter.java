@@ -123,13 +123,13 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 super.onScrolled(recyclerView, dx, dy);
 
                 if (dy > 0) {
-                    scrollDirection = Constants.SCROLL_UP;
-                    Log.i("RecyclerView scrolled: ", "scroll up!");
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
                     //    Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
                 } else {
-                    scrollDirection = Constants.SCROLL_DOWN;
-                    Log.i("RecyclerView scrolled: ", "scroll down!");
+                    scrollDirection = Constants.SCROLL_UP;
+                    Log.i("RecyclerView scrolled: ", "scroll up!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
                     //   Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
                 }
@@ -197,7 +197,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-      //  Utils.logD(LOG_TAG,"onBindViewHolder, position"+position);
+        Utils.logD(LOG_TAG,"onBindViewHolder, position"+position);
 
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
@@ -209,11 +209,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         }
 
 
-        if (scrollDirection == Constants.SCROLL_UP) {
-            Log.d(LOG_TAG, "runEnterAnimation_up");
+        if (scrollDirection == Constants.SCROLL_DOWN) {
+            Log.d(LOG_TAG, "runEnterAnimation_down");
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
-                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                Log.d(LOG_TAG, "lasAnimated,position:" + lastAnimatedPosition + "," + position);
                 view.setTranslationY(Utils.getScreenHeight(mContext));
                 view.animate()
                         .translationY(0)
@@ -223,7 +223,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
 
             }
         } else {
-            Log.d(LOG_TAG, "runEnterAnimation_down");
+            Log.d(LOG_TAG, "runEnterAnimation_up");
             if (position < lastAnimatedPosition) {
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
