@@ -1,6 +1,9 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -29,6 +32,7 @@ import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.model.Pharmacy;
 import com.chernandezgil.farmacias.ui.adapter.item_animator.CustomItemAnimator;
+import com.chernandezgil.farmacias.ui.fragment.ListTabFragment;
 
 
 import java.util.List;
@@ -48,13 +52,10 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     private CustomItemAnimator mCustomItemAnimator;
     private int expandedPosition = RecyclerView.NO_POSITION;
     private Transition expandCollapse = null;
-    private TimeMeasure mTm;
     private static int COLLAPSE = 2;
     private static int EXPAND = 3;
     private RecyclerView mRecyclerView;
     private int lastAnimatedPosition = -1;
-    private static final int ANIMATED_ITEMS_COUNT = 50;
-
 
 
 
@@ -62,14 +63,12 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     int scrollDirection;
 
 
-
-    public ListTabAdapter(Context context, ListTabAdapterOnClickHandler clickHandler,
+    public ListTabAdapter(ListTabFragment fragment,
                           RecyclerView recyclerView, CustomItemAnimator customItemAnimator
                         ){
-        mContext=context;
-        mClickHandler=clickHandler;
+        mContext=fragment.getActivity();
+        mClickHandler=fragment;
         mRecyclerView = recyclerView;
-        mTm=new TimeMeasure("start ListTabAdapter");
         mCustomItemAnimator = customItemAnimator;
 
 
@@ -113,11 +112,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 }
             });
         }
-        //NOTE: should be UP, but there is to much happening on the UI thread and is not working smooth
         scrollDirection = Constants.SCROLL_DOWN;
-
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -126,15 +122,11 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                     scrollDirection = Constants.SCROLL_DOWN;
                     Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
-                    //    Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
                 } else {
                     scrollDirection = Constants.SCROLL_UP;
                     Log.i("RecyclerView scrolled: ", "scroll up!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
-                    //   Log.i("RecyclerView scrolled: ", "currentVisible,firstVisible"+currentFirstVisible +","+ firstVisibleInRecyclerViw);
                 }
-                //     firstVisibleInRecyclerViw = currentFirstVisible;
-
             }
         });
 
@@ -170,7 +162,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         return holder;
 
     }
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
@@ -204,35 +196,28 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
 
     }
     private void runEnterAnimation(View view, int position) {
-        if (position >= ANIMATED_ITEMS_COUNT - 1) {
+        if (position >= mPharmacyList.size() - 1) {
             return;
         }
 
-
         if (scrollDirection == Constants.SCROLL_DOWN) {
-            Log.d(LOG_TAG, "runEnterAnimation_down");
+            Utils.logD(LOG_TAG, "runEnterAnimation_down");
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
-                Log.d(LOG_TAG, "lasAnimated,position:" + lastAnimatedPosition + "," + position);
+                Utils.logD(LOG_TAG, "lasAnimated,position:" + lastAnimatedPosition + "," + position);
                 view.setTranslationY(Utils.getScreenHeight(mContext));
-                view.animate()
-                        .translationY(0)
-                        .setInterpolator(new DecelerateInterpolator(3.f))
-                        .setDuration(500)
-                        .start();
 
+                ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(view,"translationY",0);
+                //more than this causes the animation to stutters
+                objectAnimator.setDuration(350);
+                objectAnimator.setInterpolator(new DecelerateInterpolator(3.f));
+                objectAnimator.start();
             }
         } else {
-            Log.d(LOG_TAG, "runEnterAnimation_up");
+            Utils.logD(LOG_TAG, "runEnterAnimation_up");
             if (position < lastAnimatedPosition) {
-                Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
+                Utils.logD(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
-//                view.setTranslationY(-Utils.getScreenHeight(mContext));
-//                view.animate()
-//                        .translationY(0)
-//                        .setInterpolator(new DecelerateInterpolator(3.f))
-//                        .setDuration(500)
-//                        .start();
             }
         }
     }

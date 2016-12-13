@@ -1,10 +1,13 @@
 package com.chernandezgil.farmacias.ui.adapter;
 
 
+import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -64,16 +67,16 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     @Constants.ScrollDirection
     int scrollDirection;
 
-    public FindRecyclerViewAdapter(FindFragment context,
+    public FindRecyclerViewAdapter(FindFragment findFragment,
                                    RecyclerView recyclerview,
                                    CustomItemAnimator customItemAnimator) {
         mRecyclerView = recyclerview;
-        mContext = context.getActivity();
+        mContext = findFragment.getActivity();
         mCustomItemAnimator = customItemAnimator;
-        mCallback = context;
+        mCallback = findFragment;
         offset = mContext.getResources().getDimensionPixelSize(R.dimen.offset_y);
 
-        scrollDirection = Constants.SCROLL_UP;
+        scrollDirection = Constants.SCROLL_DOWN;
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -82,13 +85,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 super.onScrolled(recyclerView, dx, dy);
 
                 if (dy > 0) {
-                    scrollDirection = Constants.SCROLL_UP;
-                    Log.i("RecyclerView scrolled: ", "scroll up!");
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
 
                 } else {
-                    scrollDirection = Constants.SCROLL_DOWN;
-                    Log.i("RecyclerView scrolled: ", "scroll down!");
+                    scrollDirection = Constants.SCROLL_UP;
+                    Log.i("RecyclerView scrolled: ", "scroll up!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
 
                 }
@@ -215,29 +218,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-
-//        Observable.from(new String[]{"1","2"})
-//
-//                .delay(5000, TimeUnit.MILLISECONDS)
-//                .map(s -> {
-//                    return "1";
-//                })
-
-//        Observable.timer(50, TimeUnit.MILLISECONDS)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(s -> {
-//                    runEnterAnimation(holder.itemView, position);
-//                    bindHolder(holder, position);
-//                });
-        //  runEnterAnimation(holder.itemView, position);
 
         runEnterAnimation(holder.itemView, position);
         bindHolder(holder, position);
@@ -249,30 +236,23 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
 
 
-        if (scrollDirection == Constants.SCROLL_UP) {
+        if (scrollDirection == Constants.SCROLL_DOWN) {
             Log.d(LOG_TAG, "runEnterAnimation_up");
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 view.setTranslationY(Utils.getScreenHeight(mContext));
-                view.animate()
-                        .translationY(0)
-                        .setInterpolator(new DecelerateInterpolator(3.f))
-                        .setDuration(500)
-                        .start();
-
+                ObjectAnimator objectAnimator= ObjectAnimator.ofFloat(view,"translationY",0);
+                objectAnimator.setDuration(700)
+                        .setInterpolator(new DecelerateInterpolator(3.f));
+                objectAnimator.start();
             }
         } else {
             Log.d(LOG_TAG, "runEnterAnimation_down");
             if (position < lastAnimatedPosition) {
                 Log.d(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
-//                view.setTranslationY(-Utils.getScreenHeight(mContext));
-//                view.animate()
-//                        .translationY(0)
-//                        .setInterpolator(new DecelerateInterpolator(3.f))
-//                        .setDuration(500)
-//                        .start();
+
             }
         }
     }

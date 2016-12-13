@@ -194,10 +194,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     private void setUpRecyclerView() {
         CustomItemAnimator customItemAnimator = new CustomItemAnimator();
-        mAdapter = new ListTabAdapter(getActivity(), this, mRecyclerView, customItemAnimator);
-        // SlideInBottomAnimatorAdapter animatorAdapter = new SlideInBottomAnimatorAdapter(mAdapter, mRecyclerView);
+        mAdapter = new ListTabAdapter(this, mRecyclerView, customItemAnimator);
         mRecyclerView.setItemAnimator(customItemAnimator);
-        //    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //    ScrollerLinearLayoutManager to manage tappin twice on BottomNavigation
         mRecyclerView.setLayoutManager(new ScrollerLinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
