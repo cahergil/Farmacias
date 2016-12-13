@@ -36,7 +36,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.seek_bar_key)));
-
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_rate_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_email_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_share_app_key)));
@@ -97,6 +96,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         String stringValue = newValue.toString();
 
+        //only used the first "load". Subsequent changes not because in SeekbarPreferences don't call
+        //to update listeners
         if (preference instanceof SeekBarPreference) {
             preference.setSummary(("" + stringValue + " Km"));
 

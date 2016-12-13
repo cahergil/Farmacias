@@ -10,22 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/title"
+        android:textSize="16sp"
+        android:textColor="@color/black"
         android:text="Radio de busqueda"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp">
 
         <SeekBar
             android:id="@+id/seekbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="8" />
+            android:layout_weight="8"
+            android:progressTint="@color/red_700"
+            android:thumb="@drawable/shape_progress_thumb"/>
 
         <TextView
             android:id="@android:id/summary"

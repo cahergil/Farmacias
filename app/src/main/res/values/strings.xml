@@ -105,5 +105,7 @@
     <string name="cbn_alrededor" translatable="true">Cerca</string>
     <string name="cbn_buscar" translatable="true">Buscar</string>
     <string name="cbn_favoritos" translatable="true">Favoritos</string>
+    <!-- SeekBarPreference -->
+    <string name="sbp_distance"><xliff:g id="distance">%1$1d</xliff:g> Km</string>
 
 </resources>
