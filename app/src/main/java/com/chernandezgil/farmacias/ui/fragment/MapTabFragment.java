@@ -56,11 +56,13 @@ import com.chernandezgil.farmacias.presenter.MapTabPresenter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.GroundOverlay;
@@ -88,7 +90,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
     public static final String USER_LOCATION = "userLocation";
-    private static final int USER_CIRCLE_RADIO=120;
+    private static final int USER_CIRCLE_RADIO=150; //meters
     private static final int USER_CIRCLE_ANIMATION_MS=3000;
     private static final int STATE_COLLAPSED=0;
     private static final int STATE_EXPANDED=1;
@@ -155,6 +157,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @BindView(R.id.ivFavoriteMap)
     ImageView ivFavorite;
 
+    @BindView(R.id.zoomPlus)
+    ImageView ivZoomPlus;
+    @BindView(R.id.zoomMinus)
+    ImageView ivZoomMinus;
+
 
     private Geocoder mGeocoder;
     private PharmacyObjectMap mLastMarkerClicked;
@@ -168,7 +175,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private SnackBarWrapper mSnackBar;
 
     private boolean mCancelThread;
-
+    private ValueAnimator mAnimator;
 
     private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
         @Override
@@ -239,16 +246,13 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvGo();
         setUpIvShare();
         setUpIvFavorite();
-
+        setUpZoomControls();
 
         mapFragment = Utils.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
 
-
-
         mMapFragment=mapFragment;
-
         if(savedInstanceState!=null){
             mRotation=true;
             mLastMarkerClicked=savedInstanceState.getParcelable("lastMarkerClicked_key");
@@ -358,26 +362,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         //mTm.log("onMapsReady:"+this.toString());
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+
         //to disable the two little images in the right-bottom side of the map
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        //reposition zoom control to upper right side of the map
-        //http://stackoverflow.com/questions/14071230/android-maps-library-v2-zoom-controls-custom-position
-        View mZoomControls = mMapFragment.getView().findViewById(0x1);
-        if (mZoomControls != null && mZoomControls.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
-            // ZoomControl is inside of RelativeLayout
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mZoomControls.getLayoutParams();
-
-            // Align it to - parent top|left
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-            // Update margins, set to 10dp
-            final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
-                    getResources().getDisplayMetrics());
-            params.setMargins(margin, margin, margin, margin);
-        }
-
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -433,6 +420,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     .title(getString(R.string.mtf_tu_ubicacion))
                     .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
+            //cancel previous animation
+            if(mAnimator!=null) {
+                mAnimator.cancel();
+            }
             Paint strokePaint =new Paint();
             strokePaint.setColor(Color.parseColor("#0D47A1"));
             Paint fillPaint =new Paint();
@@ -445,8 +436,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                             .strokeColor(strokePaint.getColor())
                             .fillColor(fillPaint.getColor())
                             .radius(USER_CIRCLE_RADIO)
+
             );
-            ValueAnimator mAnimator = new ValueAnimator();
+            mAnimator = new ValueAnimator();
             mAnimator.setRepeatCount(ValueAnimator.INFINITE);
             mAnimator.setRepeatMode(ValueAnimator.RESTART);
             mAnimator.setIntValues(0, 1);
@@ -465,7 +457,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
                 }
             });
-            mAnimator.start();
+            //if I start the animator here, the zoom stops working
 
 
         } else {
@@ -494,8 +486,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         } else {
             mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_COLLAPSED);
             mMap.animateCamera(cameraUpdate.getmCameraUpdate());
-        }
 
+
+        }
+        mAnimator.start();
 
     }
 
@@ -514,10 +508,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         list.add(new LatLng(37.92687,-4.52637));
         String message;
         if(Utils.contains(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),list)){
-            message="Sin resultados. Radio de busqueda insuficiente";
+            message=getString(R.string.mtf_radio_busqueda_insuficiente);
           // Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
         } else {
-            message="Fuera de Extremadura";
+            message=getString(R.string.mtf_fuera_de_extremadura);
         }
 
         Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
@@ -660,6 +654,23 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+    private void setUpZoomControls(){
+        ivZoomPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+
+        ivZoomMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.animateCamera(CameraUpdateFactory.zoomOut());
+
+            }
+        });
+    }
+
     @Override
     public boolean onMarkerClick(Marker marker) {
 
@@ -687,9 +698,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         showPharmacyInBottomSheet(firstSortedPharmacy);
         mBottomSheetBehavior.setPeekHeight(llUper.getHeight());
-
-
-
 
 
     }

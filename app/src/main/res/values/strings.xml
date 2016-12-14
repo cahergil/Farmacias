@@ -10,6 +10,8 @@
     <!-- MapTabFragment-->
     <string name="format_distance"><xliff:g id="distance">%1$1.2f</xliff:g> Km</string>
     <string name="mtf_tu_ubicacion" translatable="true">Tu ubicación</string>
+    <string name="mtf_radio_busqueda_insuficiente" translatable="true">Sin resultados. Radio de busqueda insuficiente</string>
+    <string name="mtf_fuera_de_extremadura" translatable="true">Fuera de Extremadura</string>
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
     <string name="settings_title" translatable="true">Settings Activity</string>
