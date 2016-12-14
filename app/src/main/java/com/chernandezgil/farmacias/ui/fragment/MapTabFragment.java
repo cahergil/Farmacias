@@ -1,12 +1,22 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.animation.IntEvaluator;
+import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
@@ -28,6 +38,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,6 +61,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -72,9 +87,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
+    public static final String USER_LOCATION = "userLocation";
+    private static final int USER_CIRCLE_RADIO=120;
+    private static final int USER_CIRCLE_ANIMATION_MS=3000;
     private static final int STATE_COLLAPSED=0;
     private static final int STATE_EXPANDED=1;
-    public static final String USER_LOCATION = "userLocation";
 
 
     private GoogleMap mMap;
@@ -406,15 +423,51 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if(pharmacyObjectMap==null) {
             return;
         }
-        MarkerOptions markerOption = new MarkerOptions().position(
-                new LatLng(pharmacyObjectMap.getLat(), pharmacyObjectMap.getLon())
-        );
+        MarkerOptions markerOption = new MarkerOptions();
+        double lat=pharmacyObjectMap.getLat();
+        double lon=pharmacyObjectMap.getLon();
+        markerOption.position(new LatLng(lat, lon));
+
         if(pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Tu ubicación")
+                    .title(getString(R.string.mtf_tu_ubicacion))
                     .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
-            //   markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user_position));
+            Paint strokePaint =new Paint();
+            strokePaint.setColor(Color.parseColor("#0D47A1"));
+            Paint fillPaint =new Paint();
+            fillPaint.setColor(Color.parseColor("#90CAF9"));
+
+            Circle circle=mMap.addCircle(
+                    new CircleOptions()
+                            .center(new LatLng(lat,lon))
+                            .strokeWidth(4f)
+                            .strokeColor(strokePaint.getColor())
+                            .fillColor(fillPaint.getColor())
+                            .radius(USER_CIRCLE_RADIO)
+            );
+            ValueAnimator mAnimator = new ValueAnimator();
+            mAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            mAnimator.setRepeatMode(ValueAnimator.RESTART);
+            mAnimator.setIntValues(0, 1);
+            mAnimator.setDuration(USER_CIRCLE_ANIMATION_MS);
+            mAnimator.setEvaluator(new IntEvaluator());
+            mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float animatedFraction = valueAnimator.getAnimatedFraction();
+                    strokePaint.setAlpha((int)((1-animatedFraction)*255));
+                    fillPaint.setAlpha((int)((1-animatedFraction)*255));
+                    circle.setRadius(animatedFraction * USER_CIRCLE_RADIO);
+                    circle.setStrokeColor(strokePaint.getColor());
+                    circle.setFillColor(fillPaint.getColor());
+
+                }
+            });
+            mAnimator.start();
+
+
         } else {
             Bitmap bitmap= mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
@@ -428,6 +481,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mPresenter.onAddMarkerToHash(newMark, pharmacyObjectMap);
 
     }
+
+
+
 
 
 

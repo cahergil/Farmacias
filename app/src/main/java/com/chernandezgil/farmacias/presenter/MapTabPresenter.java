@@ -341,7 +341,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(Utils.getDefaultBitmapTextSize());
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setColor(Color.parseColor("#FFCDD2"));
+        paint.setColor(Color.WHITE);
         paint.setColorFilter(paintColorFilter);
 
         canvas.drawBitmap(markerBitmap, 0, 0, paint);
