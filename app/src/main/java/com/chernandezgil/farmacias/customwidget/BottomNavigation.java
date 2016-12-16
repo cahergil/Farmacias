@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
@@ -16,11 +17,12 @@ import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.customwidget.behaviour.QuickReturnView;
 
 /**
  * Created by Carlos on 01/12/2016.
  */
-
+@CoordinatorLayout.DefaultBehavior(QuickReturnView.class)
 public class BottomNavigation extends LinearLayout implements View.OnClickListener {
     private static final int NONE = -1;
     private static final int CAPACITY = 3;

@@ -133,6 +133,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
                 mRecyclerView,
                 customItemAnimator,
                 mSharedPreferences);
+
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(customItemAnimator);

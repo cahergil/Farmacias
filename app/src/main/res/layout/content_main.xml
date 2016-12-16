@@ -1,17 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!--
+    1) this line
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    is necessary, otherwise the content of the fragment would be placed
+    under the toolbar. An effect similar to fitsystemwindows with statusbar.
+    2) It has to be placed in a child of CoordinatorLayout, what it is the case.
+    It could be also inside a RelativeLayout(I think)
+-->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:mContext=".ui.activity.MainActivity"
-    tools:showIn="@layout/activity_main">
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-
-    <FrameLayout
-        android:id="@+id/fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</RelativeLayout>

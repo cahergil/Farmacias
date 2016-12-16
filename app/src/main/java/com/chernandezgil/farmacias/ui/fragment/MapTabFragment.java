@@ -421,7 +421,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                     .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
             //cancel previous animation
-            if(mAnimator!=null) {
+            if(mAnimator!=null && mAnimator.isRunning()) {
                 mAnimator.cancel();
             }
             Paint strokePaint =new Paint();

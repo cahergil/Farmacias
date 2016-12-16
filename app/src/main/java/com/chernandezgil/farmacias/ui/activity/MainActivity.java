@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -91,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements
     Toolbar toolbar;
     @BindView(R.id.bottom_navigation)
     BottomNavigation mBottomNavigationView;
-
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbar;
 
     private GoogleApiClient mGoogleApiClient;
     private ActionBar actionBar;
@@ -138,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements
         mMainActivityPresenter.setView(this);
         mMainActivityPresenter.onStart();
         setUpToolBar();
+        setUpCollapsingToolbar();
 
         // enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
@@ -422,6 +425,11 @@ public class MainActivity extends AppCompatActivity implements
         actionBar.setHomeAsUpIndicator(menuDrawable);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+
+    }
+
+    private void setUpCollapsingToolbar(){
+        mCollapsingToolbar.setTitleEnabled(false);
     }
 
     private void setUpNavigationDrawerContent(NavigationView navigationView) {

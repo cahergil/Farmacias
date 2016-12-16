@@ -116,7 +116,7 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.3.1'
 
-    //material dialogs
+
     compile 'com.android.support:percent:25.0.0'
 
 

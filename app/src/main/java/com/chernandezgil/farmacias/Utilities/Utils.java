@@ -44,6 +44,9 @@ import java.util.Locale;
  * Created by Carlos on 06/07/2016.
  */
 public class Utils {
+
+    private static final String LOG_TAG= Utils.class.getSimpleName();
+
     static int screenHeight = 0;
     static int oldStatusBarFlags;
 
@@ -227,6 +230,7 @@ public class Utils {
         return (int)(14*scale);
     }
 
+    //review this, not working properly
     public static String getStreetFromAddress(String address) {
         String result;
         boolean found = false;
@@ -244,7 +248,10 @@ public class Utils {
 
         }
         if (found) {
-            return address.substring(0, n);
+            Utils.logD(LOG_TAG,"address:"+address);
+            Utils.logD(LOG_TAG,"n:"+n);
+            return address;
+//            return address.substring(0, n);
         } else {
             return address;
         }

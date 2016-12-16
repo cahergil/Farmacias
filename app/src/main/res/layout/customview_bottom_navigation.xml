@@ -45,7 +45,7 @@ Relativelayout must have layout_gravity=center"-->
                 android:gravity="center"
                 android:text="@string/cbn_alrededor"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
+                android:textSize="12.5sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
         </RelativeLayout>
@@ -84,7 +84,7 @@ Relativelayout must have layout_gravity=center"-->
                 android:gravity="center"
                 android:text="@string/cbn_buscar"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
+                android:textSize="12.5sp"
                 android:visibility="gone"
                 tools:visibility="visible"/>
         </RelativeLayout>
@@ -122,7 +122,7 @@ Relativelayout must have layout_gravity=center"-->
                 android:gravity="center"
                 android:text="@string/cbn_favoritos"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
+                android:textSize="12.5sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
         </RelativeLayout>

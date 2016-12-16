@@ -21,24 +21,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" />
+
         <LinearLayout
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:layout_marginTop="20dp"
+            android:orientation="vertical">
 
-            android:orientation="vertical"
-            >
             <ImageView
                 android:id="@+id/zoomPlus"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
+                android:layout_marginBottom="5dp"
                 android:background="@drawable/shape_zoom_controls"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:tint="@color/gray700"
-                app:srcCompat="@drawable/ic_magnify_plus"
-                android:layout_marginBottom="5dp"
-                />
+                app:srcCompat="@drawable/ic_magnify_plus" />
+
             <ImageView
                 android:id="@+id/zoomMinus"
                 android:layout_width="match_parent"
@@ -46,44 +46,67 @@
                 android:background="@drawable/shape_zoom_controls"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:tint="@color/gray700"
-                app:srcCompat="@drawable/ic_magnify_minus"/>
+                app:srcCompat="@drawable/ic_magnify_minus" />
         </LinearLayout>
 
     </FrameLayout>
 
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/bottom_sheet"
+    <!--
+    Big problem: Setting scrollflags in CollapsingToolbarLayout activity_main
+    causes to stop working margin_bottom(set in fragment container: FrameLayout of activity_main).
+    . But that margin works ok in fragment_tab_list. So here in fragment_tab_map, the bottom navigation
+     overlaps partially with bottom sheet in collapsed state. Setting margin bottom didn't work
+     anywhere, neither in layout of viewpager nor here. The only
+     way is wrapping the bottom sheet in another layout, but according
+     to this code:https://github.com/android/platform_frameworks_support/blob/master/design/src/android/support/design/widget/BottomSheetBehavior.java#807
+     is has to have the Layoutparams of CoordinatorLayout, that wouldn't be the case
+     if we wrap with a LinearLayout, RelativeLayout or FrameLayout, only with another
+     Coordinator works. After that set the margins.
+     Change: with the addition of quick return pattern for bottom navigation, there is no need
+     to add margin_bottom, therefore i striped out that in FrameLayout of activity_main.
+      However here now we need to double this margin.
+    -->
+    <android.support.design.widget.CoordinatorLayout
+
         android:layout_width="match_parent"
-        android:layout_height="350dp"
-        android:background="@color/white"
-        android:clipToPadding="true"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="112dp"
+        >
 
-        <LinearLayout
-            android:id="@+id/llBottomSheet"
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/bottom_sheet"
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="350dp"
+            android:background="@color/white"
+            android:clipToPadding="true">
 
-            <include
-                layout="@layout/bottom_sheet_upper_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <include
-                layout="@layout/bottom_sheet_middle_box"
+            <LinearLayout
+                android:id="@+id/llBottomSheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="16dp" />
+                android:orientation="vertical">
 
-            <include
-                layout="@layout/bottom_sheet_lower_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp" />
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+                <include
+                    layout="@layout/bottom_sheet_upper_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
+                <include
+                    layout="@layout/bottom_sheet_middle_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp" />
+
+                <include
+                    layout="@layout/bottom_sheet_lower_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp" />
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>
 </android.support.design.widget.CoordinatorLayout>
