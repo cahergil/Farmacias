@@ -1,6 +1,7 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +17,11 @@ import android.view.ViewGroup;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
+import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,27 +29,26 @@ import butterknife.ButterKnife;
 /**
  * Created by Carlos on 06/08/2016.
  */
-public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelectedListener{
+public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelectedListener {
 
-    private static final String LOG_TAG=TabLayoutFragment.class.getSimpleName();
+    private static final String LOG_TAG = TabLayoutFragment.class.getSimpleName();
     private static final String TAG_FRAGMENT = "TAB_FRAGMENT";
-
+    private int mOffset;
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
     @BindView(R.id.tabs)
     TabLayout mTabLayout;
 
 
-
-    private Adapter pagerAdapter=null;
+    private Adapter pagerAdapter = null;
     private PreferencesManager mSharedPreferences;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mSharedPreferences=new PreferencesManagerImp(getActivity().getApplicationContext());
-        if(savedInstanceState !=null) {
+        mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
+        if (savedInstanceState != null) {
             mSharedPreferences.setCurrentItemTabLayout(savedInstanceState.getInt("current_item_key"));
         }
 
@@ -55,7 +59,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     public void onSaveInstanceState(Bundle outState) {
         Utils.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putInt("current_item_key",mViewPager.getCurrentItem());
+        outState.putInt("current_item_key", mViewPager.getCurrentItem());
 
 
     }
@@ -64,8 +68,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onCreateView");
-        View view=inflater.inflate(R.layout.fragment_tablayout,container,false);
-        ButterKnife.bind(this,view);
+        View view = inflater.inflate(R.layout.fragment_tablayout, container, false);
+        ButterKnife.bind(this, view);
 
         return view;
     }
@@ -73,16 +77,18 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mOffset =(int) Utils.convertDpToPixel(112,getActivity());
         Utils.logD(LOG_TAG, "onActivityCreated");
         setUpViewPager();
         setUpTabLayout();
         mViewPager.setCurrentItem(mSharedPreferences.getCurrentItemTabLayout());
-     }
-
-    public int getCurrentItem(){
-        return mTabLayout.getSelectedTabPosition();
+        //place this exactly here, otherwise onSelectedTag gets called on launch.
+        mTabLayout.addOnTabSelectedListener(this); //24.0.0
     }
 
+    public int getCurrentItem() {
+        return mTabLayout.getSelectedTabPosition();
+    }
 
 
     @Override
@@ -110,22 +116,64 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
         super.onStop();
     }
 
-    private void setUpViewPager(){
-        pagerAdapter=new Adapter(getContext(),getChildFragmentManager());
+    private void setUpViewPager() {
+        pagerAdapter = new Adapter(getContext(), getChildFragmentManager());
 
         mViewPager.setAdapter(pagerAdapter);
 
 
     }
-    private void setUpTabLayout(){
+
+    private void setUpTabLayout() {
         mTabLayout.setupWithViewPager(mViewPager);
-     //   mTabLayout.setOnTabSelectedListener(this);
-        mTabLayout.addOnTabSelectedListener(this); //24.0.0
+        //   mTabLayout.setOnTabSelectedListener(this);
+        //mTabLayout.addOnTabSelectedListener(this); //24.0.0
     }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        int position=tab.getPosition();
+        int position = tab.getPosition();
+        if (position == 1) {
+            Toolbar toolbar = ((MainActivity) getActivity()).getToolbar();
+            if (toolbar != null) {
+
+                int[] toolbarLocation= new int[2];
+                toolbar.getLocationInWindow(toolbarLocation);
+//                int[] location1=new int[2];
+//                toolbar.getLocationOnScreen(location1);
+//
+//                Utils.logD(LOG_TAG,"window[x]:"+toolbarLocation[0]+",screen[x]:"+location1[0]);
+//                Utils.logD(LOG_TAG,"window[y]:"+toolbarLocation[1]+",screen[y]:"+location1[1]);
+
+//                Rect rectGlobal =new Rect();
+//                Rect rectLocal =new Rect();
+//                toolbar.getGlobalVisibleRect(rectGlobal);
+//                toolbar.getLocalVisibleRect(rectLocal);
+//                Utils.logD(LOG_TAG,"Globl:left="+rectGlobal.left+",top="+rectGlobal.top);
+//                Utils.logD(LOG_TAG,"Globl:left="+rectLocal.left+",top="+rectLocal.top);
+                List<Fragment> lista =getChildFragmentManager().getFragments();
+                MapTabFragment f=null;
+                for (int i = 0; i <lista.size() ; i++) {
+                    Fragment fragment= lista.get(i);
+                    if(fragment instanceof MapTabFragment) {
+                        f =(MapTabFragment) fragment;
+                        break;
+                    }
+                }
+                //toolbar is off the screen
+                if (toolbarLocation[1] <= 0 && f!=null) {
+                    f.translateYBottomSheet(mOffset);
+
+                //toolbar is visible
+                } else if(toolbarLocation[1] > 0 && f!=null) {
+                    f.setBottomSheetPosition();
+
+                }
+
+
+
+            }
+        }
         mViewPager.setCurrentItem(position);
         mSharedPreferences.setCurrentItemTabLayout(position);
     }
@@ -141,27 +189,29 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
 
-    public SparseArray<Fragment> getFragments(){
+    public SparseArray<Fragment> getFragments() {
         return pagerAdapter.getRegisteredFragment();
     }
+
     //to remember: https://code.google.com/p/android/issues/detail?id=69586
     public static class Adapter extends FragmentPagerAdapter {
         public SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
         private Context context;
-        public Adapter(Context ctxt,FragmentManager fm) {
+
+        public Adapter(Context ctxt, FragmentManager fm) {
 
             super(fm);
-           // Utils.logD(LOG_TAG,"Adapter");
+            // Utils.logD(LOG_TAG,"Adapter");
 
             context = ctxt;
 
         }
 
         public SparseArray<Fragment> getRegisteredFragment() {
-            SparseArray<Fragment> copy =new SparseArray<>();
-            for(int i =0;i<registeredFragments.size();i++) {
-                copy.put(i,registeredFragments.get(i));
+            SparseArray<Fragment> copy = new SparseArray<>();
+            for (int i = 0; i < registeredFragments.size(); i++) {
+                copy.put(i, registeredFragments.get(i));
             }
             return copy;
 
@@ -173,11 +223,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             //Utils.logD(LOG_TAG,"getItem:"+position);
             switch (position) {
                 case 0:
-                     return new ListTabFragment();
+                    return new ListTabFragment();
 
                 case 1:
-                     return new MapTabFragment();
-                default: return null;
+                    return new MapTabFragment();
+                default:
+                    return null;
 
             }
 
@@ -217,7 +268,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
                 case 1:
                     return context.getString(R.string.tlf_tab_map_string);
 
-                default: return null;
+                default:
+                    return null;
 
             }
         }

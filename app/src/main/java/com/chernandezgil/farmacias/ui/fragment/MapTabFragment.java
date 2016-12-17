@@ -53,6 +53,7 @@ import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.PharmacyObjectMap;
 import com.chernandezgil.farmacias.presenter.MapTabPresenter;
+import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
@@ -85,15 +86,15 @@ import butterknife.Unbinder;
  * Created by Carlos on 10/07/2016.
  */
 public class MapTabFragment extends Fragment implements OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener,GoogleMap.OnMapClickListener,MapTabContract.View {
+        GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, MapTabContract.View {
 
 
     private static final String LOG_TAG = MapTabFragment.class.getSimpleName();
     public static final String USER_LOCATION = "userLocation";
-    private static final int USER_CIRCLE_RADIO=150; //meters
-    private static final int USER_CIRCLE_ANIMATION_MS=3000;
-    private static final int STATE_COLLAPSED=0;
-    private static final int STATE_EXPANDED=1;
+    private static final int USER_CIRCLE_RADIO = 150; //meters
+    private static final int USER_CIRCLE_ANIMATION_MS = 3000;
+    private static final int STATE_COLLAPSED = 0;
+    private static final int STATE_EXPANDED = 1;
 
 
     private GoogleMap mMap;
@@ -102,7 +103,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     private BottomSheetBehavior mBottomSheetBehavior;
     private CustomSupporMapFragment mMapFragment;
-    private boolean mRotation=false;
+    private boolean mRotation = false;
     private MapTabPresenter mPresenter;
     private LoaderProvider mLoaderProvider;
     private LoaderManager mLoaderManager;
@@ -121,7 +122,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     TextView tvDistance;
     @BindView(R.id.name)
     TextView tvName;
-
 
 
     @BindView(R.id.llUpper)
@@ -163,9 +163,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     ImageView ivZoomMinus;
 
 
+    @BindView(R.id.wrapperCoordinator)
+    CoordinatorLayout mWrapperCoordinator;
+
     private Geocoder mGeocoder;
     private PharmacyObjectMap mLastMarkerClicked;
-    private Bitmap  markerBitmap;
+    private Bitmap markerBitmap;
     private Unbinder unbinder;
 
     private int mBottomSheetState;
@@ -180,7 +183,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Utils.logD(LOG_TAG,"onReceive");
+            Utils.logD(LOG_TAG, "onReceive");
             //update location variable
             mLocation = mSharedPreferences.getLocation();
             //get the new address
@@ -198,12 +201,12 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapClick(LatLng latLng) {
         Projection projection = mMap.getProjection();
-        Point point=projection.toScreenLocation(latLng);
+        Point point = projection.toScreenLocation(latLng);
 
-        Rect rect=new Rect();
+        Rect rect = new Rect();
         bottomSheet.getGlobalVisibleRect(rect);
-        if(!rect.contains(point.x,point.y)) {
-            Utils.logD(LOG_TAG,"outside bottom sheet");
+        if (!rect.contains(point.x, point.y)) {
+            Utils.logD(LOG_TAG, "outside bottom sheet");
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
     }
@@ -211,24 +214,21 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public MapTabFragment() {
     }
 
-    
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTm= new TimeMeasure(LOG_TAG);
+        mTm = new TimeMeasure(LOG_TAG);
         Utils.logD(LOG_TAG, "onCreate");
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
-        mLoaderProvider=new LoaderProvider(getActivity());
-        mLoaderManager=getLoaderManager();
-        mPresenter =new MapTabPresenter(mLoaderProvider,mLoaderManager,mGeocoder,mSharedPreferences);
+        mLoaderProvider = new LoaderProvider(getActivity());
+        mLoaderManager = getLoaderManager();
+        mPresenter = new MapTabPresenter(mLoaderProvider, mLoaderManager, mGeocoder, mSharedPreferences);
         mPresenter.setView(this);
         mPresenter.setLocation(mLocation);
         mAddress = mPresenter.onGetAddressFromLocation(mLocation);
-
-
 
 
     }
@@ -239,7 +239,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
-        unbinder=ButterKnife.bind(this,view);
+        unbinder = ButterKnife.bind(this, view);
         setUpBotomSheet();
         setUpTvPhone();
         setUpIvCall();
@@ -248,20 +248,21 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvFavorite();
         setUpZoomControls();
 
+
         mapFragment = Utils.handleMapFragmentRecreation(getChildFragmentManager(),
                 R.id.mapFragmentContainer, "mapFragment");
         mapFragment.getMapAsync(this);
 
-        mMapFragment=mapFragment;
-        if(savedInstanceState!=null){
-            mRotation=true;
-            mLastMarkerClicked=savedInstanceState.getParcelable("lastMarkerClicked_key");
+        mMapFragment = mapFragment;
+        if (savedInstanceState != null) {
+            mRotation = true;
+            mLastMarkerClicked = savedInstanceState.getParcelable("lastMarkerClicked_key");
             mPresenter.onSetLastMarkerClick(mLastMarkerClicked);
-            mBottomSheetState=savedInstanceState.getInt("bottom_sheet_state");
+            mBottomSheetState = savedInstanceState.getInt("bottom_sheet_state");
         }
 
 
-        markerBitmap= Utils.getBitmapFromVectorDrawable(getActivity().getApplicationContext(),R.drawable.hospital_pin_stroke);
+        markerBitmap = Utils.getBitmapFromVectorDrawable(getActivity().getApplicationContext(), R.drawable.hospital_pin_stroke);
         mPresenter.onSetMarkerBitMap(markerBitmap);
 
 
@@ -270,7 +271,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG,"onViewCreated");
+        Utils.logD(LOG_TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         //start the loader once the view is ready
         mPresenter.onStartLoader();
@@ -281,7 +282,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Utils.logD(LOG_TAG,"setUserVisibleHint:"+isVisibleToUser);
+        Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
 
@@ -316,15 +317,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //    }
 
 
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key",mLocation);
-        outState.putParcelable("lastMarkerClicked_key",mLastMarkerClicked);
-        outState.putInt("bottom_sheet_state",mBottomSheetBehavior.getState());
+        outState.putParcelable("location_key", mLocation);
+        outState.putParcelable("lastMarkerClicked_key", mLastMarkerClicked);
+        outState.putInt("bottom_sheet_state", mBottomSheetBehavior.getState());
     }
+
     @Override
     public void onStart() {
         Utils.logD(LOG_TAG, "onStart");
@@ -335,16 +335,16 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onResume() {
-        Utils.logD(LOG_TAG,"onResume");
+        Utils.logD(LOG_TAG, "onResume");
         super.onResume();
         IntentFilter filter = new IntentFilter(ListTabFragment.NEW_LOCATION);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,filter);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver, filter);
     }
 
     @Override
     public void onPause() {
-        Utils.logD(LOG_TAG,"onPause");
-         super.onPause();
+        Utils.logD(LOG_TAG, "onPause");
+        super.onPause();
 
     }
 
@@ -354,6 +354,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
         super.onStop();
     }
+
     //this callback executes after onstart
     @SuppressWarnings("ResourceType")
     @Override
@@ -369,24 +370,24 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                Log.d(LOG_TAG,"onmapLoaded");
+                Log.d(LOG_TAG, "onmapLoaded");
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        int count=0;
-                        CustomCameraUpdate cu=null;
-                        while(cu==null && !mCancelThread) {
+                        int count = 0;
+                        CustomCameraUpdate cu = null;
+                        while (cu == null && !mCancelThread) {
                             count++;
-                            cu= mPresenter.getCameraUpdate();
-                            Utils.logD(LOG_TAG,"count"+count);
+                            cu = mPresenter.getCameraUpdate();
+                            Utils.logD(LOG_TAG, "count" + count);
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            if(count>15) mCancelThread=true;
+                            if (count > 15) mCancelThread = true;
                         }
-                        if(!mCancelThread) {
+                        if (!mCancelThread) {
                             moveCamera(cu);
                         }
                     }
@@ -407,31 +408,31 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void addMarkerToMap(PharmacyObjectMap pharmacyObjectMap) {
 
 
-        if(pharmacyObjectMap==null) {
+        if (pharmacyObjectMap == null) {
             return;
         }
         MarkerOptions markerOption = new MarkerOptions();
-        double lat=pharmacyObjectMap.getLat();
-        double lon=pharmacyObjectMap.getLon();
+        double lat = pharmacyObjectMap.getLat();
+        double lon = pharmacyObjectMap.getLon();
         markerOption.position(new LatLng(lat, lon));
 
-        if(pharmacyObjectMap.getName().equals(USER_LOCATION)) {
+        if (pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(getString(R.string.mtf_tu_ubicacion))
                     .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
 
             //cancel previous animation
-            if(mAnimator!=null && mAnimator.isRunning()) {
+            if (mAnimator != null && mAnimator.isRunning()) {
                 mAnimator.cancel();
             }
-            Paint strokePaint =new Paint();
+            Paint strokePaint = new Paint();
             strokePaint.setColor(Color.parseColor("#0D47A1"));
-            Paint fillPaint =new Paint();
+            Paint fillPaint = new Paint();
             fillPaint.setColor(Color.parseColor("#90CAF9"));
 
-            Circle circle=mMap.addCircle(
+            Circle circle = mMap.addCircle(
                     new CircleOptions()
-                            .center(new LatLng(lat,lon))
+                            .center(new LatLng(lat, lon))
                             .strokeWidth(4f)
                             .strokeColor(strokePaint.getColor())
                             .fillColor(fillPaint.getColor())
@@ -449,8 +450,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                 @Override
                 public void onAnimationUpdate(ValueAnimator valueAnimator) {
                     float animatedFraction = valueAnimator.getAnimatedFraction();
-                    strokePaint.setAlpha((int)((1-animatedFraction)*255));
-                    fillPaint.setAlpha((int)((1-animatedFraction)*255));
+                    strokePaint.setAlpha((int) ((1 - animatedFraction) * 255));
+                    fillPaint.setAlpha((int) ((1 - animatedFraction) * 255));
                     circle.setRadius(animatedFraction * USER_CIRCLE_RADIO);
                     circle.setStrokeColor(strokePaint.getColor());
                     circle.setFillColor(fillPaint.getColor());
@@ -461,10 +462,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
         } else {
-            Bitmap bitmap= mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
+            Bitmap bitmap = mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(pharmacyObjectMap.getName())
-                    .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance()/1000));
+                    .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance() / 1000));
         }
         markerOption.anchor(0.5f, 0.5f);
 
@@ -475,13 +476,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-
-
-
-
     @Override
     public void moveCamera(CustomCameraUpdate cameraUpdate) {
-        if(cameraUpdate.isNoResultsPosition()) {
+        if (cameraUpdate.isNoResultsPosition()) {
             handleNoResults((cameraUpdate));
         } else {
             mBottomSheetBehavior.setState(mBottomSheetBehavior.STATE_COLLAPSED);
@@ -493,39 +490,38 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void handleNoResults(CustomCameraUpdate cameraUpdate){
+    private void handleNoResults(CustomCameraUpdate cameraUpdate) {
         mMap.moveCamera(cameraUpdate.getmCameraUpdate());
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15),2000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         ArrayList<LatLng> list = new ArrayList<LatLng>();
-        list.add(new LatLng(39.63108,-7.62451));
-        list.add(new LatLng(37.92687,-7.59155));
-        list.add(new LatLng(37.92687,-4.52637));
-        list.add(new LatLng(40.41768,-4.63623));
-        list.add(new LatLng(40.54929,-6.97083));
-        list.add(new LatLng(39.63108,-7.62451));
-        list.add(new LatLng(37.92687,-7.59155));
-        list.add(new LatLng(37.92687,-4.52637));
+        list.add(new LatLng(39.63108, -7.62451));
+        list.add(new LatLng(37.92687, -7.59155));
+        list.add(new LatLng(37.92687, -4.52637));
+        list.add(new LatLng(40.41768, -4.63623));
+        list.add(new LatLng(40.54929, -6.97083));
+        list.add(new LatLng(39.63108, -7.62451));
+        list.add(new LatLng(37.92687, -7.59155));
+        list.add(new LatLng(37.92687, -4.52637));
         String message;
-        if(Utils.contains(new LatLng(mLocation.getLatitude(),mLocation.getLongitude()),list)){
-            message=getString(R.string.mtf_radio_busqueda_insuficiente);
-          // Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
+        if (Utils.contains(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), list)) {
+            message = getString(R.string.mtf_radio_busqueda_insuficiente);
+            // Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
         } else {
-            message=getString(R.string.mtf_fuera_de_extremadura);
+            message = getString(R.string.mtf_fuera_de_extremadura);
         }
 
-        Snackbar.make(mRootView,message,Snackbar.LENGTH_INDEFINITE).show();
+        Snackbar.make(mRootView, message, Snackbar.LENGTH_INDEFINITE).show();
     }
-
 
 
     @Override
     public boolean collapseBottomSheet() {
-       if(isBottomSheetExpanded()) {
-           mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-           return true;
-       }
-       return false;
+        if (isBottomSheetExpanded()) {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            return true;
+        }
+        return false;
     }
 
 //    @Override
@@ -540,11 +536,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //    }
 
 
-
-
     @Override
     public void refreshMapIfNecesary(PharmacyObjectMap updatedPharmacy) {
-        if(mLastMarkerClicked.getPhone().equals(updatedPharmacy.getPhone())) {
+        if (mLastMarkerClicked.getPhone().equals(updatedPharmacy.getPhone())) {
             showPharmacyInBottomSheet(updatedPharmacy);
         }
 
@@ -566,6 +560,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             }
         }, 30);
     }
+
     @Override
     public void launchActivity(Intent intent) {
 
@@ -573,15 +568,15 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public  void setStateBottomSheet(int state) {
-        if(state==STATE_COLLAPSED) {
+    public void setStateBottomSheet(int state) {
+        if (state == STATE_COLLAPSED) {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
     }
 
-    private void setUpBotomSheet(){
+    private void setUpBotomSheet() {
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         //initially set hidden(in case there are no pharmacies around).Not working
         mBottomSheetBehavior.setHideable(true);
@@ -589,6 +584,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
     }
+
     public void updateClickedPhoneToPresenter(String phone) {
         mPresenter.updateFavoriteFlag(phone);
 
@@ -600,7 +596,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void setUpIvFavorite(){
+    private void setUpIvFavorite() {
         ivFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -612,17 +608,18 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         });
     }
-    private void setUpIvGo(){
+
+    private void setUpIvGo() {
         ivGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               mPresenter.handleClickGo();
+                mPresenter.handleClickGo();
 
             }
         });
     }
 
-    public void setUpTvPhone(){
+    public void setUpTvPhone() {
 
         tvPhone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -633,7 +630,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-    private void setUpIvCall(){
+    private void setUpIvCall() {
         ivCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -644,7 +641,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void setUpIvShare(){
+    private void setUpIvShare() {
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -654,7 +651,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void setUpZoomControls(){
+    private void setUpZoomControls() {
         ivZoomPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -671,20 +668,22 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
+
     @Override
     public boolean onMarkerClick(Marker marker) {
 
-            mPresenter.handleOnMarkerClick(marker);
-            return false;
+        mPresenter.handleOnMarkerClick(marker);
+        return false;
     }
+
     @Override
     public void preShowPharmacyInBottomSheet(PharmacyObjectMap firstSortedPharmacy, PharmacyObjectMap lastClicked) {
-        Utils.logD(LOG_TAG,"preshowPharmacy");
+        Utils.logD(LOG_TAG, "preshowPharmacy");
 
         //if there has been a rotation
-        if(mRotation) {
-            if(lastClicked!=null) {
-                Utils.logD(LOG_TAG,"firstsor");
+        if (mRotation) {
+            if (lastClicked != null) {
+                Utils.logD(LOG_TAG, "firstsor");
                 //npe   java.lang.NullPointerException: Attempt to invoke virtual method 'double java.lang.Double.doubleValue()' on a null object reference
                 addMarkerToMap(lastClicked);
                 firstSortedPharmacy = lastClicked;
@@ -692,8 +691,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
                 setStateBottomSheet(mBottomSheetState);
             }
 
-            mRotation=false;
-         }
+            mRotation = false;
+        }
 
 
         showPharmacyInBottomSheet(firstSortedPharmacy);
@@ -703,43 +702,42 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy){
+    public void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy) {
 
-            int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
-            llUper.setBackgroundColor(color);
+        int color = pharmacy.isOpen() ? color_pharmacy_open : color_pharmacy_close;
+        llUper.setBackgroundColor(color);
 //            Marker marker=getKeyFromValue(pharmacy);
 //            HashMap hashMap= mPresenter.onGetHashMap();
 //            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
-            Drawable favDraResid=ContextCompat.getDrawable(getActivity(),pharmacy.isFavorite()?R.drawable.ic_heart :R.drawable.ic_heart_outline);
-            ivFavorite.setImageDrawable(favDraResid);
-            setTintedVectorDrawable(ivCall, R.drawable.phone, color);
-            setTintedVectorDrawable(ivGo, R.drawable.directions, color);
-            setTintedVectorDrawable(ivDistance, R.drawable.distance, color);
-            setTintedVectorDrawable(ivMarker, R.drawable.map_marker, color);
-            setTintedVectorDrawable(ivPhone, R.drawable.phone, color);
-            setTintedVectorDrawable(ivClock, R.drawable.clock, color);
-            setTintedVectorDrawable(ivShare,R.drawable.share,color);
+        Drawable favDraResid = ContextCompat.getDrawable(getActivity(), pharmacy.isFavorite() ? R.drawable.ic_heart : R.drawable.ic_heart_outline);
+        ivFavorite.setImageDrawable(favDraResid);
+        setTintedVectorDrawable(ivCall, R.drawable.phone, color);
+        setTintedVectorDrawable(ivGo, R.drawable.directions, color);
+        setTintedVectorDrawable(ivDistance, R.drawable.distance, color);
+        setTintedVectorDrawable(ivMarker, R.drawable.map_marker, color);
+        setTintedVectorDrawable(ivPhone, R.drawable.phone, color);
+        setTintedVectorDrawable(ivClock, R.drawable.clock, color);
+        setTintedVectorDrawable(ivShare, R.drawable.share, color);
 
-            tvName.setText(pharmacy.getName());
-            ivOrder.setImageBitmap(pharmacy.getMarkerImage());
+        tvName.setText(pharmacy.getName());
+        ivOrder.setImageBitmap(pharmacy.getMarkerImage());
 
-            tvCall.setTextColor(color);
-            tvGo.setTextColor(color);
-            tvShare.setTextColor(color);
-
-
-            tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
-            tvAdress.setText(pharmacy.getAddressFormatted());
-            tvHours.setText(pharmacy.getHours());
-            tvPhone.setText(pharmacy.getPhoneFormatted());
-            mPresenter.onSetLastMarkerClick(pharmacy);
-            mLastMarkerClicked=pharmacy;
+        tvCall.setTextColor(color);
+        tvGo.setTextColor(color);
+        tvShare.setTextColor(color);
 
 
+        tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
+        tvAdress.setText(pharmacy.getAddressFormatted());
+        tvHours.setText(pharmacy.getHours());
+        tvPhone.setText(pharmacy.getPhoneFormatted());
+        mPresenter.onSetLastMarkerClick(pharmacy);
+        mLastMarkerClicked = pharmacy;
 
 
     }
-//    public void setTintedDrawable(ImageView imageView,@DrawableRes int drawableResId,int color ){
+
+    //    public void setTintedDrawable(ImageView imageView,@DrawableRes int drawableResId,int color ){
 //
 //        SVG svg=new SVGBuilder().readFromResource(getResources(),R.raw.distance4)
 //                .build();
@@ -753,8 +751,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //    }
     public void setTintedVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
 
-        VectorDrawableCompat drawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
-        if(drawable==null) return;
+        VectorDrawableCompat drawable = VectorDrawableCompat.create(getResources(), drawableResId, null);
+        if (drawable == null) return;
         drawable.setTint(color);
         imageView.setImageDrawable(drawable);
 
@@ -762,12 +760,40 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public boolean isBottomSheetExpanded(){
-       return mBottomSheetBehavior.getState()==BottomSheetBehavior.STATE_EXPANDED;
+    public boolean isBottomSheetExpanded() {
+        return mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED;
     }
 
 
+    public void setBottomSheetPosition(){
+        final int screenHeight = Utils.getScreenHeight(getActivity());
+        Utils.logD(LOG_TAG, "Screen height:" + screenHeight);
 
+        final int[] position = new int[2];
+        mWrapperCoordinator.getLocationInWindow(position);
+
+        final int[] position1 = new int[2];
+        mWrapperCoordinator.getLocationOnScreen(position1);
+
+        final int posBottomWrapperCoordinator = position[1] + mWrapperCoordinator.getHeight();
+        final int posBottomWrapperCoordinator1 = position1[1] + mWrapperCoordinator.getHeight();
+
+        Utils.logD(LOG_TAG,"pos:"+position[1]);
+        Utils.logD(LOG_TAG,"pos1:"+position1[1]);
+
+        Utils.logD(LOG_TAG,"y+height:"+posBottomWrapperCoordinator);
+        Utils.logD(LOG_TAG,"y1+height:"+posBottomWrapperCoordinator1);
+        final int bottomNavigationHeight= ((MainActivity)getContext()).getBottomNavigationView().getHeight();
+        Utils.logD(LOG_TAG,"bottom navigation height:"+bottomNavigationHeight);
+        Utils.logD(LOG_TAG,"y1+height+bnheight:"+(posBottomWrapperCoordinator+bottomNavigationHeight));
+
+        mWrapperCoordinator.setTranslationY(0);
+        mWrapperCoordinator.setBottom(Utils.getScreenHeight(getActivity()));
+    }
+
+    public void translateYBottomSheet(float offset) {
+        mWrapperCoordinator.setTranslationY(offset);
+    }
 
 
 //    @SuppressWarnings("ResourceType")

@@ -29,14 +29,14 @@
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_scrollFlags="scroll|enterAlways">
+                app:layout_scrollFlags="scroll|enterAlways|snap">
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="57dp"
                     android:background="?attr/colorPrimary"
-                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:layout_scrollFlags="scroll|enterAlways|snap"
                     app:popupTheme="@style/AppTheme.PopupOverlay" />
 
                 <include layout="@layout/layout_toolbar_find" />
@@ -56,7 +56,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="com.chernandezgil.farmacias.customwidget.behaviour.BottomNavigationHide"
+            app:layout_behavior="com.chernandezgil.farmacias.customwidget.behaviour.QuickReturnView"
             android:layout_gravity="bottom">
 
             <android.support.design.widget.CoordinatorLayout
@@ -73,6 +73,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+
+
 
                 />
 
