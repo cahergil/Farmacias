@@ -304,6 +304,9 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
             // Fetch the address lines using getAddressLine,
             // join them, and send them to the thread.
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                if (i == 0) {
+                    preferencesManager.saveStreet(address.getAddressLine(i));
+                }
                 stringBuilder.append(address.getAddressLine(i));
                 if (i != address.getMaxAddressLineIndex() - 1) {
                     stringBuilder.append(Constants.COMMA);
@@ -353,12 +356,12 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                 break;
             case 2:
                 //70% of original size and reduce the margin with the bottom
-                paint.setTextSize(Utils.getDefaultBitmapTextSize()*0.7f);
+                paint.setTextSize(Utils.getDefaultBitmapTextSize() * 0.7f);
                 factor = 0.75f;
                 break;
             case 3:
                 //50% of original size and reduce the margin with the bottom
-                paint.setTextSize(Utils.getDefaultBitmapTextSize()*0.5f);
+                paint.setTextSize(Utils.getDefaultBitmapTextSize() * 0.5f);
                 factor = 0.60f;
                 break;
             default:

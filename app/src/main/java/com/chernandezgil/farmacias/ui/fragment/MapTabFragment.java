@@ -419,7 +419,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if (pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(getString(R.string.mtf_tu_ubicacion))
-                    .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
+              //      .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
+                    .snippet(mSharedPreferences.getStreet());
 
             //cancel previous animation
             if (mAnimator != null && mAnimator.isRunning()) {

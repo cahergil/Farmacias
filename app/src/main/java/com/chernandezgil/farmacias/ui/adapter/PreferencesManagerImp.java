@@ -27,6 +27,7 @@ public class PreferencesManagerImp implements PreferencesManager {
     private static final String FAVORITE_LIST_KEY ="favorite_list_key";
     private static final String COLOR_MAP_KEY ="color_map_key";
     private static final String LOCATION_KEY = "location_key";
+    private static final String STREET_KEY ="street_key";
 
 
     public PreferencesManagerImp(Context context) {
@@ -151,4 +152,17 @@ public class PreferencesManagerImp implements PreferencesManager {
         }
         return null;
     }
+
+    @Override
+    public void saveStreet(String street) {
+        mEditor.putString(STREET_KEY,street);
+        mEditor.apply();
+    }
+
+    @Override
+    public String getStreet() {
+        return mPrefs.getString(STREET_KEY,Constants.EMPTY_STRING);
+    }
+
+
 }

@@ -27,5 +27,7 @@ public interface PreferencesManager {
     public List<Pharmacy> getFavorites();
     public void saveColorMap(HashMap<String,Integer> colorMap);
     public HashMap<String,Integer> getColorMap();
+    public void saveStreet(String street);
+    public String getStreet();
 
 }

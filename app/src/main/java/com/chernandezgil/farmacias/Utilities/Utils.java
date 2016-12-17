@@ -45,7 +45,7 @@ import java.util.Locale;
  */
 public class Utils {
 
-    private static final String LOG_TAG= Utils.class.getSimpleName();
+    private static final String LOG_TAG = Utils.class.getSimpleName();
 
     static int screenHeight = 0;
     static int oldStatusBarFlags;
@@ -227,36 +227,9 @@ public class Utils {
 
         Context context = MyApplication.getContext();
         float scale = context.getResources().getDisplayMetrics().density;
-        return (int)(14*scale);
+        return (int) (14 * scale);
     }
 
-    //review this, not working properly
-    public static String getStreetFromAddress(String address) {
-        String result;
-        boolean found = false;
-        int n = 0;
-        int cont = 0;
-        if (address == null) return null;
-        while (n != -1) {
-            cont++;
-            n = address.indexOf(Constants.COMMA, n);
-            if (cont == 2) {
-                found = true;
-                break;
-            }
-            n++;
-
-        }
-        if (found) {
-            Utils.logD(LOG_TAG,"address:"+address);
-            Utils.logD(LOG_TAG,"n:"+n);
-            return address;
-//            return address.substring(0, n);
-        } else {
-            return address;
-        }
-
-    }
 
     public static int getColor(@ColorRes int resId) {
 
@@ -341,11 +314,12 @@ public class Utils {
         Resources resources = context.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            return  resources.getDimensionPixelSize(resourceId);
+            return resources.getDimensionPixelSize(resourceId);
         }
         return 126;
 
     }
+
     public static void setLightStatusBar(View view, Activity activity) {
 
 
@@ -466,9 +440,9 @@ public class Utils {
 
 
     public static int getStatusPharmacyColor(Pharmacy pharmacy) {
-        Context context =MyApplication.getContext();
-        return pharmacy.isOpen()? ContextCompat.getColor(context,R.color.pharmacy_open):
-                ContextCompat.getColor(context,R.color.pharmacy_close);
+        Context context = MyApplication.getContext();
+        return pharmacy.isOpen() ? ContextCompat.getColor(context, R.color.pharmacy_open) :
+                ContextCompat.getColor(context, R.color.pharmacy_close);
     }
 
 }
