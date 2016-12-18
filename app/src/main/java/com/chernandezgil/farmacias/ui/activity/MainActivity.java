@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
         setUpToolBar();
         setUpCollapsingToolbar();
 
-        // enableStrictModeForDebug();
+        //enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
 
         if (hasAllPermissions(getDesiredPermissions())) {

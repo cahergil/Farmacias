@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
+import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -148,7 +149,7 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
     @Override
     public void handleClickCall() {
-        String uri = "tel:" + mLastMarkerClicked.getPhone();
+        final String uri = "tel:" + mLastMarkerClicked.getPhone();
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(uri));
         mView.launchActivity(intent);
@@ -158,11 +159,11 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
     @Override
     public void handleClickShare() {
         //http://stackoverflow.com/questions/26149422/android-sharing-formatted-data-using-intent
-        String name = mLastMarkerClicked.getName();
+        final String name = mLastMarkerClicked.getName();
         double distance = mLastMarkerClicked.getDistance();
-        String address = mLastMarkerClicked.getAddressFormatted();
-        String phone = mLastMarkerClicked.getPhone();
-        Intent intent = Utils.getShareIntent(name, distance, address, phone);
+        final String address = mLastMarkerClicked.getAddressFormatted();
+        final String phone = mLastMarkerClicked.getPhone();
+        final Intent intent = Utils.getShareIntent(name, distance, address, phone);
         mView.launchActivity(intent);
     }
 
@@ -187,6 +188,18 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
 
 
     }
+
+
+    @Override
+    public void handleClickOpeningHours() {
+        final String hours = mLastMarkerClicked.getHours();
+        final int layoutId = Utils.is24HoursPharmacy(hours)? R.layout.dialog_opening_hours_24_hours
+                :R.layout.dialog_opening_hours_normal;
+        final int titleBackgroundColor=Utils.getStatusPharmacyColor(mLastMarkerClicked.isOpen());
+        mView.showOpeningHours(layoutId,titleBackgroundColor);
+
+    }
+
 
     @Override
     public void handleOnMarkerClick(Marker marker) {

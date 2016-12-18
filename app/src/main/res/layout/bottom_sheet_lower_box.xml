@@ -22,7 +22,7 @@
                 android:id="@+id/ivDistance"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-
+                app:srcCompat="@drawable/distance"
 
                 />
 
@@ -96,7 +96,6 @@
                 android:id="@+id/ivPhone"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-
                 app:srcCompat="@drawable/phone" />
         </FrameLayout>
 
@@ -128,7 +127,6 @@
                 android:id="@+id/ivClock"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-
                 app:srcCompat="@drawable/clock" />
         </FrameLayout>
 

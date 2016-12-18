@@ -137,8 +137,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             Toolbar toolbar = ((MainActivity) getActivity()).getToolbar();
             if (toolbar != null) {
 
-                int[] toolbarLocation= new int[2];
-                toolbar.getLocationInWindow(toolbarLocation);
+                int[] toolbarScreenLocation= new int[2];
+                toolbar.getLocationInWindow(toolbarScreenLocation);
 //                int[] location1=new int[2];
 //                toolbar.getLocationOnScreen(location1);
 //
@@ -161,11 +161,11 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
                     }
                 }
                 //toolbar is off the screen
-                if (toolbarLocation[1] <= 0 && f!=null) {
+                if (toolbarScreenLocation[1] <= 0 && f!=null) {
                     f.translateYBottomSheet(mOffset);
 
                 //toolbar is visible
-                } else if(toolbarLocation[1] > 0 && f!=null) {
+                } else if(toolbarScreenLocation[1] > 0 && f!=null) {
                     f.setBottomSheetPosition();
 
                 }

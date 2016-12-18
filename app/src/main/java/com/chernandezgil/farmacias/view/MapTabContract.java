@@ -30,6 +30,7 @@ public interface MapTabContract {
         public void showPharmacyInBottomSheet(PharmacyObjectMap pharmacy);
         public boolean isBottomSheetExpanded();
         public void setStateBottomSheet(int state);
+        public void showOpeningHours(int layoutId,int backgroundColor);
     }
     public interface Presenter<V> {
 
@@ -56,10 +57,6 @@ public interface MapTabContract {
         public void handleClickShare();
         public void handleClickFavorite();
         public void handleOnMarkerClick(Marker marker);
-
-
-
-
-
+        void handleClickOpeningHours();
     }
 }

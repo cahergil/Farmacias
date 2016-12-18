@@ -162,7 +162,7 @@ public class ListTabPresenter implements ListTabContract.Presenter<ListTabContra
     public void onClickOpeningHours(Pharmacy pharmacy) {
         int layoutId = Utils.is24HoursPharmacy(pharmacy.getHours())? R.layout.dialog_opening_hours_24_hours
                 :R.layout.dialog_opening_hours_normal;
-        int titleBackgroundColor=Utils.getStatusPharmacyColor(pharmacy);
+        int titleBackgroundColor=Utils.getStatusPharmacyColor(pharmacy.isOpen());
 
         mView.showOpeningHours(layoutId,titleBackgroundColor);
     }

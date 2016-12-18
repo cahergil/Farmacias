@@ -7,41 +7,32 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
@@ -49,6 +40,7 @@ import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
 import com.chernandezgil.farmacias.customwidget.CustomSupporMapFragment;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.model.CustomCameraUpdate;
 import com.chernandezgil.farmacias.model.PharmacyObjectMap;
@@ -57,17 +49,13 @@ import com.chernandezgil.farmacias.ui.activity.MainActivity;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManagerImp;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.MapTabContract;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.GroundOverlay;
-import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -147,6 +135,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     ImageView ivClock;
     @BindView(R.id.ivShare)
     ImageView ivShare;
+
 
     @BindColor(R.color.pharmacy_close)
     int color_pharmacy_close;
@@ -246,6 +235,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         setUpIvGo();
         setUpIvShare();
         setUpIvFavorite();
+        setUpIvOpeningHours();
         setUpZoomControls();
 
 
@@ -275,9 +265,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         super.onViewCreated(view, savedInstanceState);
         //start the loader once the view is ready
         mPresenter.onStartLoader();
-        //  setUserVisibleHint(true); setting it here doen't work
-        // I opted for setting this value in the instantiation of
-        //  the fragment in FragmentPagerAdapter. solution not valid after 24.0.0
+        //  setUserVisibleHint(true); setting it here doesn't work
+        //  I opted for setting this value in the instantiation of
+        //  the fragment in FragmentPagerAdapter.
     }
 
     @Override
@@ -285,37 +275,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
-
-//    private Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
-//        Drawable drawable = AppCompatDrawableManager.get().getDrawable(context, drawableId);
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            drawable = (DrawableCompat.wrap(drawable)).mutate();
-//        }
-//
-//        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-//                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(bitmap);
-//        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-//        drawable.draw(canvas);
-//
-//        return bitmap;
-//    }
-
-
-//    private  Bitmap getBitmap(int drawableResId) {
-//      //  VectorDrawableCompat vectorDrawable=VectorDrawableCompat.create(getResources(),drawableResId,null);
-//      //  Drawable vectorDrawable = AppCompatDrawableManager.get().getDrawable(getActivity(), drawableResId);
-//        Drawable vectorDrawable= ContextCompat.getDrawable(getActivity(),drawableResId);
-//       // vectorDrawable.setColorFilter(color_pharmacy_open, PorterDuff.Mode.SRC_ATOP);
-//        vectorDrawable.setTint(color_pharmacy_open);
-//        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-//                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(bitmap);
-//        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-//        vectorDrawable.draw(canvas);
-//        return bitmap;
-//    }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -419,7 +378,6 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if (pharmacyObjectMap.getName().equals(USER_LOCATION)) {
             markerOption.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(getString(R.string.mtf_tu_ubicacion))
-              //      .snippet(Utils.getStreetFromAddress(pharmacyObjectMap.getAddressFormatted()));
                     .snippet(mSharedPreferences.getStreet());
 
             //cancel previous animation
@@ -652,6 +610,24 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
+    private void setUpIvOpeningHours(){
+        tvHours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.handleClickOpeningHours();
+            }
+        });
+
+    }
+
+    @Override
+    public void showOpeningHours(int layoutId,int backgroundColor) {
+
+        DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId, backgroundColor);
+        dialog.show(getActivity().getSupportFragmentManager(), "DIALOG");
+
+    }
+
     private void setUpZoomControls() {
         ivZoomPlus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -712,13 +688,13 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
         Drawable favDraResid = ContextCompat.getDrawable(getActivity(), pharmacy.isFavorite() ? R.drawable.ic_heart : R.drawable.ic_heart_outline);
         ivFavorite.setImageDrawable(favDraResid);
-        setTintedVectorDrawable(ivCall, R.drawable.phone, color);
-        setTintedVectorDrawable(ivGo, R.drawable.directions, color);
-        setTintedVectorDrawable(ivDistance, R.drawable.distance, color);
-        setTintedVectorDrawable(ivMarker, R.drawable.map_marker, color);
-        setTintedVectorDrawable(ivPhone, R.drawable.phone, color);
-        setTintedVectorDrawable(ivClock, R.drawable.clock, color);
-        setTintedVectorDrawable(ivShare, R.drawable.share, color);
+        tintVectorDrawable(ivCall,color);
+        tintVectorDrawable(ivGo, color);
+        tintVectorDrawable(ivDistance, color);
+        tintVectorDrawable(ivMarker, color);
+        tintVectorDrawable(ivPhone, color);
+        tintVectorDrawable(ivClock, color);
+        tintVectorDrawable(ivShare, color);
 
         tvName.setText(pharmacy.getName());
         ivOrder.setImageBitmap(pharmacy.getMarkerImage());
@@ -730,7 +706,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
         tvAdress.setText(pharmacy.getAddressFormatted());
-        tvHours.setText(pharmacy.getHours());
+        boolean open=Utils.isPharmacyOpen(pharmacy.getHours());
+        tvHours.setText(open? getString(R.string.mtf_openinghour_open):getString(R.string.mtf_openinghour_close));
         tvPhone.setText(pharmacy.getPhoneFormatted());
         mPresenter.onSetLastMarkerClick(pharmacy);
         mLastMarkerClicked = pharmacy;
@@ -738,25 +715,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    //    public void setTintedDrawable(ImageView imageView,@DrawableRes int drawableResId,int color ){
-//
-//        SVG svg=new SVGBuilder().readFromResource(getResources(),R.raw.distance4)
-//                .build();
-//
-//        Drawable drawable=svg.getDrawable();
-//
-//     //   Drawable drawable= ContextCompat.getDrawable(getActivity(),drawableResId);
-//        drawable.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
-//        imageView.setImageDrawable(drawable);
-//
-//    }
-    public void setTintedVectorDrawable(ImageView imageView, @DrawableRes int drawableResId, int color) {
+    public void tintVectorDrawable(ImageView imageView, int color) {
 
-        VectorDrawableCompat drawable = VectorDrawableCompat.create(getResources(), drawableResId, null);
-        if (drawable == null) return;
-        drawable.setTint(color);
-        imageView.setImageDrawable(drawable);
-
+        DrawableCompat.setTint(imageView.getDrawable(),color);
 
     }
 
@@ -816,6 +777,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onDestroyView() {
         mCancelThread = true;
+        if (mAnimator != null && mAnimator.isRunning()) {
+            mAnimator.cancel();
+        }
         super.onDestroyView();
     }
 

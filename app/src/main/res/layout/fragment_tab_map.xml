@@ -37,7 +37,7 @@
                 android:layout_marginBottom="5dp"
                 android:background="@drawable/shape_zoom_controls"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/gray700"
+                android:tint="@color/color_zoom_controls"
                 app:srcCompat="@drawable/ic_magnify_plus" />
 
             <ImageView
@@ -46,7 +46,7 @@
                 android:layout_height="40dp"
                 android:background="@drawable/shape_zoom_controls"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/gray700"
+                android:tint="@color/color_zoom_controls"
                 app:srcCompat="@drawable/ic_magnify_minus" />
         </LinearLayout>
 
