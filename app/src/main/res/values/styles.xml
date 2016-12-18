@@ -128,4 +128,46 @@
         <item name="android:layout_weight">1.5</item>
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <!--bottom_sheet_lower_box.xml styles-->
+    <style name="BottomSheetLowerBoxTextViewStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">4</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lines">1</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/bottom_sheet_text</item>
+        <item name="android:textSize">@dimen/bslb_text_size</item>
+
+    </style>
+    <style name="BottomSheetLowerBoxLinearLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center</item>
+
+
+    </style>
+
+    <!--bottom_sheet_middle_box.xml styles-->
+    <style name="BottomSheetMiddleBoxImageView">
+        <item name="android:layout_width">@dimen/bsmb_image_width</item>
+        <item name="android:layout_height">@dimen/bsmb_image_height</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="BottomSheetMiddleBoxTextView">
+        <item name="android:layout_width">@dimen/bsmb_image_width</item>
+        <item name="android:layout_height">@dimen/bsmb_image_height</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/bslb_text_size</item>
+        <item name="android:textColor">@color/bottom_sheet_icons</item>
+        <item name="android:divider">?android:dividerHorizontal</item>
+        <item name="android:showDividers">end</item>
+    </style>
 </resources>

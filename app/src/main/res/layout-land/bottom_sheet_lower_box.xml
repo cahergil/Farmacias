@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/bslb_initial_margin_top"
         android:orientation="horizontal">
 
         <FrameLayout
@@ -20,10 +20,9 @@
 
             <ImageView
                 android:id="@+id/ivDistance"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
-
+                android:layout_width="@dimen/bslb_image_width"
+                android:layout_height="@dimen/bslb_image_height"
+                app:srcCompat="@drawable/distance"
                 />
 
         </FrameLayout>
@@ -34,8 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:ellipsize="end"
-            android:lines="2"
-            android:text=""
+            android:lines="1"
             android:textColor="@color/bottom_sheet_text"
             android:textSize="@dimen/bslb_text_size"
             tools:text="1,2 Km" />
@@ -47,8 +45,8 @@
 
             <ImageView
                 android:id="@+id/ivMarker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/bslb_image_width"
+                android:layout_height="@dimen/bslb_image_height"
                 app:srcCompat="@drawable/map_marker" />
 
         </FrameLayout>
@@ -59,8 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:ellipsize="end"
-            android:lines="2"
-            android:text="740 Villanueva St, Badajoz, Extremadura"
+            android:lines="1"
             android:textColor="@color/bottom_sheet_text"
             android:textSize="@dimen/bslb_text_size"
             tools:text="740 Villanueva St, Badajoz, Extremadura" />
@@ -72,8 +69,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="@dimen/bslb_initial_margin_bottom"
+        android:layout_marginTop="@dimen/bslb_initial_margin_top"
         android:orientation="horizontal">
         <FrameLayout
             android:layout_width="0dp"
@@ -83,9 +80,8 @@
 
             <ImageView
                 android:id="@+id/ivPhone"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
+                android:layout_width="@dimen/bslb_image_width"
+                android:layout_height="@dimen/bslb_image_height"
                 app:srcCompat="@drawable/phone" />
         </FrameLayout>
 
@@ -94,7 +90,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:text="(415) 349 -0942"
             android:textColor="@color/bottom_sheet_text"
             android:textSize="@dimen/bslb_text_size"
             tools:text="(924) 84 19 97" />
@@ -106,9 +101,8 @@
 
             <ImageView
                 android:id="@+id/ivClock"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-
+                android:layout_width="@dimen/bslb_image_width"
+                android:layout_height="@dimen/bslb_image_height"
                 app:srcCompat="@drawable/clock" />
         </FrameLayout>
 
@@ -117,10 +111,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:text="LV09:00-14:00,16:30-20:30S09:00-14:00"
+            android:lines="1"
+            android:ellipsize="end"
             android:textColor="@color/bottom_sheet_text"
             android:textSize="@dimen/bslb_text_size"
-
             tools:text="LV09:00-14:00,16:30-20:30S09:00-14:00" />
 
     </LinearLayout>

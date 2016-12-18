@@ -3,10 +3,40 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="bslb_text_size">14sp</dimen>
+
     <dimen name="offset_y">300dp</dimen>
     <dimen name="ic_clear_margin">16dp</dimen>
     <dimen name="appbar_elevation">4dp</dimen>
 
+    <!-- activity_main.xml-->
+    <dimen name="am_snack_container">150dp</dimen>
+
+    <!-- bottom_sheet_lower_box.xml-->
+    <dimen name="bslb_margin_right_image">18dp</dimen>
+    <dimen name="bslb_image_width">24dp</dimen>
+    <dimen name="bslb_image_height">24dp</dimen>
+    <dimen name="bslb_text_size">14sp</dimen>
+    <dimen name="bslb_initial_margin_top">16dp</dimen>
+    <dimen name="bslb_initial_margin_bottom">8dp</dimen>
+
+    <!-- bottom_sheet_middle_box.xml-->
+    <dimen name="bsmb_initial_margin_top">8dp</dimen>
+    <dimen name="bsmb_initial_margin_bottom">8dp</dimen>
+    <dimen name="bsmb_image_width">0dp</dimen>
+    <dimen name="bsmb_image_height">26dp</dimen>
+
+    <!-- bottom_sheet_upper_box.xml-->
+    <dimen name="bsub_linear_marker_heigh">80dp</dimen>
+    <dimen name="bsub_linear_marker_image_width">48dp</dimen>
+    <dimen name="bsub_linear_marker_image_height">48dp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_padding_left">20dp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_padding_right">20dp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_margin_top">8dp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_margin_bottom">8dp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_upper_text_size">18sp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_lower_text_size">14sp</dimen>
+    <dimen name="bsub_linear_pharmacy_name_lower_layout_hight">20dp</dimen>
+    <dimen name="bsub_linear_fav_icon_layout_width">65dp</dimen>
+    <dimen name="bsub_linear_fav_icon_layout_height">65dp</dimen>
 
 </resources>
