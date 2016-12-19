@@ -94,7 +94,58 @@
     <dimen name="ps_title_margin_left">16dp</dimen>
     <dimen name="ps_title_margin_top">8dp</dimen>
     <dimen name="ps_title_text_size">16sp</dimen>
-    <dimen name="ps_linear_seek_bar_margin_bottom">16sp</dimen>
-    <dimen name="ps_linear_seek_bar_margin_top">8sp</dimen>
+    <dimen name="ps_linear_seek_bar_margin_bottom">16dp</dimen>
+    <dimen name="ps_linear_seek_bar_margin_top">8dp</dimen>
+
+    <!-- row_favorite_list.xml-->
+    <dimen name="rfl_card_margin_bottom">4dp</dimen>
+    <dimen name="rfl_card_margin_top">4dp</dimen>
+    <dimen name="rfl_card_corner_radius">2dp</dimen>
+    <dimen name="rfl_card_elevation">1dp</dimen>
+    <dimen name="rfl_outer_relative_margin_left">16dp</dimen>
+    <dimen name="rfl_outer_relative_margin_right">16dp</dimen>
+    <dimen name="rfl_ll_horizontal_margin_top">16dp</dimen>
+    <dimen name="rfl_circle_frame_width">56dp</dimen>
+    <dimen name="rfl_circle_frame_height">40dp</dimen>
+    <dimen name="rfl_circle_frame_margin_top">3dp</dimen>
+    <dimen name="rfl_text_view_width">39dp</dimen>
+    <dimen name="rfl_text_view_eight">39dp</dimen>
+    <dimen name="rfl_text_size">20sp</dimen>
+    <dimen name="rfl_tvOpen_margin_bottom">8dp</dimen>
+    <dimen name="rfl_tvDistance_width">0dp</dimen>
+    <dimen name="rfl_tvDistance_eight">25dp</dimen>
+    <dimen name="rfl_drag_handler_relative_layout_width">40dp</dimen>
+    <dimen name="rfl_drag_handler_relative_layout_eight">40dp</dimen>
+    <dimen name="rfl_drag_image_reorder_with">35dp</dimen>
+    <dimen name="rfl_drag_image_reorder_eight">35dp</dimen>
+    <dimen name="rfl_drag_image_undo_with">35dp</dimen>
+    <dimen name="rfl_drag_image_undo_eight">35dp</dimen>
+    <dimen name="rfl_include_margin_top">8dp</dimen>
+
+    <!-- row_find_list.xml-->
+    <dimen name="rfind_list_card_margin_top">8dp</dimen>
+    <dimen name="rfind_list_card_margin_bottom">8dp</dimen>
+    <dimen name="rfind_list_card_margin_left">8dp</dimen>
+    <dimen name="rfind_list_card_margin_right">8dp</dimen>
+    <dimen name="rfind_list_relative_layout_margin_top">8dp</dimen>
+    <dimen name="rfind_list_relative_layout_margin_bottom">16dp</dimen>
+    <dimen name="rfind_list_relative_layout_margin_left">16dp</dimen>
+    <dimen name="rfind_list_relative_layout_margin_right">16dp</dimen>
+    <dimen name="rfind_list_card_corner_radious">2dp</dimen>
+    <dimen name="rfind_list_name_height">30dp</dimen>
+    <dimen name="rfind_list_name_text_size">20sp</dimen>
+    <dimen name="rfind_list_name_margin_bottom">8dp</dimen>
+    <dimen name="rfind_list_txtPhone_padding_right">36dp</dimen>
+    <dimen name="rfind_list_include_margin_top">8dp</dimen>
+
+    <!-- row_suggestins_bean.xml-->
+    <dimen name="rsb_image_view_width">20dp</dimen>
+    <dimen name="rsb_image_view_height">20dp</dimen>
+    <dimen name="rsb_clear_width">20dp</dimen>
+    <dimen name="rsb_clear_height">20dp</dimen>
+    <dimen name="rsb_clear_margin_right">16dp</dimen>
+    <dimen name="rsb_image_view_margin_left">16dp</dimen>
+    <dimen name="rsb_image_view_margin_right">16dp</dimen>
+    <dimen name="rsb_text_view_padding">16dp</dimen>
 
 </resources>

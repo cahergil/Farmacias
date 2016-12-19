@@ -4,38 +4,36 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_search"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/rfind_list_card_margin_bottom"
+    android:layout_marginLeft="@dimen/rfind_list_card_margin_left"
+    android:layout_marginRight="@dimen/rfind_list_card_margin_right"
+    android:layout_marginTop="@dimen/rfind_list_card_margin_top"
     android:stateListAnimator="@animator/statelistanimator_pharmacy"
     card_view:cardBackgroundColor="@color/white"
     card_view:cardCornerRadius="2dp">
 
     <RelativeLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginBottom="@dimen/rfind_list_relative_layout_margin_bottom"
+        android:layout_marginLeft="@dimen/rfind_list_relative_layout_margin_left"
+        android:layout_marginRight="@dimen/rfind_list_relative_layout_margin_right"
+        android:layout_marginTop="@dimen/rfind_list_relative_layout_margin_top">
 
         <TextView
             android:id="@+id/name"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="@dimen/rfind_list_name_height"
+            android:layout_marginBottom="@dimen/rfind_list_name_margin_bottom"
             android:layout_alignParentLeft="true"
-            android:gravity="center_vertical"
             android:layout_alignParentTop="true"
             android:ellipsize="end"
+            android:gravity="center_vertical"
             android:maxLines="1"
             android:textColor="@color/colorPrimary"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp"
+            android:textSize="@dimen/rfind_list_name_text_size"
             tools:text="Farmacia Carlos La puente" />
 
         <View
@@ -45,8 +43,8 @@
             />
 
         <TextView
-            style="@style/Widget.TimeRow"
             android:id="@+id/locality"
+            style="@style/Widget.TimeRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/name"
@@ -57,15 +55,13 @@
 
             />
 
-
-
         <TextView
-            tools:text="Conde de Cartagena 36, Badajoz"
             android:id="@+id/address"
             style="@style/Widget.TimeRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/locality"
+            tools:text="Conde de Cartagena 36, Badajoz"
             />
         <View
             style="@style/Separator"
@@ -73,13 +69,13 @@
 
             />
         <TextView
-            tools:text="Distancia: 2,3 Km"
             android:id="@+id/distance"
             style="@style/Widget.TimeRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/address"
-           />
+            tools:text="Distancia: 2,3 Km"
+            />
         <View
             style="@style/Separator"
             android:layout_below="@+id/distance"
@@ -92,15 +88,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/distance"
-            android:paddingEnd="36dp"
-            android:paddingRight="36dp"
+            android:paddingEnd="@dimen/rfind_list_txtPhone_padding_right"
+            android:paddingRight="@dimen/rfind_list_txtPhone_padding_right"
             tools:text="Teléfono: 924 84 19 97"
              />
 
 
         <include
             layout="@layout/layout_options"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/rfind_list_include_margin_top"
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

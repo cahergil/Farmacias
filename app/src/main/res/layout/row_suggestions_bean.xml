@@ -9,11 +9,11 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_weight="0.1"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/rsb_image_view_width"
+        android:layout_height="@dimen/rsb_image_view_height"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/rsb_image_view_margin_left"
+        android:layout_marginRight="@dimen/rsb_image_view_margin_right"
         app:srcCompat="@drawable/ic_lupa_suggestions"
 
 
@@ -24,16 +24,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="16dp"
+        android:padding="@dimen/rsb_text_view_padding"
         android:textColor="@color/suggestions_row"
         tools:text="Carlos La Puente"/>
 
     <ImageView
         android:id="@+id/ivClearItem"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/rsb_clear_width"
+        android:layout_height="@dimen/rsb_clear_height"
         android:layout_weight="0.1"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="@dimen/rsb_clear_margin_right"
         android:layout_gravity="center_vertical"
         android:tint="@color/black"
         android:alpha="0.20"

@@ -6,41 +6,40 @@
     android:id="@+id/card_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
-    android:layout_marginTop="4dp"
+    android:layout_marginBottom="@dimen/rfl_card_margin_bottom"
+    android:layout_marginTop="@dimen/rfl_card_margin_top"
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@animator/statelistanimator_pharmacy"
-    card_view:cardCornerRadius="2dp"
-    card_view:cardElevation="1dp">
+    card_view:cardCornerRadius="@dimen/rfl_card_corner_radius"
+    card_view:cardElevation="@dimen/rfl_card_elevation">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginLeft="@dimen/rfl_outer_relative_margin_left"
+        android:layout_marginRight="@dimen/rfl_outer_relative_margin_right">
 
         <LinearLayout
             android:id="@+id/llHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/rfl_ll_horizontal_margin_top"
             android:orientation="horizontal">
 
             <FrameLayout
-                android:layout_width="56dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="3dp">
+                android:layout_width="@dimen/rfl_circle_frame_width"
+                android:layout_height="@dimen/rfl_circle_frame_height"
+                android:layout_marginTop="@dimen/rfl_circle_frame_margin_top">
 
                 <TextView
                     android:id="@+id/ivCircle"
-                    android:layout_width="39dp"
-                    android:layout_height="39dp"
+                    android:layout_width="@dimen/rfl_text_view_width"
+                    android:layout_height="@dimen/rfl_text_view_eight"
                     android:background="@drawable/shape_circle"
                     android:gravity="center_vertical|center_horizontal"
                     android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/rfl_text_size"
                     tools:text="A"
-
                     />
 
             </FrameLayout>
@@ -72,7 +71,7 @@
                         style="@style/Widget.TimeRow2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="@dimen/rfl_tvOpen_margin_bottom"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
@@ -80,8 +79,8 @@
 
                     <TextView
                         android:id="@+id/tvDistance"
-                        android:layout_width="0dp"
-                        android:layout_height="25dp"
+                        android:layout_width="@dimen/rfl_tvDistance_width"
+                        android:layout_height="@dimen/rfl_tvDistance_eight"
                         android:layout_weight="1"
                         android:gravity="center"
                         tools:text="0,124 Km" />
@@ -91,14 +90,14 @@
             </LinearLayout>
 
             <RelativeLayout
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/rfl_drag_handler_relative_layout_width"
+                android:layout_height="@dimen/rfl_drag_handler_relative_layout_eight"
                 android:layout_gravity="center_vertical">
 
                 <ImageView
                     android:id="@+id/ivReorder"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="@dimen/rfl_drag_image_reorder_with"
+                    android:layout_height="@dimen/rfl_drag_image_reorder_eight"
                     android:alpha="0.54"
                     android:layout_alignParentRight="true"
                     android:visibility="visible"
@@ -106,8 +105,8 @@
 
                 <ImageView
                     android:id="@+id/ivUndo"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
+                    android:layout_width="@dimen/rfl_drag_image_undo_with"
+                    android:layout_height="@dimen/rfl_drag_image_undo_eight"
                     android:visibility="invisible"
                     android:layout_alignParentRight="true"
                     app:srcCompat="@drawable/ic_undo" />
@@ -121,7 +120,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/llHorizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/rfl_include_margin_top"
             android:visibility="gone" />
 
     </RelativeLayout>
