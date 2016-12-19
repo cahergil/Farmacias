@@ -52,7 +52,7 @@
             android:paddingRight="5dp"
             android:textSize="13sp"
             android:textStyle="bold"
-            tools:text="Created by Christoph van Ochten" />
+            tools:text="Created by Carlos Hernández Gil" />
 
         <TextView
             android:id="@+id/time_ago"
@@ -91,7 +91,7 @@
             android:paddingRight="5dp"
             android:singleLine="true"
             android:textSize="24sp"
-            tools:text="Mies van der Rohe" />
+            tools:text="footer description" />
 
         <ImageView
             android:id="@+id/image"

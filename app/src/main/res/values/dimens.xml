@@ -148,4 +148,30 @@
     <dimen name="rsb_image_view_margin_right">16dp</dimen>
     <dimen name="rsb_text_view_padding">16dp</dimen>
 
+    <!-- row_tab_list.xml-->
+    <dimen name="rtl_card_margin_bottom">4dp</dimen>
+    <dimen name="rtl_card_margin_top">4dp</dimen>
+    <dimen name="rtl_card_corner_radius">2dp</dimen>
+    <dimen name="rtl_card_elevation">1dp</dimen>
+    <dimen name="rtl_outer_linear_margin_bottom">8dp</dimen>
+    <dimen name="rtl_outer_linear_margin_top">8dp</dimen>
+    <dimen name="rtl_outer_linear_margin_right">16dp</dimen>
+    <dimen name="rtl_outer_linear_margin_left">16dp</dimen>
+    <dimen name="rtl_tvOrder_width">35dp</dimen>
+    <dimen name="rtl_tvOrder_height">35dp</dimen>
+    <dimen name="rtl_tvOrder_margin_top">5dp</dimen>
+    <dimen name="rtl_tvOrder_text_size">18sp</dimen>
+    <dimen name="rtl_tvName_padding_left">10dp</dimen>
+    <dimen name="rtl_tvName_text_size">15sp</dimen>
+
+    <dimen name="rtl_tvDistance_height">25dp</dimen>
+    <dimen name="rtl_tvStreet_text_size">14sp</dimen>
+    <dimen name="rtl_tvStreet_margin_left">35dp</dimen>
+    <dimen name="rtl_tvOpen_margin_bottom">8dp</dimen>
+    <dimen name="rtl_tvOpen_margin_left">35dp</dimen>
+    <dimen name="rtl_layout_options_margin_left">35dp</dimen>
+    <dimen name="rtl_layout_options_margin_top">8dp</dimen>
+
+
+
 </resources>
