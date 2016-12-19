@@ -126,16 +126,17 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     }
 
     public void startTracking() {
+
         startLocationUpdates(getGoogleApiClient());
         Utils.logD(LOG_TAG, "startLocationUpdates");
 
     }
 
     public void stopTracking() {
-        //
-        if(getGoogleApiClient().isConnected())
-            stopLocationUpdates(getGoogleApiClient());
+
+        stopLocationUpdates(getGoogleApiClient());
         Utils.logD(LOG_TAG, "stopLocationUpdates");
+
     }
 
     @Override
@@ -158,6 +159,13 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
 
     @SuppressWarnings({"MissingPermission"})
     public void startLocationUpdates(GoogleApiClient googleApiClient) {
+        // particular case:hace un requestLocationSettings y casi al mismo tiempo  stop(),
+        // ,se recibe settingsResult:SUCCESS y luego hace startLocationUpdates y como
+        // no está conectado da error
+        if(!googleApiClient.isConnected()) {
+            return;
+        }
+
         PendingResult<Status> result = LocationServices.FusedLocationApi.requestLocationUpdates(
                 googleApiClient, mLocationRequest, this);
         result.setResultCallback(new ResultCallback<Status>() {
@@ -176,8 +184,11 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     }
 
     protected void stopLocationUpdates(GoogleApiClient googleApiClient) {
-        LocationServices.FusedLocationApi.removeLocationUpdates(
-                googleApiClient, this);
+        if(!getGoogleApiClient().isConnected()) {
+            return;
+        }
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+
     }
 
     @SuppressWarnings({"MissingPermission"})

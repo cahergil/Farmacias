@@ -1,0 +1,138 @@
+<resources xmlns:xliff="http://schemas.android.com/tools">
+    <string name="app_name" translatable="true">Farmaex</string>
+    <string name="action_settings" translatable="true">Einstellungen</string>
+    <string name="places_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="maps_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_server_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_browser_api_key">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
+
+    <string name="content_authority" translatable="false">com.chernandezgil.farmacias</string>
+    <!-- MapTabFragment-->
+    <string name="format_distance"><xliff:g id="distance">%1$1.2f</xliff:g> Km</string>
+    <string name="mtf_tu_ubicacion" translatable="true">Sie sind here</string>
+    <string name="mtf_radio_busqueda_insuficiente" translatable="true">kein Eintrag gefunden. Suchradius nicht genung</string>
+    <string name="mtf_fuera_de_extremadura" translatable="true">Sie sind nicht in Extremadura</string>
+    <string name="mtf_openinghour_open" translatable="true">geöffnet</string>
+    <string name="mtf_openinghour_close" translatable="true">geschlossen</string>
+    <!-- MainActivityPresenter-->
+    <string name="address_not_found" translatable="true">unbekannte Adresse</string>
+    <string name="settings_title" translatable="true">Einstellungen</string>
+    <string name="pref_title_first_section" translatable="false">App</string>
+    <string name="pref_title_second_section" translatable="true">Andere</string>
+    <string name="seek_bar_key" translatable="false">seekbar_key</string>
+    <string name="seek_bar_title" translatable="true">Suchradius</string>
+    <!-- Preferences -->
+    <string name="pref_rate_key" translatable="false">rate</string>
+    <string name="rate_app" translatable="true">Wenn Sie die App mögen, bewerten sie es bitte auf Play Store</string>
+    <string name="rate_app_title" translatable="true">Bewerten Sie die App</string>
+    <string name="pref_email_key" translatable="false">email</string>
+    <string name="email_title">mailen den Entwickler</string>
+
+    <string name="pref_share_app_key" translatable="false">share app</string>
+    <string name="share_app_string">Freunden die App empfehlen</string>
+    <string name="share_app_title">Teilen diese App mit Freunden</string>
+
+    <string name="pref_version_key" translatable="false">version</string>
+    <string name="version_title">Version</string>
+
+    <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
+    <string name="subject" translatable="true">Bemerkung über die App Farmaex</string>
+
+    <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
+
+    <string name="pref_delete_history_key" translatable="false">delete</string>
+    <string name="pref_delete_history_title" translatable="true">Suchverlauf entfernenen</string>
+    <string name="pref_delete_history_summary" translatable="true">Beim clicken werden Sie den Suchverlauf entfernen</string>
+    <string name="pref_delete_toast_message" translatable="true">Suchverlauf entfernt</string>
+
+    <!-- ListTabFragment -->
+    <string name="ltf_removed_from_favorite" translatable="true">Apotheke von Favoriten gelöscht</string>
+    <string name="ltf_added_to_favorite" translatable="true">Apotheke in Favoriten gespeichert</string>
+
+    <!-- TabLayoutFragment -->
+    <string name="tlf_tab_list_string" translatable="true">Liste</string>
+    <string name="tlf_tab_map_string" translatable="true">Landkarte</string>
+    <!-- FindRecyclerViewAdapter -->
+    <!--<string name="fca_format_telefono" translatable="true"><xliff:g id="telefono">Teléfono: %1$1s</xliff:g></string>-->
+    <!--<string name="fca_format_direccion" translatable="true"><xliff:g id="direccion">Dirección: %1$1s</xliff:g></string>-->
+    <!--<string name="fca_format_localidad" translatable="true">Localidad: </string>-->
+    <!--<string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>-->
+
+    <string name="fca_telefono" translatable="true">Telefon:</string>
+    <string name="fca_direccion" translatable="true">Adresse:</string>
+    <string name="fca_localidad" translatable="true">Gemeinde:</string>
+    <string name="format_distancia" translatable="true"><xliff:g id="distancia">Entfernung: %1$1.2f</xliff:g> Km</string>
+    <string name="fca_distancia" translatable="true">Entfernung:</string>
+
+    <!-- Searchable configuration -->
+    <string name="sc_search_hint" translatable="true">Suchen...</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <!-- Navitation Drawer -->
+    <string name="nd_localizador" translatable="true">Umgebung</string>
+    <string name="nd_buscar" translatable="true">Apotheke suchen</string>
+    <string name="nd_favorites" translatable="true">Favoriten</string>
+    <string name="nd_settings" translatable="true">Einstellungen</string>
+    <string name="nd_ayuda" translatable="true">Hilfe</string>
+    <string name="nd_feedback" translatable="true">Rückmeldung</string>
+    <string name="nd_otras" translatable="true">Andere</string>
+
+    <!-- layout_toolbar_find.xml -->
+    <string name="ltf_hint_search">Apotheken suchen</string>
+
+    <!-- empty_results -->
+    <string name="er_no_favorites" translatable="true">Sie haben keine Apotheke in der Liste</string>
+    <string name="er_no_find" translatable="true">Kein Eintrag gefunden</string>
+    <string name="er_no_around" translatable="true">Es gitb keine Apotheke in Ihrer Nähe</string>
+
+    <!-- empty_results -->
+    <string name="ma_app_title_alrededor" translatable="true">Apotheke in Ihrer Nähe</string>
+    <string name="ma_app_title_buscar" translatable="true">Apotheke suchen</string>
+    <string name="ma_app_title_favoritos" translatable="true">Favoriten</string>
+    <string name="ma_app_title_default" translatable="true">Apotheken</string>
+
+    <!-- dialog_schedule_normal_normal.xml -->
+    <string name="sn_lunes" translatable="true">Montag:</string>
+    <string name="sn_martes" translatable="true">Dienstag:</string>
+    <string name="sn_miercoles" translatable="true">Mittwoch:</string>
+    <string name="sn_jueves" translatable="true">Donnerstag:</string>
+    <string name="sn_viernes" translatable="true">Freitag:</string>
+    <string name="sn_sabado" translatable="true">Samstag:</string>
+    <string name="sn_domingo" translatable="true">Sonntag:</string>
+
+    <string name="sn_normal_hour" translatable="false">09:00-14:00,16:30-20:30</string>
+    <string name="sn_sabado_hour" translatable="false">09:00-14:00</string>
+    <string name="sn_na_hour" translatable="false">-</string>
+    <!-- bottom_sheet_middle_box.java-->
+    <string name="bsmb_llamar" translatable="true">ANRUFEN</string>
+    <string name="bsmb_ir" translatable="true">GEHEN</string>
+    <string name="bsmb_compartir" translatable="true">TEILEN</string>
+
+    <!-- bottom_sheet_upper_box.java-->
+    <string name="bsub_subtitle" translatable="true">Apotheke</string>
+
+    <!-- DialogOpeningHoursPharmacy.java-->
+    <string name="dialog_title" translatable="true">Öffnungszeiten</string>
+    <string name="dialog_mensaje" translatable="true">Geschäftszeit</string>
+    <string name="dialog_ok_button" translatable="false">ok</string>
+
+    <!-- dialog_opening_hours_24_hours-->
+    <string name="doh_24h_open" translatable="true">24 Stunden geöffnet</string>
+
+    <!-- customview_bottom_navigation.xml-->
+    <string name="cbn_alrededor" translatable="true">Umgebung</string>
+    <string name="cbn_buscar" translatable="true">Suchen</string>
+    <string name="cbn_favoritos" translatable="true">Favoriten</string>
+    <!-- SeekBarPreference -->
+    <string name="sbp_distance"><xliff:g id="distance">%1$1d</xliff:g> Km</string>
+
+    <!-- row_tab_list.xml -->
+    <string name="rtl_farmacia_abierta" translatable="true">geöffnet</string>
+    <string name="rtl_farmacia_cerrada" translatable="true">geschlossen</string>
+
+    <!-- shared intent -->
+    <string name="shared_intent_text_farmacia" translatable="true">Apotheke:</string>
+    <string name="shared_intent_text_distancia" translatable="true">Entfernung:</string>
+    <string name="shared_intent_text_direccion" translatable="true">Adresse:</string>
+    <string name="shared_intent_text_tef" translatable="true">Telefon:</string>
+</resources>

@@ -207,7 +207,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 view.setTranslationY(Utils.getScreenHeight(mContext));
                 ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(view,"translationY",0);
                 //more than this causes the animation to stutter
-                objectAnimator.setDuration(300);
+                objectAnimator.setDuration(200);
                 objectAnimator.setInterpolator(new DecelerateInterpolator(3.f));
                 objectAnimator.start();
             }

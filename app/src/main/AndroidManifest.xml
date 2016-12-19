@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.chernandezgil.farmacias">
 
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
@@ -61,12 +62,17 @@
         <service
             android:name=".services.DownloadFarmacias"
             android:exported="false" />
-        <!-- Content provider -->
+        <!-- Content provider
+        when adding internationalization, authorities gave me an error
+        https://code.google.com/p/android/issues/detail?id=40455,
+        Solution: just hardcode the string.
+        -->
         <provider
             android:name=".data.source.local.DbProvider"
-            android:authorities="@string/content_authority"
+            android:authorities="com.chernandezgil.farmacias"
             android:exported="false"
-            android:syncable="true" />
+            android:syncable="true"
+         />
         <!-- Search provider -->
         <provider
             android:name=".data.source.local.RecentSuggestionsProvider"

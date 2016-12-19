@@ -16,11 +16,11 @@
     <string name="mtf_openinghour_close" translatable="true">cerrada</string>
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
-    <string name="settings_title" translatable="true">Settings Activity</string>
+    <string name="settings_title" translatable="true">Settings</string>
     <string name="pref_title_first_section" translatable="false">App</string>
     <string name="pref_title_second_section" translatable="true">Otras</string>
     <string name="seek_bar_key" translatable="false">seekbar_key</string>
-
+    <string name="seek_bar_title" translatable="true">Radio de busqueda</string>
     <!-- Preferences -->
     <string name="pref_rate_key" translatable="false">rate</string>
     <string name="rate_app" translatable="true">Si te gusta la app, por favor evaluala en Play Store</string>
@@ -68,10 +68,14 @@
     <string name="sc_search_hint" translatable="true">Buscar...</string>
     <string name="title_activity_main2">Main2Activity</string>
 
-    <!-- Navitation Drawer -->
+    <!-- navigation_drawer_menu.xml-->
     <string name="nd_localizador" translatable="true">Cerca</string>
     <string name="nd_buscar" translatable="true">Buscar Farmacia</string>
-    <string name="nd_favorites" translatable="true">Favorites</string>
+    <string name="nd_favorites" translatable="true">Favoritos</string>
+    <string name="nd_settings" translatable="true">Ajustes</string>
+    <string name="nd_ayuda" translatable="true">Ayuda</string>
+    <string name="nd_feedback" translatable="true">Feedback</string>
+    <string name="nd_otras" translatable="true">Otras</string>
 
     <!-- layout_toolbar_find.xml -->
     <string name="ltf_hint_search">Buscar farmacia</string>
@@ -121,6 +125,8 @@
     <string name="cbn_favoritos" translatable="true">Favoritos</string>
     <!-- SeekBarPreference -->
     <string name="sbp_distance"><xliff:g id="distance">%1$1d</xliff:g> Km</string>
+
+
 
     <!-- row_tab_list.xml -->
     <string name="rtl_farmacia_abierta" translatable="true">Abierta</string>

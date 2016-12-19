@@ -23,11 +23,15 @@
             <item
                 android:id="@+id/item_navigation_drawer_settings"
                 android:icon="@drawable/ic_settings"
-                android:title="Settings" />
+                android:title="@string/nd_settings" />
             <item
-                android:id="@+id/item_navigation_donate"
-                android:icon="@drawable/ic_help"
-                android:title="Ayuda" />
+                android:id="@+id/item_navigation_help"
+                android:icon="@drawable/ic_help_circle"
+                android:title="@string/nd_ayuda" />
+            <item
+                android:id="@+id/item_navigation_feedback"
+                android:icon="@drawable/ic_comment_alert"
+                android:title="@string/nd_feedback" />
         </menu>
     </item>
 

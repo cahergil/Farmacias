@@ -5,7 +5,7 @@
         <com.chernandezgil.farmacias.customwidget.SeekBarPreference
             android:defaultValue="5"
             app:max="50"
-            android:title="Radio de busqueda"
+            android:title="@string/seek_bar_title"
             android:key="@string/seek_bar_key"
             />
         <Preference

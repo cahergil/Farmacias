@@ -36,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.Utilities.TimeMeasure;
@@ -370,6 +371,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         if (pharmacyObjectMap == null) {
             return;
         }
+        if (!isAdded()) return;
         MarkerOptions markerOption = new MarkerOptions();
         double lat = pharmacyObjectMap.getLat();
         double lon = pharmacyObjectMap.getLon();
@@ -421,10 +423,11 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
         } else {
+            String distance =getString(R.string.format_distance, pharmacyObjectMap.getDistance() / 1000);
             Bitmap bitmap = mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(pharmacyObjectMap.getName())
-                    .snippet(getString(R.string.format_distance, pharmacyObjectMap.getDistance() / 1000));
+                    .snippet(distance);
         }
         markerOption.anchor(0.5f, 0.5f);
 
