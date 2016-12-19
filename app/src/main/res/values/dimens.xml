@@ -69,4 +69,10 @@
     <dimen name="erf_image_height">80dp</dimen>
     <dimen name="erf_text_margin_top">15dp</dimen>
     <dimen name="erf_text_size">20sp</dimen>
+
+    <!-- empty_results_find.xml-->
+    <dimen name="erfind_image_width">80dp</dimen>
+    <dimen name="erfind_image_height">80dp</dimen>
+    <dimen name="erfind_text_margin_top">15dp</dimen>
+    <dimen name="erfind_text_size">20sp</dimen>
 </resources>
