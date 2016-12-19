@@ -101,6 +101,10 @@
     <string name="bsmb_llamar" translatable="true">LLAMAR</string>
     <string name="bsmb_ir" translatable="true">IR</string>
     <string name="bsmb_compartir" translatable="true">COMPARTIR</string>
+
+    <!-- bottom_sheet_upper_box.java-->
+    <string name="bsub_subtitle" translatable="true">Farmacia</string>
+
     <!-- DialogOpeningHoursPharmacy.java-->
     <string name="dialog_title" translatable="true">Horario</string>
     <string name="dialog_mensaje" translatable="true">Horario de apertura</string>

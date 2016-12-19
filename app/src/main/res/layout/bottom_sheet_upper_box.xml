@@ -59,6 +59,7 @@
             android:showDividers="end"
             android:textSize="@dimen/bsub_linear_pharmacy_name_lower_text_size"
             android:textColor="@color/gray300"
+            android:text="@string/bsub_subtitle"
             tools:text="Farmacia"/>
 
     </LinearLayout>
