@@ -97,7 +97,10 @@
     <string name="sn_normal_hour" translatable="false">09:00-14:00,16:30-20:30</string>
     <string name="sn_sabado_hour" translatable="false">09:00-14:00</string>
     <string name="sn_na_hour" translatable="false">-</string>
-
+    <!-- bottom_sheet_middle_box.java-->
+    <string name="bsmb_llamar" translatable="true">LLAMAR</string>
+    <string name="bsmb_ir" translatable="true">IR</string>
+    <string name="bsmb_compartir" translatable="true">COMPARTIR</string>
     <!-- DialogOpeningHoursPharmacy.java-->
     <string name="dialog_title" translatable="true">Horario</string>
     <string name="dialog_mensaje" translatable="true">Horario de apertura</string>

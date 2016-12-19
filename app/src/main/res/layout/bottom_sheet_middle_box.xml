@@ -43,17 +43,20 @@
         <TextView
             android:id="@+id/txtCall"
             style="@style/BottomSheetMiddleBoxTextView"
+            android:text="@string/bsmb_llamar"
             tools:text="LLAMAR"
             />
 
         <TextView
             android:id="@+id/txtGo"
             style="@style/BottomSheetMiddleBoxTextView"
+            android:text="@string/bsmb_ir"
             tools:text="IR"/>
 
         <TextView
             android:id="@+id/txtShare"
             style="@style/BottomSheetMiddleBoxTextView"
+            android:text="@string/bsmb_compartir"
             tools:text="COMPARTIR"/>
 
     </LinearLayout>

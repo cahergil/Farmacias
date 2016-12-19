@@ -161,8 +161,8 @@
     </style>
 
     <style name="BottomSheetMiddleBoxTextView">
-        <item name="android:layout_width">@dimen/bsmb_image_width</item>
-        <item name="android:layout_height">@dimen/bsmb_image_height</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">26dp</item>
         <item name="android:layout_weight">2</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">@dimen/bslb_text_size</item>
