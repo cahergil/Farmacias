@@ -44,7 +44,7 @@
     <color name="bottom_navigation_text">@color/gray500</color>
     <color name="bottom_navigation_icon_selected">@color/white</color>
     <color name="bottom_navigation_icon_unselected">@color/gray500</color>
-
+    <color name="dialog_opening_hours_title">@color/gray700</color>
     <array name="colors">
         <item>#3b5999</item>
         <item>#EF6C00</item>

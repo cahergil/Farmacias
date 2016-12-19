@@ -2,17 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="@dimen/doht_layout_height"
     android:id="@+id/titleDialog"
-    android:background="@color/gray700"
+    android:background="@color/dialog_opening_hours_title"
     android:orientation="horizontal">
 
     <ImageView
         android:layout_centerVertical="true"
         android:layout_marginLeft="12dp"
         android:id="@+id/imageClock"
-        android:layout_height="32dp"
-        android:layout_width="32dp"
+        android:layout_height="@dimen/doht_image_height"
+        android:layout_width="@dimen/doht_image_width"
         app:srcCompat="@drawable/clock"
         android:tint="@color/white"
          />
@@ -22,9 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dialog_title"
-        android:textSize="24sp"
+        android:textSize="@dimen/doht_text_size"
         android:layout_alignTop="@+id/imageClock"
         android:textColor="@color/white"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="@dimen/doht_text_margin_left"
          />
 </RelativeLayout>
