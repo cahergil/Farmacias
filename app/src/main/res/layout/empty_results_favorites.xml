@@ -14,18 +14,18 @@
         app:srcCompat="@drawable/svg_heart_"
         />
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivImagen"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/erf_text_margin_top"
+        android:alpha="0.34"
+        android:gravity="center"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/erf_text_margin_top"
-        android:layout_below="@+id/ivImagen"
-        android:layout_centerInParent="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
         android:textColor="@color/black"
-        android:alpha="0.34"
         android:textSize="@dimen/erf_text_size"
         android:text="@string/er_no_favorites"/>
 
