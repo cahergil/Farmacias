@@ -6,26 +6,26 @@
 
     <ImageView
         android:id="@+id/ivImagen"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:alpha="0.34"
+        android:layout_width="@dimen/era_image_width"
+        android:layout_height="@dimen/era_image_height"
         android:layout_centerInParent="true"
+        android:alpha="0.34"
         app:srcCompat="@drawable/svg_house_pharmacy_"
         />
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ivImagen"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/era_text_margin_top"
+        android:alpha="0.34"
+        android:gravity="center"
         android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="15dp"
-        android:layout_below="@+id/ivImagen"
-        android:layout_centerInParent="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="20sp"
+        android:textSize="@dimen/era_text_size"
         android:textColor="@color/black"
-        android:alpha="0.34"
         android:text="@string/er_no_around"/>
 
 </RelativeLayout>
