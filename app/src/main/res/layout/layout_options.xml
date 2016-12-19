@@ -15,47 +15,46 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:background="?selectableItemBackgroundBorderless"
-
-            android:visibility="gone"
             android:id="@+id/ivPhone"
             style="@style/ImageViewOptions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
             app:srcCompat="@drawable/phone" />
 
         <View style="@style/VerticalSparator" />
 
         <ImageView
-            android:background="?selectableItemBackgroundBorderless"
-            android:visibility="gone"
             android:id="@+id/ivGo"
             style="@style/ImageViewOptions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
             app:srcCompat="@drawable/directions" />
 
         <View style="@style/VerticalSparator" />
 
         <ImageView
-            android:background="?selectableItemBackgroundBorderless"
-            android:visibility="gone"
             android:id="@+id/ivShare"
             style="@style/ImageViewOptions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
             app:srcCompat="@drawable/share" />
 
         <View style="@style/VerticalSparator" />
 
         <ImageView
-            android:background="?selectableItemBackgroundBorderless"
-            android:visibility="gone"
             android:id="@+id/ivOpeningHours"
             style="@style/ImageViewOptions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
             app:srcCompat="@drawable/clock" />
 
         <View style="@style/VerticalSparator" />
 
         <ImageView
-            android:background="?selectableItemBackgroundBorderless"
             android:id="@+id/ivFavorite"
-            android:visibility="gone"
             style="@style/ImageViewOptions"
+            android:background="?selectableItemBackgroundBorderless"
+            android:visibility="gone"
             app:srcCompat="@drawable/ic_heart" />
 
     </LinearLayout>
