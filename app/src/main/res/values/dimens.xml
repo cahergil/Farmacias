@@ -26,7 +26,7 @@
     <dimen name="bsmb_image_height">26dp</dimen>
 
     <!-- bottom_sheet_upper_box.xml-->
-    <dimen name="bsub_linear_marker_heigh">80dp</dimen>
+    <dimen name="bsub_linear_marker_heigh">81dp</dimen>
     <dimen name="bsub_linear_marker_image_width">48dp</dimen>
     <dimen name="bsub_linear_marker_image_height">48dp</dimen>
     <dimen name="bsub_linear_pharmacy_name_padding_left">20dp</dimen>
