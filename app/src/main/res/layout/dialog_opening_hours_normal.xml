@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/dohn_margin_top"
         android:orientation="horizontal">
 
         <TextView
@@ -52,7 +52,6 @@
         <TextView
             android:id="@+id/textView3"
             style="@style/Widget.Hours"
-
             android:text="@string/sn_miercoles" />
 
         <TextView
@@ -71,7 +70,6 @@
         <TextView
             android:id="@+id/textView4"
             style="@style/Widget.Hours"
-
             android:text="@string/sn_jueves" />
 
         <TextView

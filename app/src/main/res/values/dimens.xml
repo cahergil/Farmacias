@@ -47,4 +47,7 @@
     <dimen name="doh_24_margin_top">20dp</dimen>
     <dimen name="doh_24_text_size">20sp</dimen>
 
+    <!-- dialog_opening_hours_normal.xml-->
+    <dimen name="dohn_margin_top">20dp</dimen>
+
 </resources>
