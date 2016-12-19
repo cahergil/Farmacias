@@ -60,7 +60,6 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
     private CustomItemAnimator mCustomItemAnimator;
     private OnClickCallbacks mCallback;
     private float offset;
-    private static int firstVisibleInRecyclerViw;
 
 
 
@@ -76,7 +75,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         mCallback = findFragment;
         offset = mContext.getResources().getDimensionPixelSize(R.dimen.offset_y);
 
-        scrollDirection = Constants.SCROLL_DOWN;
+        scrollDirection = Constants.SCROLL_UP;
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -85,13 +84,13 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
                 super.onScrolled(recyclerView, dx, dy);
 
                 if (dy > 0) {
-                    scrollDirection = Constants.SCROLL_DOWN;
-                    Log.i("RecyclerView scrolled: ", "scroll down!");
+                    scrollDirection = Constants.SCROLL_UP;
+                    Log.i("RecyclerView scrolled: ", "scroll up!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
 
                 } else {
-                    scrollDirection = Constants.SCROLL_UP;
-                    Log.i("RecyclerView scrolled: ", "scroll up!");
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
 
                 }
@@ -236,7 +235,7 @@ public class FindRecyclerViewAdapter extends RecyclerView.Adapter<FindRecyclerVi
         }
 
 
-        if (scrollDirection == Constants.SCROLL_DOWN) {
+        if (scrollDirection == Constants.SCROLL_UP) {
             Log.d(LOG_TAG, "runEnterAnimation_up");
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;

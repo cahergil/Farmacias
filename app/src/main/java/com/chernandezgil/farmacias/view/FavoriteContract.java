@@ -13,35 +13,28 @@ import java.util.List;
  */
 
 public interface FavoriteContract {
-    public interface View {
-        public void showResults(List<Pharmacy> pharmacyList);
-        public void showNoResults();
+    interface View {
 
-
-        public void showLoading();
-        public void hideLoading();
-        public void showOpeningHours(int layout);
-        public void launchActivity(Intent intent);
-        public void showSnackBar(String message);
-
-
-
+        void showResults(List<Pharmacy> pharmacyList);
+        void showNoResults();
+        void showLoading();
+        void hideLoading();
+        void showOpeningHours(int layout);
+        void launchActivity(Intent intent);
+        void showSnackBar(String message);
 
     }
 
-    public interface Presenter<V> {
+    interface Presenter<V> {
 
-
-        void setView(V view);
-
-        void detachView();
-
-        public void onInitLoader();
-        public void onRestartLoader();
-        public void onClickPhone(String phone);
-        public void onClickGo(Pharmacy pharmacy);
-        public void onClickShare(Pharmacy pharmacy);
-        public void onClickOpeningHours(String hour);
+       void setView(V view);
+       void detachView();
+       void onInitLoader();
+       void onRestartLoader();
+       void onClickPhone(String phone);
+       void onClickGo(Pharmacy pharmacy);
+       void onClickShare(Pharmacy pharmacy);
+       void onClickOpeningHours(String hour);
 
     }
 }

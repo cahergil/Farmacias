@@ -28,7 +28,9 @@ public class PreferencesManagerImp implements PreferencesManager {
     private static final String COLOR_MAP_KEY ="color_map_key";
     private static final String LOCATION_KEY = "location_key";
     private static final String STREET_KEY ="street_key";
-
+    private static final String SEEKBAR_KEY="seekbar_key";
+    private static final String FIRST_EXECUTION_KEY="first_execution_key";
+    private static final String CURRENT_ITEM_KEY ="current_item_key";
 
     public PreferencesManagerImp(Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -50,32 +52,32 @@ public class PreferencesManagerImp implements PreferencesManager {
 
     @Override
     public int retrieveRadioBusquedaFromSp() {
-        return mPrefs.getInt("seekbar_key", 4);
+        return mPrefs.getInt(SEEKBAR_KEY, 4);
 
     }
 
     @Override
     public boolean isFirstExecution() {
-        return mPrefs.getBoolean("first_execution_key", true);
+        return mPrefs.getBoolean(FIRST_EXECUTION_KEY, true);
 
     }
 
     @Override
     public void setFirstExecutionFalse() {
 
-        mEditor.putBoolean("first_execution_key", false);
+        mEditor.putBoolean(FIRST_EXECUTION_KEY, false);
         mEditor.apply();
     }
 
     public int getCurrentItemTabLayout() {
 
-        return mPrefs.getInt("current_item_key", 0);
+        return mPrefs.getInt(CURRENT_ITEM_KEY, 0);
 
     }
 
     public void setCurrentItemTabLayout(int currentItemTabLayout) {
 
-        mEditor.putInt("current_item_key", currentItemTabLayout);
+        mEditor.putInt(CURRENT_ITEM_KEY, currentItemTabLayout);
         mEditor.apply();
     }
 

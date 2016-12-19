@@ -44,6 +44,7 @@
     <string name="pref_delete_history_title" translatable="true">Borrar historial de busqueda</string>
     <string name="pref_delete_history_summary" translatable="true">Al hacer click borraras el historial de busquedas realizadas hasta ahora</string>
     <string name="pref_delete_toast_message" translatable="true">Historial borrado</string>
+
     <!-- ListTabFragment -->
     <string name="ltf_removed_from_favorite" translatable="true">Farmacia eliminada de favoritos</string>
     <string name="ltf_added_to_favorite" translatable="true">Farmacia añadida a favoritos</string>
@@ -62,6 +63,7 @@
     <string name="fca_localidad" translatable="true">Localidad:</string>
     <string name="format_distancia" translatable="true"><xliff:g id="distancia">Distancia: %1$1.2f</xliff:g> Km</string>
     <string name="fca_distancia" translatable="true">Distancia:</string>
+
     <!-- Searchable configuration -->
     <string name="sc_search_hint" translatable="true">Buscar...</string>
     <string name="title_activity_main2">Main2Activity</string>
@@ -120,4 +122,13 @@
     <!-- SeekBarPreference -->
     <string name="sbp_distance"><xliff:g id="distance">%1$1d</xliff:g> Km</string>
 
+    <!-- row_tab_list.xml -->
+    <string name="rtl_farmacia_abierta" translatable="true">Abierta</string>
+    <string name="rtl_farmacia_cerrada" translatable="true">Cerrada</string>
+
+    <!-- shared intent -->
+    <string name="shared_intent_text_farmacia" translatable="true">Farmacia:</string>
+    <string name="shared_intent_text_distancia" translatable="true">distancia:</string>
+    <string name="shared_intent_text_direccion" translatable="true">dirección:</string>
+    <string name="shared_intent_text_tef" translatable="true">tef:</string>
 </resources>

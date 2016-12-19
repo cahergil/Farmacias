@@ -275,7 +275,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         holder.ivPhone.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivClock.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivShare.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-  //      holder.ivFavorite.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
     }
     @Override
     public void onBindViewHolder(FavoriteAdapter.MyViewHolder holder, int position, List<Object> payloads) {
@@ -377,6 +376,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             holder.tvStreet.setVisibility(View.VISIBLE);
             holder.tvOpen.setVisibility(View.VISIBLE);
             holder.tvDistance.setVisibility(View.VISIBLE);
+
             String firsChar =pharmacy.getName().substring(0,1).toUpperCase();
             holder.tvCircle.setText(pharmacy.getName().substring(0,1));
             gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.shape_circle);
@@ -389,14 +389,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             holder.tvStreet.setText(pharmacy.getAddressFormatted());
             holder.tvDistance.setText(mContext.getString(R.string.format_distance, pharmacy.getDistance()));
             boolean isOpen = pharmacy.isOpen();
-            holder.tvOpen.setText(isOpen ? "Abierta" : "Cerrada");
-            int favDraResid;
-            if (pharmacy.isFavorite()) {
-                favDraResid = R.drawable.ic_heart;
-            } else {
-                favDraResid = R.drawable.ic_heart_outline;
-            }
-//            holder.ivFavorite.setImageResource(favDraResid);
+            holder.tvOpen.setText(isOpen ? mContext.getString(R.string.rtl_farmacia_abierta)
+                    : mContext.getString(R.string.rtl_farmacia_cerrada));
 
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
                 final boolean isExpanded = position == expandedPosition;
@@ -495,9 +489,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             ivShare.setOnClickListener(this);
             ivGo.setOnClickListener(this);
             ivClock.setOnClickListener(this);
-
-
-
 
         }
         @Override

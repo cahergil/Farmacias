@@ -13,33 +13,30 @@ import java.util.List;
  */
 public interface ListTabContract {
 
-    public interface View {
-        public void showResults(List<Pharmacy> pharmacyList);
-        public void showNoResults();
-        public void showLoading();
-        public void showSnackBar(String message);
-        public void hideLoading();
-        public void setAddress(String address);
-        public void launchActivity(Intent intent);
-        public void showOpeningHours(int layout,int titleBackgroundColor);
-
+    interface View {
+        void showResults(List<Pharmacy> pharmacyList);
+        void showNoResults();
+        void showLoading();
+        void showSnackBar(String message);
+        void hideLoading();
+        void setAddress(String address);
+        void launchActivity(Intent intent);
+        void showOpeningHours(int layout,int titleBackgroundColor);
 
     }
-    public interface Presenter<V> {
 
+    interface Presenter<V> {
 
         void setView(V view);
-
         void detachView();
-
-        public void onStartLoader();
-        public void onGetAddressFromLocation(Location currentLocation);
-        public void setLocation(Location currentLocation);
-        public void handleClickGo(Pharmacy pharmacy,Location currentLocation, String currentAddress);
-        public void handleClickCall(String phone);
-        public void handleClickShare(Pharmacy pharmacy);
-        public void handleClickFavorite(Pharmacy pharmacy);
-        public void onClickOpeningHours(Pharmacy pharmacy);
+        void onStartLoader();
+        void onGetAddressFromLocation(Location currentLocation);
+        void setLocation(Location currentLocation);
+        void handleClickGo(Pharmacy pharmacy,Location currentLocation, String currentAddress);
+        void handleClickCall(String phone);
+        void handleClickShare(Pharmacy pharmacy);
+        void handleClickFavorite(Pharmacy pharmacy);
+        void onClickOpeningHours(Pharmacy pharmacy);
 
 
 

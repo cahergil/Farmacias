@@ -13,21 +13,21 @@ import java.util.List;
  */
 public interface PreferencesManager {
 
-    public SharedPreferences getSharedPreferences();
-    public String getLocationKey();
+    SharedPreferences getSharedPreferences();
+    String getLocationKey();
     int retrieveRadioBusquedaFromSp();
     boolean isFirstExecution();
     void setFirstExecutionFalse();
-    public int getCurrentItemTabLayout();
-    public void setCurrentItemTabLayout(int currentItemTabLayout);
-    public void saveLocation(Location location);
-    public Location getLocation();
-    public int getRadio();
-    public void saveFavoriteList(List<Pharmacy> list);
-    public List<Pharmacy> getFavorites();
-    public void saveColorMap(HashMap<String,Integer> colorMap);
-    public HashMap<String,Integer> getColorMap();
-    public void saveStreet(String street);
-    public String getStreet();
+    int getCurrentItemTabLayout();
+    void setCurrentItemTabLayout(int currentItemTabLayout);
+    void saveLocation(Location location);
+    Location getLocation();
+    int getRadio();
+    void saveFavoriteList(List<Pharmacy> list);
+    List<Pharmacy> getFavorites();
+    void saveColorMap(HashMap<String,Integer> colorMap);
+    HashMap<String,Integer> getColorMap();
+    void saveStreet(String street);
+    String getStreet();
 
 }

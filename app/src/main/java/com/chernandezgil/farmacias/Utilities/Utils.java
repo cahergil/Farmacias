@@ -176,10 +176,10 @@ public class Utils {
 
     public static Intent getShareIntent(String name, double dist, String aformatted, String tel) {
         Context context = MyApplication.getContext();
-        final String nombre = "Farmacia:";
-        final String distancia = "distancia:";
-        final String direccion = "direccion:";
-        final String telefono = "tef:";
+        final String nombre = context.getString(R.string.shared_intent_text_farmacia);
+        final String distancia = context.getString(R.string.shared_intent_text_distancia);;
+        final String direccion = context.getString(R.string.shared_intent_text_direccion);;
+        final String telefono = context.getString(R.string.shared_intent_text_tef);;
 
         String textToShare = nombre + name + Constants.CR
                 + distancia + context.getString(R.string.format_distance, dist) + Constants.CR

@@ -5,5 +5,5 @@ package com.chernandezgil.farmacias.view;
  */
 
 public interface MoveListToTop {
-    public void moveSmoothToTop();
+    void moveSmoothToTop();
 }

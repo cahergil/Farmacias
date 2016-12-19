@@ -5,14 +5,12 @@ package com.chernandezgil.farmacias.view;
  */
 public interface MainActivityContract {
 
-    public interface View {
+    interface View {
 
     }
-    public interface Presenter<V> {
-
+    interface Presenter<V> {
 
         void setView(V view);
-
         void detachView();
         void onStart();
 

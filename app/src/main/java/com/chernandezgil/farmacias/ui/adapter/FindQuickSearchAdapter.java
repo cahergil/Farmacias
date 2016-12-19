@@ -36,7 +36,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
     public static final int DATABASE_ROW = 1;
     public final OnClickHandler mCallback;
     private String mSearchString;
-    int count=0;
+
 
     public String getmSearchString() {
         return mSearchString;
@@ -48,7 +48,6 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
 
     public FindQuickSearchAdapter(Context context, OnClickHandler callback){
         mContext = context;
-
         mLupa = ContextCompat.getDrawable(mContext,R.drawable.ic_lupa_suggestions);
         mHistory = ContextCompat.getDrawable(mContext,R.drawable.ic_history);
         mColorSpan = ContextCompat.getColor(mContext,R.color.blue_mobile_web);
@@ -57,7 +56,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-     //   Utils.logD(LOG_TAG,"onCreateViewHolderQuickSearch");
+        //   Utils.logD(LOG_TAG,"onCreateViewHolderQuickSearch");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_suggestions_bean,parent,false);
         ViewHolder holder = new ViewHolder(view);
         holder.tvText.setOnClickListener(this);
@@ -67,7 +66,7 @@ public class FindQuickSearchAdapter extends RecyclerView.Adapter<FindQuickSearch
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-   //     Utils.logD(LOG_TAG,"onBindViewHolderQuickSearch:position"+position);
+        //     Utils.logD(LOG_TAG,"onBindViewHolderQuickSearch:position"+position);
         SuggestionsBean suggestionsBean = mList.get(position);
         holder.ivIcon.setImageDrawable(suggestionsBean.getImageId()==0? mHistory : mLupa);
         holder.ivClearItem.setVisibility(suggestionsBean.getImageId()==0? View.VISIBLE:View.INVISIBLE);

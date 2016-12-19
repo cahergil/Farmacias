@@ -112,19 +112,19 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 }
             });
         }
-        scrollDirection = Constants.SCROLL_DOWN;
+        scrollDirection = Constants.SCROLL_UP;
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
                 if (dy > 0) {
-                    scrollDirection = Constants.SCROLL_DOWN;
-                    Log.i("RecyclerView scrolled: ", "scroll down!");
-                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
-                } else {
                     scrollDirection = Constants.SCROLL_UP;
                     Log.i("RecyclerView scrolled: ", "scroll up!");
+                    Log.i("RecyclerView scrolled: ", "dy:" + dy);
+                } else {
+                    scrollDirection = Constants.SCROLL_DOWN;
+                    Log.i("RecyclerView scrolled: ", "scroll down!");
                     Log.i("RecyclerView scrolled: ", "dy:" + dy);
                 }
             }
@@ -133,8 +133,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      //  Utils.logD(LOG_TAG,"onCreateViewHolder");
-
+        //  Utils.logD(LOG_TAG,"onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_tab_list, parent, false);
 
         MyViewHolder holder = new MyViewHolder(view);
@@ -200,21 +199,20 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             return;
         }
 
-        if (scrollDirection == Constants.SCROLL_DOWN) {
-            Utils.logD(LOG_TAG, "runEnterAnimation_down");
+        if (scrollDirection == Constants.SCROLL_UP) {
+            Utils.logD(LOG_TAG, "runEnterAnimation_up");
             if (position > lastAnimatedPosition) {
                 lastAnimatedPosition = position;
                 Utils.logD(LOG_TAG, "lasAnimated,position:" + lastAnimatedPosition + "," + position);
                 view.setTranslationY(Utils.getScreenHeight(mContext));
-
                 ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(view,"translationY",0);
-                //more than this causes the animation to stutters
-                objectAnimator.setDuration(350);
+                //more than this causes the animation to stutter
+                objectAnimator.setDuration(300);
                 objectAnimator.setInterpolator(new DecelerateInterpolator(3.f));
                 objectAnimator.start();
             }
         } else {
-            Utils.logD(LOG_TAG, "runEnterAnimation_up");
+            Utils.logD(LOG_TAG, "runEnterAnimation_down");
             if (position < lastAnimatedPosition) {
                 Utils.logD(LOG_TAG, "lasAnimated,position" + lastAnimatedPosition + "," + position);
                 lastAnimatedPosition = position;
@@ -228,16 +226,13 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         holder.tvStreet.setText(pharmacy.getAddressFormatted());
         holder.tvDistance.setText(mContext.getString(R.string.format_distance,pharmacy.getDistance()/1000));
         boolean isOpen=pharmacy.isOpen();
-        holder.tvOpen.setText(isOpen? "Abierta":"Cerrada");
+        holder.tvOpen.setText(isOpen? mContext.getString(R.string.rtl_farmacia_abierta)
+                :mContext.getString(R.string.rtl_farmacia_cerrada));
         int color;
-        GradientDrawable gradientDrawable;
         if(isOpen) {
             color=getColor(R.color.pharmacy_open);
-            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_open);
         } else {
             color=getColor(R.color.pharmacy_close);
-            //   holder.tvOpen.setTextColor(color);
-            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.distance_box_close);
         }
         holder.tvOpen.setTextColor(color);
 
@@ -265,8 +260,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             R.drawable.shape_circle_order_close);
         holder.tvOrder.setText(pharmacy.getOrder());
 
-        //  AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(mContext, R.drawable.arrow_avd);
-        //  holder.ivArrow.setImageDrawable(drawableCompat);
     }
 
 
@@ -334,8 +327,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
         public ImageView ivFavorite;
         @BindView(R.id.ivGo)
         public ImageView ivGo;
-//        @BindView(R.id.holderContainer)
-//        public CardView cardView;
         @BindView(R.id.optionsRow)
         public LinearLayout llOptionsRow;
 
@@ -349,9 +340,6 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
             ivFavorite.setOnClickListener(this);
             ivGo.setOnClickListener(this);
             ivClock.setOnClickListener(this);
-
-
-
 
         }
         @Override

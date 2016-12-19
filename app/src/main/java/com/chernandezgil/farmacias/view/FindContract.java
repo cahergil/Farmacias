@@ -14,41 +14,36 @@ import java.util.List;
  */
 
 public interface FindContract {
-    public interface View {
-        public void showResults(List<Pharmacy> pharmacyList);
-        public void showNoResults();
-        public void showResultsQuickSearch(List<SuggestionsBean> list);
-        public void showNoResultsQuickSearch();
-        public void hideEmptyView();
-        public void showEmptyView();
-        public void showLoading();
-        public void hideLoading();
-        public void hideQuickSearchRecyclerView();
-        public void launchActivity(Intent intent);
-        public void showSnackBar(String message);
-        public void showOpeningHours(int layout);
-
-
+    interface View {
+        void showResults(List<Pharmacy> pharmacyList);
+        void showNoResults();
+        void showResultsQuickSearch(List<SuggestionsBean> list);
+        void showNoResultsQuickSearch();
+        void hideEmptyView();
+        void showEmptyView();
+        void showLoading();
+        void hideLoading();
+        void hideQuickSearchRecyclerView();
+        void launchActivity(Intent intent);
+        void showSnackBar(String message);
+        void showOpeningHours(int layout);
 
 
     }
-    public interface Presenter<V> {
-
+    interface Presenter<V> {
 
         void setView(V view);
-
         void detachView();
-
-        public void onInitLoader();
-        public void onRestartLoader(String newText);
-        public void onInitLoaderQuickSearch();
-        public void onRestartLoaderQuickSearch(String text);
-        public void setLocation(Location currentLocation);
-        public void onClickGo(Pharmacy pharmacy,Location currentLocation);
-        public void onClickFavorite(Pharmacy pharmacy);
-        public void onClickPhone(String phone);
-        public void onClickShare(Pharmacy pharmacy);
-        public void onClickOpeningHours(String hour);
+        void onInitLoader();
+        void onRestartLoader(String newText);
+        void onInitLoaderQuickSearch();
+        void onRestartLoaderQuickSearch(String text);
+        void setLocation(Location currentLocation);
+        void onClickGo(Pharmacy pharmacy,Location currentLocation);
+        void onClickFavorite(Pharmacy pharmacy);
+        void onClickPhone(String phone);
+        void onClickShare(Pharmacy pharmacy);
+        void onClickOpeningHours(String hour);
 
 
     }
