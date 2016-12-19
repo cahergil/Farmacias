@@ -39,4 +39,12 @@
     <dimen name="bsub_linear_fav_icon_layout_width">65dp</dimen>
     <dimen name="bsub_linear_fav_icon_layout_height">65dp</dimen>
 
+    <!-- customview_bottom_navigation.xml-->
+    <dimen name="cbn_elevation">8dp</dimen>
+    <dimen name="cbn_relative_layout_heigh">56dp</dimen>
+
+    <!-- dialog_opening_hours_24_hours.xml-->
+    <dimen name="doh_24_margin_top">20dp</dimen>
+    <dimen name="doh_24_text_size">20sp</dimen>
+
 </resources>

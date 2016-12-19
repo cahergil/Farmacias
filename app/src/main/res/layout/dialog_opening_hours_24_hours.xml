@@ -10,8 +10,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/doh_24_margin_top"
         android:gravity="center"
         android:text="@string/doh_24h_open"
-        android:textSize="20sp" />
+        android:textSize="@dimen/doh_24_text_size" />
 </LinearLayout>

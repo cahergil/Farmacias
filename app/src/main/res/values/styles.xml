@@ -170,4 +170,30 @@
         <item name="android:divider">?android:dividerHorizontal</item>
         <item name="android:showDividers">end</item>
     </style>
+
+    <!--bottom_sheet_middle_box.xml styles-->
+    <style name="BottomNavigationLinearLayout">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/ripple_bottom_navigation</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="BottomNavigationCheckeableImageView">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:tint">@color/selector_bottonnavigation_tint_images</item>
+        <item name="android:visibility">visible</item>
+    </style>
+    <style name="BottomNavigationTextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginTop">30dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:visibility">gone</item>
+    </style>
 </resources>
