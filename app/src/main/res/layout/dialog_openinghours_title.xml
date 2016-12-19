@@ -9,7 +9,7 @@
 
     <ImageView
         android:layout_centerVertical="true"
-        android:layout_marginLeft="12dp"
+        android:layout_marginLeft="@dimen/doht_image_margin_left"
         android:id="@+id/imageClock"
         android:layout_height="@dimen/doht_image_height"
         android:layout_width="@dimen/doht_image_width"
