@@ -37,6 +37,7 @@
 
     <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
     <string name="subject" translatable="true">Comentario sobre la aplicacion Farmacias de Extremadura</string>
+    <string name="sendchooser_text" translatable="true">Enviar email...</string>
 
     <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
@@ -137,4 +138,16 @@
     <string name="shared_intent_text_distancia" translatable="true">distancia:</string>
     <string name="shared_intent_text_direccion" translatable="true">dirección:</string>
     <string name="shared_intent_text_tef" translatable="true">tef:</string>
+
+
+    <!-- SnackBarWrapper.java-->
+    <string name="sbw_nuevas_localizaciones">Nueva localizacion detectada</string>
+    <string name="sbw_actualizar">ACTUALIZAR</string>
+
+    <!-- SettingsFragment -->
+    <string name="borrar_historial_confirmar_accion">Confirmar borrado</string>
+    <string name="borrar_historial_mensaje">¿Seguro que quiere borrar el historial de busqueda?</string>
+    <string name="borrar_historial_yes_text">si</string>
+    <string name="borrar_historial_no_text">cancelar</string>
+
 </resources>

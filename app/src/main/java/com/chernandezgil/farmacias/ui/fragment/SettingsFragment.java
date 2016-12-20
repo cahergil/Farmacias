@@ -1,5 +1,7 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,7 +19,10 @@ import android.widget.Toast;
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.SeekBarPreference;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogBorrarHistorialBusqueda;
+import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.source.local.RecentSuggestionsProvider;
+import com.chernandezgil.farmacias.ui.activity.SettingsActivity;
 
 /**
  * Created by Carlos on 22/09/2016.
@@ -140,13 +145,10 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (key.equals(getString(R.string.pref_delete_history_key))) {
-            // RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath("suggestions") segun
-            // el codigo de la clase para los insert hay que agregar suggestions
-            Uri uri = RecentSuggestionsProvider.BASE_CONTENT_URI.buildUpon().appendPath("suggestions").build();
-            int deletedRows = getActivity().getContentResolver().delete(uri,null,null);
-            if(deletedRows>0) {
-                Toast.makeText(getActivity(),getString(R.string.pref_delete_toast_message),Toast.LENGTH_SHORT).show();
-            }
+
+            DialogBorrarHistorialBusqueda dialog = new DialogBorrarHistorialBusqueda();
+            dialog.show(((SettingsActivity)getActivity()).getSupportFragmentManager(),"HISTORIAL");
+
         }
 
         return true;

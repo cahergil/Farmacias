@@ -37,6 +37,8 @@
 
     <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
     <string name="subject" translatable="true">Bemerkung über die App Farmaex</string>
+    <string name="sendchooser_text" translatable="true">Email senden...</string>
+
 
     <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
@@ -135,4 +137,13 @@
     <string name="shared_intent_text_distancia" translatable="true">Entfernung:</string>
     <string name="shared_intent_text_direccion" translatable="true">Adresse:</string>
     <string name="shared_intent_text_tef" translatable="true">Telefon:</string>
+
+    <!-- SnackBarWrapper.java-->
+    <string name="sbw_nuevas_localizaciones">Neue GPS Koordinate gefunden</string>
+    <string name="sbw_actualizar">AKTUALISIEREN</string>
+    <!-- SettingsFragment -->
+    <string name="borrar_historial_confirmar_accion">Löschung bestätigen</string>
+    <string name="borrar_historial_mensaje">Sind Sie sicher, dass Sie den gesamten Suchverlauf löschen möchten?</string>
+    <string name="borrar_historial_yes_text">ja</string>
+    <string name="borrar_historial_no_text">abbrechen</string>
 </resources>

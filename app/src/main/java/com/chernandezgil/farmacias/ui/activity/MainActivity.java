@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +37,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.chernandezgil.farmacias.BuildConfig;
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.BottomNavigation;
 import com.chernandezgil.farmacias.presenter.MainActivityPresenter;
@@ -428,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void setUpCollapsingToolbar(){
+    private void setUpCollapsingToolbar() {
         mCollapsingToolbar.setTitleEnabled(false);
     }
 
@@ -453,18 +456,57 @@ public class MainActivity extends AppCompatActivity implements
                     case R.id.item_navigation_drawer_settings:
                         option = 3;
                         break;
+
+                    case R.id.item_navigation_help:
+                        option = 4;
+                        break;
+                    case R.id.item_navigation_feedback:
+                        option = 5;
+                        sendFeedback();
+                        break;
+
                     default:
                         return true;
 
                 }
 
                 drawerLayout.closeDrawer(GravityCompat.START);
-                coordinateSelection(option);
+                if(option<4) {
+                    coordinateSelection(option);
+                }
 
 
                 return true;
             }
         });
+    }
+
+    //good app filtering chooser
+    private void sendFeedback(){
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                Uri.fromParts("mailto", getString(R.string.mailto),null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.subject));
+        startActivity(Intent.createChooser(emailIntent, getString(R.string.sendchooser_text)));
+
+    }
+    //https://medium.com/google-developers/sharing-content-between-android-apps-2e6db9d1368b#.i7ucfcrfg
+    //http://stackoverflow.com/questions/8701634/send-email-intent/%20%22
+    //this method doesn't filter very well the app that can manage the share
+    private void sendFeedbackSharingIntent(){
+        Intent shareIntent= ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                //.setType("application/txt") with this flag filters much better, but not as good as sendFeedBabck
+                .addEmailTo(getString(R.string.mailto))
+                .setSubject(getString(R.string.subject))
+                .setText(Constants.EMPTY_STRING)
+                .setChooserTitle(R.string.sendchooser_text)
+                .createChooserIntent()
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        if (shareIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(shareIntent);
+        }
     }
 
     private void postLaunchFragment(int option) {
@@ -509,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements
             } else if (option == 1 && (f instanceof FindFragment)) {
                 ((FindFragment) f).moveSmoothToTop();
             } else if (option == 2 && (f instanceof FavoriteFragment)) {
-                 ((FavoriteFragment) f).moveSmoothToTop();
+                ((FavoriteFragment) f).moveSmoothToTop();
             } else {
 
             }
@@ -541,6 +583,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void coordinateSelection(int option) {
 
+
         updateNavigationDrawerSelection(option);
         updateToolBarTitle(option);
         updateBottomNavigationStatus(option);
@@ -555,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    public BottomNavigation getBottomNavigationView(){
+    public BottomNavigation getBottomNavigationView() {
         return mBottomNavigationView;
     }
 

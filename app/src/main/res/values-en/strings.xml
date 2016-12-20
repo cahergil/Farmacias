@@ -19,7 +19,7 @@
     <string name="address_not_found" translatable="true">Unknown location</string>
     <string name="settings_title" translatable="true">Settings</string>
     <string name="pref_title_first_section" translatable="false">App</string>
-    <string name="pref_title_second_section" translatable="true">Other</string>
+    <string name="pref_title_second_section" translatable="true">Others</string>
     <string name="seek_bar_key" translatable="false">seekbar_key</string>
     <string name="seek_bar_title" translatable="true">Search radio</string>
     <!-- Preferences -->
@@ -37,7 +37,8 @@
     <string name="version_title" translatable="true">Version</string>
 
     <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
-    <string name="subject" translatable="true">Comment about bout Farmaex app</string>
+    <string name="subject" translatable="true">Comment about Farmaex app</string>
+    <string name="sendchooser_text" translatable="true">send Email...</string>
 
     <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
@@ -136,4 +137,13 @@
     <string name="shared_intent_text_distancia" translatable="true">distance:</string>
     <string name="shared_intent_text_direccion" translatable="true">address:</string>
     <string name="shared_intent_text_tef" translatable="true">phone:</string>
+
+    <!-- SnackBarWrapper.java-->
+    <string name="sbw_nuevas_localizaciones">New location detected</string>
+    <string name="sbw_actualizar">UPDATE</string>
+    <!-- SettingsFragment -->
+    <string name="borrar_historial_confirmar_accion">Confirm delete</string>
+    <string name="borrar_historial_mensaje">Are you sure you want to delete your search history ?</string>
+    <string name="borrar_historial_yes_text">yes</string>
+    <string name="borrar_historial_no_text">cancel</string>
 </resources>

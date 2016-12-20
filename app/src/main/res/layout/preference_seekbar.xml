@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/ps_title_margin_left"
         android:layout_marginTop="@dimen/ps_title_margin_top"
-        android:text="Radio de busqueda"
+        android:text="@string/seek_bar_title"
         android:textColor="@color/black"
         android:textSize="@dimen/ps_title_text_size" />
 

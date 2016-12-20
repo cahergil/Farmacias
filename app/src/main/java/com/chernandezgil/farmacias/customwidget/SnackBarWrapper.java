@@ -21,9 +21,10 @@ public class SnackBarWrapper {
 
     public SnackBarWrapper(Activity context) {
         builder = new SnackbarBuilder(context)
-                .message("Nueva localizacion detectada")
+                .message(R.string.sbw_nuevas_localizaciones)
                 .duration(Snackbar.LENGTH_INDEFINITE)
-                .actionText("ACTUALIZAR");
+                .actionText(R.string.sbw_actualizar)
+                .actionTextColorRes(R.color.blue_200);
 
         setRootLayout(context);
     }
