@@ -8,7 +8,8 @@ Relativelayout must have layout_gravity=center"-->
     android:layout_height="wrap_content"
     android:background="@color/bottom_navigation_background"
     android:orientation="horizontal"
-    android:elevation="@dimen/cbn_elevation">
+    android:elevation="@dimen/cbn_elevation"
+    >
 
     <LinearLayout
         android:id="@+id/llAround"

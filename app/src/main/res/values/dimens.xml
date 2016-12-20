@@ -9,7 +9,7 @@
     <dimen name="appbar_elevation">4dp</dimen>
 
     <!-- activity_main.xml-->
-    <dimen name="am_snack_container">150dp</dimen>
+    <dimen name="am_snack_container">50dp</dimen>
 
     <!-- bottom_sheet_lower_box.xml-->
     <dimen name="bslb_margin_right_image">18dp</dimen>

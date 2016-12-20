@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
@@ -38,7 +37,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -54,6 +52,7 @@ import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.Utilities.SearchUtils;
 import com.chernandezgil.farmacias.Utilities.Utils;
 import com.chernandezgil.farmacias.customwidget.ScrollerLinearLayoutManager;
+import com.chernandezgil.farmacias.customwidget.SnackBarWrapper;
 import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
 import com.chernandezgil.farmacias.data.source.local.DbContract;
@@ -152,7 +151,7 @@ public class FindFragment extends Fragment implements FindContract.View,
                 RecentSuggestionsProvider.AUTHORITY, RecentSuggestionsProvider.MODE);
         mCompositeSubscription = new CompositeSubscription();
         mActivityCoordinator = (CoordinatorLayout) getActivity().findViewById(R.id.coordinator);
-        mSnackCoordinator = (CoordinatorLayout) getActivity().findViewById(R.id.snackContainer);
+        mSnackCoordinator = (CoordinatorLayout) getActivity().findViewById(R.id.coordinatorSnackContainer);
     }
 
 
@@ -664,22 +663,8 @@ public class FindFragment extends Fragment implements FindContract.View,
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                //another way instead of using a dummy coordinator in main_activity
-                Snackbar snack = Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT);
-                snack.show();
-                //      SnackBarWrapper snack= new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
-                //     snack.show();
-//                Snackbar snack = Snackbar.make(mActivityCoordinator,message, Snackbar.LENGTH_SHORT);
-//
-//                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)
-//                        snack.getView().getLayoutParams();
-//                params.bottomMargin =BOTTOM_NAVIGATION_HEIGHT;
-//                snack.getView().setLayoutParams(params);
-//                View view = snack.getView();
-//                view.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.bottom_navigation_background));
-//                snack.show();
-
+                  SnackBarWrapper snack= new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
+                  snack.show();
             }
         }, 30);
     }

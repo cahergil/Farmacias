@@ -1,5 +1,6 @@
 package com.chernandezgil.farmacias.ui.fragment;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,8 +20,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.chernandezgil.farmacias.R;
 import com.chernandezgil.farmacias.Utilities.Constants;
@@ -76,7 +80,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public static final String NEW_LOCATION = "new_location";
     private Parcelable mLayoutManagerState;
     private Callbacks mCallback;
-    private boolean[] mSpandState;
     private boolean mRotation;
     private PreferencesManager mSharedPreferences;
 
@@ -118,10 +121,6 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             mRotation = true;
             if (savedInstanceState.containsKey(RECYCLER_STATE_KEY)) {
                 mLayoutManagerState = savedInstanceState.getParcelable(RECYCLER_STATE_KEY);
-            }
-
-            if (savedInstanceState.containsKey(EXPANDABLE_STATE_KEY)) {
-                mSpandState = savedInstanceState.getBooleanArray(EXPANDABLE_STATE_KEY);
             }
             if (savedInstanceState.containsKey(ADDRESS_KEY)) {
                 mAddress = savedInstanceState.getString(ADDRESS_KEY);
@@ -291,7 +290,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(mRootView, message, Snackbar.LENGTH_SHORT).show();
+
+                SnackBarWrapper snackBarWrapper=new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
+                snackBarWrapper.show();
             }
         }, 30);
     }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.chernandezgil.farmacias.R;
 import com.github.andrewlord1990.snackbarbuilder.SnackbarBuilder;
@@ -37,7 +38,7 @@ public class SnackBarWrapper {
     }
 
     private void setRootLayout(Activity context) {
-        rootLayout = (CoordinatorLayout) context.findViewById(R.id.snackContainer);
+        rootLayout = (CoordinatorLayout) context.findViewById(R.id.coordinatorSnackContainer);
     }
     public void show() {
         rootLayout.setVisibility(View.VISIBLE);

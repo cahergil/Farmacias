@@ -70,7 +70,7 @@
     <string name="title_activity_main2">Main2Activity</string>
 
     <!-- navigation_drawer_menu.xml -->
-    <string name="nd_localizador" translatable="true">Around</string>
+    <string name="nd_localizador" translatable="true">Nearby</string>
     <string name="nd_buscar" translatable="true">Search Pharmacy</string>
     <string name="nd_favorites" translatable="true">Favorites</string>
     <string name="nd_settings" translatable="true">Settings</string>
