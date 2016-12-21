@@ -112,6 +112,8 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 }
             });
         }
+        //this fragment has a lot to do on initialization, put this down instead of app to avoid
+        //the animations to run at first.
         scrollDirection = Constants.SCROLL_DOWN;
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -207,7 +209,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 view.setTranslationY(Utils.getScreenHeight(mContext));
                 ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(view,"translationY",0);
                 //more than this causes the animation to stutter
-                objectAnimator.setDuration(200);
+                objectAnimator.setDuration(600);
                 objectAnimator.setInterpolator(new DecelerateInterpolator(3.f));
                 objectAnimator.start();
             }
