@@ -112,7 +112,7 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
                 }
             });
         }
-        scrollDirection = Constants.SCROLL_UP;
+        scrollDirection = Constants.SCROLL_DOWN;
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

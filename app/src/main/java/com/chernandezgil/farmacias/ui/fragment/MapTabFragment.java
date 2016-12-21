@@ -84,8 +84,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     private static final int USER_CIRCLE_ANIMATION_MS = 3000;
     private static final int STATE_COLLAPSED = 0;
     private static final int STATE_EXPANDED = 1;
-
-
+    private static final String LOCATION_KEY ="location_key";
+    private static final String LAST_MARKER_KEY ="lastMarkerClicked_key";
+    private static final String BOTTOM_SHEET_STATE= "bottom_sheet_state";
     private GoogleMap mMap;
     private Location mLocation;
     private TimeMeasure mTm;
@@ -209,7 +210,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTm = new TimeMeasure(LOG_TAG);
-        Utils.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate:" + this);
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         mGeocoder = new Geocoder(getActivity(), Locale.getDefault());
@@ -227,7 +228,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView:" + this);
         View view = inflater.inflate(R.layout.fragment_tab_map, container, false);
         unbinder = ButterKnife.bind(this, view);
         setUpBotomSheet();
@@ -262,7 +263,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG, "onViewCreated");
+        Utils.logD(LOG_TAG, "onViewCreated:"+this);
         super.onViewCreated(view, savedInstanceState);
         //start the loader once the view is ready
         mPresenter.onStartLoader();
@@ -280,14 +281,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key", mLocation);
-        outState.putParcelable("lastMarkerClicked_key", mLastMarkerClicked);
-        outState.putInt("bottom_sheet_state", mBottomSheetBehavior.getState());
+        outState.putParcelable(LOCATION_KEY, mLocation);
+        outState.putParcelable(LAST_MARKER_KEY, mLastMarkerClicked);
+        outState.putInt(BOTTOM_SHEET_STATE, mBottomSheetBehavior.getState());
     }
 
     @Override
     public void onStart() {
-        Utils.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart:"+this);
         super.onStart();
 
 
@@ -295,7 +296,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onResume() {
-        Utils.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume:"+this);
         super.onResume();
         IntentFilter filter = new IntentFilter(ListTabFragment.NEW_LOCATION);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver, filter);
@@ -303,14 +304,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onPause() {
-        Utils.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause:"+this);
         super.onPause();
 
     }
 
     @Override
     public void onStop() {
-        Utils.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop:"+this);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
         super.onStop();
     }
@@ -423,7 +424,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
 
         } else {
-            String distance =getString(R.string.format_distance, pharmacyObjectMap.getDistance() / 1000);
+            String distance = getString(R.string.format_distance, pharmacyObjectMap.getDistance() / 1000);
             Bitmap bitmap = mPresenter.onRequestCustomBitmap(pharmacyObjectMap.getOrder(), pharmacyObjectMap.isOpen());
             markerOption.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                     .title(pharmacyObjectMap.getName())
@@ -613,7 +614,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     }
 
-    private void setUpIvOpeningHours(){
+    private void setUpIvOpeningHours() {
         tvHours.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -624,7 +625,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void showOpeningHours(int layoutId,int backgroundColor) {
+    public void showOpeningHours(int layoutId, int backgroundColor) {
 
         DialogOpeningHoursPharmacy dialog = DialogOpeningHoursPharmacy.newInstance(layoutId, backgroundColor);
         dialog.show(getActivity().getSupportFragmentManager(), "DIALOG");
@@ -691,7 +692,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 //            PharmacyObjectMap pharmacyObjectMap = (PharmacyObjectMap)hashMap.get(marker);
         Drawable favDraResid = ContextCompat.getDrawable(getActivity(), pharmacy.isFavorite() ? R.drawable.ic_heart : R.drawable.ic_heart_outline);
         ivFavorite.setImageDrawable(favDraResid);
-        tintVectorDrawable(ivCall,color);
+        tintVectorDrawable(ivCall, color);
         tintVectorDrawable(ivGo, color);
         tintVectorDrawable(ivDistance, color);
         tintVectorDrawable(ivMarker, color);
@@ -709,8 +710,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
         tvAdress.setText(pharmacy.getAddressFormatted());
-        boolean open=Utils.isPharmacyOpen(pharmacy.getHours());
-        tvHours.setText(open? getString(R.string.mtf_openinghour_open):getString(R.string.mtf_openinghour_close));
+        boolean open = Utils.isPharmacyOpen(pharmacy.getHours());
+        tvHours.setText(open ? getString(R.string.mtf_openinghour_open) : getString(R.string.mtf_openinghour_close));
         tvPhone.setText(pharmacy.getPhoneFormatted());
         mPresenter.onSetLastMarkerClick(pharmacy);
         mLastMarkerClicked = pharmacy;
@@ -720,7 +721,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     public void tintVectorDrawable(ImageView imageView, int color) {
 
-        DrawableCompat.setTint(imageView.getDrawable(),color);
+        DrawableCompat.setTint(imageView.getDrawable(), color);
 
     }
 
@@ -730,7 +731,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     }
 
 
-    public void setBottomSheetPosition(){
+    public void setBottomSheetPosition() {
         final int screenHeight = Utils.getScreenHeight(getActivity());
         Utils.logD(LOG_TAG, "Screen height:" + screenHeight);
 
@@ -743,14 +744,14 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         final int posBottomWrapperCoordinator = position[1] + mWrapperCoordinator.getHeight();
         final int posBottomWrapperCoordinator1 = position1[1] + mWrapperCoordinator.getHeight();
 
-        Utils.logD(LOG_TAG,"pos:"+position[1]);
-        Utils.logD(LOG_TAG,"pos1:"+position1[1]);
+        Utils.logD(LOG_TAG, "pos:" + position[1]);
+        Utils.logD(LOG_TAG, "pos1:" + position1[1]);
 
-        Utils.logD(LOG_TAG,"y+height:"+posBottomWrapperCoordinator);
-        Utils.logD(LOG_TAG,"y1+height:"+posBottomWrapperCoordinator1);
-        final int bottomNavigationHeight= ((MainActivity)getContext()).getBottomNavigationView().getHeight();
-        Utils.logD(LOG_TAG,"bottom navigation height:"+bottomNavigationHeight);
-        Utils.logD(LOG_TAG,"y1+height+bnheight:"+(posBottomWrapperCoordinator+bottomNavigationHeight));
+        Utils.logD(LOG_TAG, "y+height:" + posBottomWrapperCoordinator);
+        Utils.logD(LOG_TAG, "y1+height:" + posBottomWrapperCoordinator1);
+        final int bottomNavigationHeight = ((MainActivity) getContext()).getBottomNavigationView().getHeight();
+        Utils.logD(LOG_TAG, "bottom navigation height:" + bottomNavigationHeight);
+        Utils.logD(LOG_TAG, "y1+height+bnheight:" + (posBottomWrapperCoordinator + bottomNavigationHeight));
 
         mWrapperCoordinator.setTranslationY(0);
         mWrapperCoordinator.setBottom(Utils.getScreenHeight(getActivity()));
@@ -779,6 +780,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onDestroyView() {
+        Utils.logD(LOG_TAG, "onDestroyView:"+this);
         mCancelThread = true;
         if (mAnimator != null && mAnimator.isRunning()) {
             mAnimator.cancel();
@@ -788,7 +790,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onDestroy() {
-        Utils.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy:"+this);
         unbinder.unbind();
         super.onDestroy();
     }

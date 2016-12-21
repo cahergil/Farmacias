@@ -98,7 +98,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate:" + this);
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
         LoaderProvider loaderProvider = new LoaderProvider(getActivity().getApplicationContext());
@@ -112,7 +112,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_list, container, false);
-        Utils.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView:" + this);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
         if (savedInstanceState == null) {
@@ -134,7 +134,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG, "onViewCreated");
+        Utils.logD(LOG_TAG, "onViewCreated:" + this);
         super.onViewCreated(view, savedInstanceState);
         mPresenter.onStartLoader();
         //  setUserVisibleHint(true); solution not valid after 24.0.0 SL
@@ -163,7 +163,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onStart() {
-        Utils.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart:" + this);
         super.onStart();
 
 
@@ -171,7 +171,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onResume() {
-        Utils.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume:" + this);
         super.onResume();
         mSharedPreferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
@@ -179,14 +179,14 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onPause() {
-        Utils.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause:"+this);
 
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Utils.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop:"+this);
         mSharedPreferences.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
@@ -291,7 +291,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
             @Override
             public void run() {
 
-                SnackBarWrapper snackBarWrapper=new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_SHORT);
+                SnackBarWrapper snackBarWrapper = new SnackBarWrapper(getActivity(), message, Snackbar.LENGTH_SHORT);
                 snackBarWrapper.show();
             }
         }, 30);
@@ -358,6 +358,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onDestroyView() {
+        Utils.logD(LOG_TAG, "onDestroyView:"+this);
         if (mSnackBar != null) {
             mSnackBar.dismiss();
         }
@@ -383,7 +384,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void onDestroy() {
-        Utils.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy:"+this);
         unbinder.unbind();
         super.onDestroy();
     }

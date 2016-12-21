@@ -92,6 +92,10 @@ public class FindFragment extends Fragment implements FindContract.View,
 
 
     private static final String LOG_TAG = FindFragment.class.getSimpleName();
+    private static final String LOCATION_KEY = "location_key";
+    private static final String LAST_SEARCH_EDITOR_KEY ="last_search_editor_key";
+    private static final String CARD_ON_SCREEN_KEY ="card_on_screen_key";
+    private static final String QUICK_SEARCH_RECYCLER_STATE ="quickSearchRecyclerViewState";
 
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -265,10 +269,10 @@ public class FindFragment extends Fragment implements FindContract.View,
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("location_key", mLocation);
-        outState.putString("last_search_editor_key", mSearchEditor.getText().toString());
-        outState.putBoolean("card_on_screen_key", mCardOnScreen);
-        outState.putInt("quickSearchRecyclerViewState", mQuickSearchRecyclerView.getVisibility());
+        outState.putParcelable(LOCATION_KEY, mLocation);
+        outState.putString(LAST_SEARCH_EDITOR_KEY, mSearchEditor.getText().toString());
+        outState.putBoolean(CARD_ON_SCREEN_KEY, mCardOnScreen);
+        outState.putInt(QUICK_SEARCH_RECYCLER_STATE, mQuickSearchRecyclerView.getVisibility());
 
 
     }
@@ -327,7 +331,7 @@ public class FindFragment extends Fragment implements FindContract.View,
             }
         });
         mClearSearch = (ImageView) getActivity().findViewById(R.id.clearSearch);
-        mSearchCardView = (CardView) getActivity().findViewById(R.id.card_search);
+        mSearchCardView = (CardView) getActivity().findViewById(R.id.cardWrapper);
         mViewSearch = (RelativeLayout) getActivity().findViewById(R.id.view_search);
         mImageSearchBack = (ImageView) getActivity().findViewById(R.id.image_search_back);
         mSearchEditor.addTextChangedListener(new TextWatcher() {

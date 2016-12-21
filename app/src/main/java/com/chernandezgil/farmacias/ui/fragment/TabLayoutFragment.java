@@ -33,6 +33,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     private static final String LOG_TAG = TabLayoutFragment.class.getSimpleName();
     private static final String TAG_FRAGMENT = "TAB_FRAGMENT";
+    private static final String CURRENT_ITEM_KEY = "current_item_key";
     private int mOffset;
     @BindView(R.id.viewpager)
     ViewPager mViewPager;
@@ -45,7 +46,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG, "onCreate");
+        Utils.logD(LOG_TAG, "onCreate:" + this);
         super.onCreate(savedInstanceState);
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         if (savedInstanceState != null) {
@@ -59,7 +60,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     public void onSaveInstanceState(Bundle outState) {
         Utils.logD(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putInt("current_item_key", mViewPager.getCurrentItem());
+        outState.putInt(CURRENT_ITEM_KEY, mViewPager.getCurrentItem());
 
 
     }
@@ -67,7 +68,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Utils.logD(LOG_TAG, "onCreateView");
+        Utils.logD(LOG_TAG, "onCreateView:" + this);
         View view = inflater.inflate(R.layout.fragment_tablayout, container, false);
         ButterKnife.bind(this, view);
 
@@ -77,8 +78,8 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mOffset =(int) Utils.convertDpToPixel(112,getActivity());
-        Utils.logD(LOG_TAG, "onActivityCreated");
+        mOffset = (int) Utils.convertDpToPixel(112, getActivity());
+        Utils.logD(LOG_TAG, "onActivityCreated:" + this);
         setUpViewPager();
         setUpTabLayout();
         mViewPager.setCurrentItem(mSharedPreferences.getCurrentItemTabLayout());
@@ -94,24 +95,24 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     @Override
     public void onStart() {
         super.onStart();
-        Utils.logD(LOG_TAG, "onStart");
+        Utils.logD(LOG_TAG, "onStart:" + this);
     }
 
     @Override
     public void onResume() {
-        Utils.logD(LOG_TAG, "onResume");
+        Utils.logD(LOG_TAG, "onResume:" + this);
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Utils.logD(LOG_TAG, "onPause");
+        Utils.logD(LOG_TAG, "onPause:" + this);
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Utils.logD(LOG_TAG, "onStop");
+        Utils.logD(LOG_TAG, "onStop:" + this);
 
         super.onStop();
     }
@@ -137,7 +138,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
             Toolbar toolbar = ((MainActivity) getActivity()).getToolbar();
             if (toolbar != null) {
 
-                int[] toolbarScreenLocation= new int[2];
+                int[] toolbarScreenLocation = new int[2];
                 toolbar.getLocationInWindow(toolbarScreenLocation);
 //                int[] location1=new int[2];
 //                toolbar.getLocationOnScreen(location1);
@@ -151,25 +152,24 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 //                toolbar.getLocalVisibleRect(rectLocal);
 //                Utils.logD(LOG_TAG,"Globl:left="+rectGlobal.left+",top="+rectGlobal.top);
 //                Utils.logD(LOG_TAG,"Globl:left="+rectLocal.left+",top="+rectLocal.top);
-                List<Fragment> lista =getChildFragmentManager().getFragments();
-                MapTabFragment f=null;
-                for (int i = 0; i <lista.size() ; i++) {
-                    Fragment fragment= lista.get(i);
-                    if(fragment instanceof MapTabFragment) {
-                        f =(MapTabFragment) fragment;
+                List<Fragment> lista = getChildFragmentManager().getFragments();
+                MapTabFragment f = null;
+                for (int i = 0; i < lista.size(); i++) {
+                    Fragment fragment = lista.get(i);
+                    if (fragment instanceof MapTabFragment) {
+                        f = (MapTabFragment) fragment;
                         break;
                     }
                 }
                 //toolbar is off the screen
-                if (toolbarScreenLocation[1] <= 0 && f!=null) {
+                if (toolbarScreenLocation[1] <= 0 && f != null) {
                     f.translateYBottomSheet(mOffset);
 
-                //toolbar is visible
-                } else if(toolbarScreenLocation[1] > 0 && f!=null) {
+                    //toolbar is visible
+                } else if (toolbarScreenLocation[1] > 0 && f != null) {
                     f.setBottomSheetPosition();
 
                 }
-
 
 
             }
@@ -279,7 +279,7 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
 
     @Override
     public void onDestroy() {
-        Utils.logD(LOG_TAG, "onDestroy");
+        Utils.logD(LOG_TAG, "onDestroy:" + this);
         super.onDestroy();
     }
 }
