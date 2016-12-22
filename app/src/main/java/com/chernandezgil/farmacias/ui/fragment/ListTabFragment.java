@@ -319,7 +319,9 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         return new SnackbarCallback() {
             @Override
             public void onSnackbarActionPressed(Snackbar snackbar) {
-                //Toast.makeText(getActivity(), "", Toast.LENGTH_LONG).show();
+
+                //set correct scrolling direction to enable animations when loading the adapter
+                mAdapter.setScrollDirection(Constants.SCROLL_UP);
                 //update location variable
                 mLocation = mSharedPreferences.getLocation();
                 //get the new address

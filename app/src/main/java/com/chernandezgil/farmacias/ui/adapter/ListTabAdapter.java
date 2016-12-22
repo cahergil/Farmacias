@@ -57,7 +57,15 @@ public class ListTabAdapter extends RecyclerView.Adapter<ListTabAdapter.MyViewHo
     private RecyclerView mRecyclerView;
     private int lastAnimatedPosition = -1;
 
+    // mainly used when new coordinates arrive, to enable animations, since now the ui thread
+    // not so busy
+    public int getScrollDirection() {
+        return scrollDirection;
+    }
 
+    public void setScrollDirection(int scrollDirection) {
+        this.scrollDirection = scrollDirection;
+    }
 
     @Constants.ScrollDirection
     int scrollDirection;
