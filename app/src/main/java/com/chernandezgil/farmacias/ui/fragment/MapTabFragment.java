@@ -209,7 +209,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTm = new TimeMeasure(LOG_TAG);
+        //mTm = new TimeMeasure(LOG_TAG);
         Utils.logD(LOG_TAG, "onCreate:" + this);
         mSharedPreferences = new PreferencesManagerImp(getActivity().getApplicationContext());
         mLocation = mSharedPreferences.getLocation();
@@ -248,9 +248,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mMapFragment = mapFragment;
         if (savedInstanceState != null) {
             mRotation = true;
-            mLastMarkerClicked = savedInstanceState.getParcelable("lastMarkerClicked_key");
+            mLastMarkerClicked = savedInstanceState.getParcelable(LAST_MARKER_KEY);
             mPresenter.onSetLastMarkerClick(mLastMarkerClicked);
-            mBottomSheetState = savedInstanceState.getInt("bottom_sheet_state");
+            mBottomSheetState = savedInstanceState.getInt(BOTTOM_SHEET_STATE);
         }
 
 
@@ -274,7 +274,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
+        //Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
 
@@ -474,7 +474,10 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
             message = getString(R.string.mtf_fuera_de_extremadura);
         }
 
-        Snackbar.make(mRootView, message, Snackbar.LENGTH_INDEFINITE).show();
+        mSnackBar = new SnackBarWrapper(getActivity(),message,Snackbar.LENGTH_INDEFINITE);
+        mSnackBar.show();
+
+        //Snackbar.make(mRootView, message, Snackbar.LENGTH_INDEFINITE).show();
     }
 
 
@@ -784,6 +787,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         mCancelThread = true;
         if (mAnimator != null && mAnimator.isRunning()) {
             mAnimator.cancel();
+        }
+        if (mSnackBar != null) {
+            mSnackBar.dismiss();
         }
         super.onDestroyView();
     }

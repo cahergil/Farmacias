@@ -1,9 +1,12 @@
 package com.chernandezgil.farmacias.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Carlos on 09/07/2016.
  */
-public class FarmaciasCsvBean {
+public class FarmaciasCsvBean implements Parcelable {
     int _id;
     String address;
     String horario;
@@ -159,4 +162,48 @@ public class FarmaciasCsvBean {
                 ", postal_code='" + postal_code + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this._id);
+        dest.writeString(this.address);
+        dest.writeString(this.horario);
+        dest.writeValue(this.lat);
+        dest.writeValue(this.lon);
+        dest.writeString(this.name);
+        dest.writeString(this.phone);
+        dest.writeString(this.locality);
+        dest.writeString(this.province);
+        dest.writeString(this.postal_code);
+    }
+
+    protected FarmaciasCsvBean(Parcel in) {
+        this._id = in.readInt();
+        this.address = in.readString();
+        this.horario = in.readString();
+        this.lat = (Double) in.readValue(Double.class.getClassLoader());
+        this.lon = (Double) in.readValue(Double.class.getClassLoader());
+        this.name = in.readString();
+        this.phone = in.readString();
+        this.locality = in.readString();
+        this.province = in.readString();
+        this.postal_code = in.readString();
+    }
+
+    public static final Parcelable.Creator<FarmaciasCsvBean> CREATOR = new Parcelable.Creator<FarmaciasCsvBean>() {
+        @Override
+        public FarmaciasCsvBean createFromParcel(Parcel source) {
+            return new FarmaciasCsvBean(source);
+        }
+
+        @Override
+        public FarmaciasCsvBean[] newArray(int size) {
+            return new FarmaciasCsvBean[size];
+        }
+    };
 }

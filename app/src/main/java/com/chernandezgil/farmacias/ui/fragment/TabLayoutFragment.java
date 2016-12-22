@@ -278,6 +278,12 @@ public class TabLayoutFragment extends Fragment implements TabLayout.OnTabSelect
     }
 
     @Override
+    public void onDestroyView() {
+        Utils.logD(LOG_TAG, "onDestroyView:" + this);
+        super.onDestroyView();
+    }
+
+    @Override
     public void onDestroy() {
         Utils.logD(LOG_TAG, "onDestroy:" + this);
         super.onDestroy();

@@ -182,7 +182,7 @@ public class Utils {
         final String telefono = context.getString(R.string.shared_intent_text_tef);;
 
         String textToShare = nombre + name + Constants.CR
-                + distancia + context.getString(R.string.format_distance, dist) + Constants.CR
+                + distancia + context.getString(R.string.format_distance, dist/1000) + Constants.CR
                 + direccion + aformatted + Constants.CR
                 + telefono + tel;
 

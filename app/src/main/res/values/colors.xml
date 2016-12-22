@@ -35,6 +35,7 @@
     <color name="blue_mobile_web">#ff4285f4</color>
     <color name="pharmacy_close">#ff736161</color>
     <color name="pharmacy_open">#ffd64646</color>
+    <color name="_your_color_code">#ff6464</color>
     <color name="pharmacy_open_list">@color/green_500</color>
     <color name="bottom_sheet_icons">@color/gray600</color>
     <color name="bottom_sheet_text">@color/black</color>

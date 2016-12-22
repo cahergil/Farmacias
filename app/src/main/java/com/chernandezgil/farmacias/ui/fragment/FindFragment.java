@@ -189,10 +189,10 @@ public class FindFragment extends Fragment implements FindContract.View,
             mPresenter.onInitLoader();
         } else {
 
-            mCardOnScreen = savedInstanceState.getBoolean("card_on_screen_key");
-            String searchText = savedInstanceState.getString("last_search_editor_key");
+            mCardOnScreen = savedInstanceState.getBoolean(CARD_ON_SCREEN_KEY);
+            String searchText = savedInstanceState.getString(LAST_SEARCH_EDITOR_KEY);
             if (mCardOnScreen) {
-                int quickSearchRecyclerViewVisibility = savedInstanceState.getInt("quickSearchRecyclerViewState");
+                int quickSearchRecyclerViewVisibility = savedInstanceState.getInt(QUICK_SEARCH_RECYCLER_STATE);
                 mPresenter.onInitLoader();
                 mSearchCardView.setVisibility(View.VISIBLE);
                 //  int options = mSearchEditor.getImeOptions();
@@ -273,7 +273,6 @@ public class FindFragment extends Fragment implements FindContract.View,
         outState.putString(LAST_SEARCH_EDITOR_KEY, mSearchEditor.getText().toString());
         outState.putBoolean(CARD_ON_SCREEN_KEY, mCardOnScreen);
         outState.putInt(QUICK_SEARCH_RECYCLER_STATE, mQuickSearchRecyclerView.getVisibility());
-
 
     }
 

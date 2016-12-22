@@ -131,7 +131,13 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-
+    // Android kills this app soon after it has gone to the background(by for example pressing home button).
+    // The app goes onPause(),onSaveInstanceState()
+    // and after onStop() and stays in background.
+    // Later on if I open other apps. and an app with higher priority needs memory, android kills our
+    // app process. But our instance state is saved in each activity or fragment bundle.
+    // If the user navigates   to the activity, then the system creates another process and for all activities
+    // and fragments onCreate() is called with the bundle saved in onSaveInstanceState().
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.logD(LOG_TAG, "onCreate");

@@ -12,7 +12,7 @@
     <string name="format_distance"><xliff:g id="distance">%1$1.2f</xliff:g> Km</string>
     <string name="mtf_tu_ubicacion" translatable="true">You are here</string>
     <string name="mtf_radio_busqueda_insuficiente" translatable="true">No results. Widen your search ratio</string>
-    <string name="mtf_fuera_de_extremadura" translatable="true">You are outside Extremadura</string>
+    <string name="mtf_fuera_de_extremadura" translatable="true">You are outside of Extremadura</string>
     <string name="mtf_openinghour_open" translatable="true">open</string>
     <string name="mtf_openinghour_close" translatable="true">close</string>
     <!-- MainActivityPresenter-->

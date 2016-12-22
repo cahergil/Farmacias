@@ -486,8 +486,8 @@ public class MapTabPresenter implements MapTabContract.Presenter<MapTabContract.
                         mFirstSortedPharmacy = mFarmaciasList.get(i);
                     }
                     mView.addMarkerToMap(mFarmaciasList.get(i));
-                    //we are in the last element, and have added it to the map
-                    //now need to add to maker as last one(so as it appears with info window over the rest
+                    // we are in the last element, and have added it to the map
+                    // now need to add to maker as last one(so as it appears with info window over the rest)
                     if (i == mFarmaciasList.size() - 1) {
                         mUserUbicationMarker = getUserLocationMarker();
                         if (mFirstSortedPharmacy != null) {

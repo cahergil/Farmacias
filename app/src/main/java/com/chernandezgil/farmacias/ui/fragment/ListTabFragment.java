@@ -40,6 +40,7 @@ import com.chernandezgil.farmacias.ui.adapter.ListTabAdapter;
 import com.chernandezgil.farmacias.ui.adapter.PreferencesManager;
 import com.chernandezgil.farmacias.view.ListTabContract;
 import com.chernandezgil.farmacias.view.MoveListToTop;
+import com.facebook.stetho.common.Util;
 import com.github.andrewlord1990.snackbarbuilder.callback.SnackbarCallback;
 
 import java.lang.reflect.Field;
@@ -145,7 +146,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
+   //     Utils.logD(LOG_TAG, "setUserVisibleHint:" + isVisibleToUser);
         super.setUserVisibleHint(isVisibleToUser);
     }
 
@@ -301,7 +302,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         if (key.equals(mSharedPreferences.getLocationKey())) {
-
+            Utils.logD(LOG_TAG,"onSharedPreferenceChanged");
             //anado isAdded porque me dio este npe
             // Process: com.chernandezgil.farmacias, PID: 8683
             //java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference

@@ -7,7 +7,7 @@ import android.os.Parcelable;
 /**
  * Created by Carlos on 10/07/2016.
  */
-public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<PharmacyObjectMap>,Parcelable {
+public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<PharmacyObjectMap> {
 
 
     Double distance;
@@ -139,6 +139,10 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        //since we inherit from FarmaciasCsvBean that implements parcelable, we override its writeToParcel
+        //method if we want this object to also be parcelable
+        //the first thing is to write to parcel member variables of super class
+        super.writeToParcel(dest,flags);
         dest.writeValue(this.distance);
         dest.writeString(this.hours);
         dest.writeValue(this.isOpen);
@@ -149,7 +153,10 @@ public class PharmacyObjectMap extends FarmaciasCsvBean implements Comparable<Ph
         dest.writeByte(this.isFavorite ? (byte) 1 : (byte) 0);
     }
 
+
     protected PharmacyObjectMap(Parcel in) {
+        //get the member variables from super class.
+        super(in);
         this.distance = (Double) in.readValue(Double.class.getClassLoader());
         this.hours = in.readString();
         this.isOpen = (Boolean) in.readValue(Boolean.class.getClassLoader());
