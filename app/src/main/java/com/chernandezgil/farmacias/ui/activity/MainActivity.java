@@ -242,8 +242,7 @@ public class MainActivity extends AppCompatActivity implements
             mRadio = mSharedPreferences.getRadio();
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, REQUEST_CODE_SETTINGS);
-            overridePendingTransition(
-                    R.anim.slide_in, R.anim.stay_exit);
+            overridePendingTransition(R.anim.slide_in, R.anim.stay_exit);
             return true;
         } else if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);

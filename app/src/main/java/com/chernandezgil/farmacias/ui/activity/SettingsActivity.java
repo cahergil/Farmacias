@@ -31,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         //make this trick in so that the enter transitions appears
         //put inside android.R.id.content identification
 
-
+    //    setContentView(R.layout.activity_settings);
         actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.settings_title));
         actionBar.setDisplayHomeAsUpEnabled(false);
