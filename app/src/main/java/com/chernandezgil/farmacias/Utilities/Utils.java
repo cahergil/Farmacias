@@ -154,7 +154,7 @@ public class Utils {
         } else {
             Calendar morningOpen = buildCalendar(now, 9, 0);
             Calendar morningClose = buildCalendar(now, 14, 0);
-            Calendar eveningOpen = buildCalendar(now, 18, 30);
+            Calendar eveningOpen = buildCalendar(now, 16, 30);
             Calendar eveningClose = buildCalendar(now, 20, 30);
             if ((date.after(morningOpen) && date.before(morningClose))
                     || (date.after(eveningOpen) && date.before(eveningClose))) {

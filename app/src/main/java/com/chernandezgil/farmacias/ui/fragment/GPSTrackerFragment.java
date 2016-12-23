@@ -40,6 +40,8 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
     private static boolean mFirstRun = false;
     public static final String BROADCAST = "broadcast";
     public static final String ACTION = "launch_fragment_0";
+    private static double MIN_DISTANCE = 25d;
+
     private boolean resurrected = false;
     private long mStartTime;
 
@@ -254,9 +256,16 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
             Utils.logD(LOG_TAG, "locationSaved {mFirstRun}");
             LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(createBroadcastIntent());
         } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
-            Utils.logD(LOG_TAG,"lat:"+lastLocation.getLatitude()+",lon:"+lastLocation.getLongitude());
-            Utils.logD(LOG_TAG, "locationSaved {ElapsedTime}");
-            mSharedPreferences.saveLocation(lastLocation);
+            Utils.logD(LOG_TAG, "lat:" + lastLocation.getLatitude() + ",lon:" + lastLocation.getLongitude());
+            Location lastStoredLocation = mSharedPreferences.getLocation();
+            double distance=Utils.meterDistanceBetweenPoints(lastStoredLocation.getLatitude(),
+                    lastStoredLocation.getLongitude(),
+                    lastLocation.getLatitude(),
+                    lastLocation.getLongitude());
+            if(distance> MIN_DISTANCE) {
+                mSharedPreferences.saveLocation(lastLocation);
+                Utils.logD(LOG_TAG, "locationSaved {ElapsedTime}");
+            }
             restartTimeCounter();
         } else if (resurrected) {
             resurrected = false;
