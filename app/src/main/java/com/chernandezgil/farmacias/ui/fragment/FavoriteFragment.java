@@ -10,6 +10,8 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.chernandezgil.farmacias.R;
+import com.chernandezgil.farmacias.Utilities.Constants;
 import com.chernandezgil.farmacias.customwidget.ScrollerLinearLayoutManager;
 import com.chernandezgil.farmacias.customwidget.dialog.DialogOpeningHoursPharmacy;
 import com.chernandezgil.farmacias.data.LoaderProvider;
@@ -55,6 +58,8 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
     RelativeLayout mEmptyView;
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     private FavoriteAdapter mAdapter;
     private Unbinder mUnbinder;
@@ -78,6 +83,7 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         View view = inflater.inflate(R.layout.fragment_favorites,container,false);
         mUnbinder= ButterKnife.bind(this,view);
         setUpRecyclerView();
+        setUpSwipeRefreshLayout();
         mPresenter.setView(this);
         return view;
 
@@ -142,6 +148,21 @@ public class FavoriteFragment extends Fragment implements FavoriteContract.View,
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
+
+    private void setUpSwipeRefreshLayout(){
+        mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),
+                R.color.colorAccent));
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mAdapter.setScrollDirection(Constants.SCROLL_UP);
+                mAdapter.recalculateIsOpenStatus();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         mAdapter.swapData(pharmacyList);

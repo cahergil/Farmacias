@@ -55,7 +55,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     private List<Pharmacy> mList;
     private Context mContext;
     private OnClickCallbacks mCallbacks;
-    private static final String LOG_TAG=FavoriteAdapter.class.getSimpleName();
+    private static final String LOG_TAG = FavoriteAdapter.class.getSimpleName();
     private CustomItemAnimator mCustomItemAnimator;
     private int expandedPosition = RecyclerView.NO_POSITION;
     private Transition expandCollapse = null;
@@ -78,16 +78,24 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     ColorMap mColorMap;
 
 
+    public int getScrollDirection() {
+        return scrollDirection;
+    }
+
+    public void setScrollDirection(int scrollDirection) {
+        this.scrollDirection = scrollDirection;
+    }
+
     public FavoriteAdapter(FavoriteFragment fragment,
                            RecyclerView recyclerView,
                            CustomItemAnimator customItemAnimator,
-                           PreferencesManager preferencesManager){
-        mContext=fragment.getActivity();
-        mCallbacks =fragment;
+                           PreferencesManager preferencesManager) {
+        mContext = fragment.getActivity();
+        mCallbacks = fragment;
         mRecyclerView = recyclerView;
-        mTm=new TimeMeasure("start FavoriteAdapter");
+        mTm = new TimeMeasure("start FavoriteAdapter");
         mCustomItemAnimator = customItemAnimator;
-        mDragStartListener =  fragment;
+        mDragStartListener = fragment;
         mSharedPreferences = preferencesManager;
         itemsPendingRemoval = new ArrayList<>();
         initColorMap();
@@ -160,20 +168,20 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
     }
 
 
-
     private void initColorMap() {
         mColorMap = new ColorMap();
-        HashMap<String,Integer> storedHashMap = mSharedPreferences.getColorMap();
-        if( storedHashMap != null) {
+        HashMap<String, Integer> storedHashMap = mSharedPreferences.getColorMap();
+        if (storedHashMap != null) {
             mColorMap.setColorHashMap(storedHashMap);
             return;
 
         }
         mColorMap.generate();
     }
+
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        Utils.logD("onItemMove","onItemMove");
+        Utils.logD("onItemMove", "onItemMove");
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(mList, i, i + 1);
@@ -194,12 +202,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         notifyItemRemoved(position);
         //in order to show the animation call this also
         notifyItemRangeChanged(position, getItemCount());
-        if(mList.isEmpty()) {
+        if (mList.isEmpty()) {
             mCallbacks.onListEmpty();
         }
-        
-    }
 
+    }
 
 
     @Override
@@ -207,11 +214,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         Pharmacy item = mList.get(position);
         return itemsPendingRemoval.contains(item);
     }
+
     @Override
     public void pendingRemoval(int position) {
-        final Pharmacy pharmacy=mList.get(position);
-        if(!itemsPendingRemoval.contains(pharmacy)) {
-            Utils.logD(LOG_TAG,"pendingRemoval position:"+position);
+        final Pharmacy pharmacy = mList.get(position);
+        if (!itemsPendingRemoval.contains(pharmacy)) {
+            Utils.logD(LOG_TAG, "pendingRemoval position:" + position);
             itemsPendingRemoval.add(pharmacy);
             // this will redraw row in "undo" state
             notifyItemChanged(position);
@@ -264,10 +272,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         return holder;
 
     }
+
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private void setDelayedTransition() {
         TransitionManager.beginDelayedTransition(mRecyclerView, expandCollapse);
     }
+
     private void setExpanded(FavoriteAdapter.MyViewHolder holder, boolean isExpanded) {
         holder.itemView.setActivated(isExpanded);
         holder.llOptionsRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
@@ -276,6 +286,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         holder.ivClock.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.ivShare.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
     }
+
     @Override
     public void onBindViewHolder(FavoriteAdapter.MyViewHolder holder, int position, List<Object> payloads) {
 
@@ -294,6 +305,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         bindHolder(holder, position);
 
     }
+
     private void runEnterAnimation(View view, int position) {
         if (position >= ANIMATED_ITEMS_COUNT - 1) {
             return;
@@ -321,13 +333,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             }
         }
     }
+
     private void bindHolder(MyViewHolder holder, int position) {
-        final Pharmacy pharmacy= mList.get(position);
+        final Pharmacy pharmacy = mList.get(position);
         if (itemsPendingRemoval.contains(pharmacy)) {
-            int color= pharmacy.getCircleColor();
-          //  holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
+            int color = pharmacy.getCircleColor();
+            //  holder.itemView.setBackgroundColor(Utils.getColor(R.color.colorAccent));
             holder.itemView.setBackgroundColor(color);
-            Utils.logD(LOG_TAG,"bindViewHolderSwiped,position;"+position);
+            Utils.logD(LOG_TAG, "bindViewHolderSwiped,position;" + position);
             //there seems to be a bounce back effect once onSwaped.
             //after calling notifyItemRangeChanged, e.g threre has been previous dismiss
             //this effect shows incorrect views, one has to change visibility of them.
@@ -348,7 +361,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
                     }
                     itemsPendingRemoval.remove(pharmacy);
                     notifyItemChanged(mList.indexOf(pharmacy));
-                    mDismissCanceled =true;
+                    mDismissCanceled = true;
 
                 }
             });
@@ -356,11 +369,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         } else {
 
             GradientDrawable gradientDrawable;
-            Utils.logD(LOG_TAG,"bindViewHolder");
-            if(mDismissCanceled) {
-                mDismissCanceled =false;
+            Utils.logD(LOG_TAG, "bindViewHolder");
+            if (mDismissCanceled) {
+                mDismissCanceled = false;
                 ObjectAnimator translateToLeft = ObjectAnimator.ofFloat(holder.itemView,
-                        "translationX",holder.itemView.getRight(),holder.itemView.getLeft());
+                        "translationX", holder.itemView.getRight(), holder.itemView.getLeft());
                 translateToLeft.setDuration(200);
                 translateToLeft.start();
 
@@ -377,10 +390,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             holder.tvOpen.setVisibility(View.VISIBLE);
             holder.tvDistance.setVisibility(View.VISIBLE);
 
-            String firsChar =pharmacy.getName().substring(0,1).toUpperCase();
-            holder.tvCircle.setText(pharmacy.getName().substring(0,1));
-            gradientDrawable= (GradientDrawable) ContextCompat.getDrawable(mContext,R.drawable.shape_circle);
-            int circleColor=mColorMap.getColorForString(firsChar);
+            String firsChar = pharmacy.getName().substring(0, 1).toUpperCase();
+            holder.tvCircle.setText(pharmacy.getName().substring(0, 1));
+            gradientDrawable = (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.shape_circle);
+            int circleColor = mColorMap.getColorForString(firsChar);
             gradientDrawable.setColor(circleColor);
             holder.tvCircle.setBackground(gradientDrawable);
             holder.tvCircle.setTag(circleColor);
@@ -424,35 +437,55 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
     public void swapData(List<Pharmacy> pharmacyList) {
         mList = reorderListIfNecessary(pharmacyList);
+        recalculateIsOpenStatus();
+
+    }
+
+    public void recalculateIsOpenStatus() {
+        boolean currentStatus;
+        Pharmacy pharmacy;
+        if (mList != null && mList.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < mList.size(); i++) {
+            pharmacy = mList.get(i);
+            currentStatus = Utils.isPharmacyOpen(pharmacy.getHours());
+            pharmacy.setOpen(currentStatus);
+
+        }
+
         notifyDataSetChanged();
+
 
     }
 
     private List<Pharmacy> reorderListIfNecessary(List<Pharmacy> pharmacyList) {
-        List<Pharmacy> storedFavorites= mSharedPreferences.getFavorites();
+        List<Pharmacy> storedFavorites = mSharedPreferences.getFavorites();
         //delete from original list those elements removed in other screens
-        for (int i = 0;i <storedFavorites.size();i++) {
-            if(!pharmacyList.contains(storedFavorites.get(i))) {
+        for (int i = 0; i < storedFavorites.size(); i++) {
+            if (!pharmacyList.contains(storedFavorites.get(i))) {
                 storedFavorites.remove(i);
             }
         }
         //add to original list those elements added in other screens
         //the new elements are added according the sortorder of the query in the content provider,
         //currently name of pharmacy order.
-        for (int i = 0; i<pharmacyList.size();i++) {
+        for (int i = 0; i < pharmacyList.size(); i++) {
             Pharmacy element = pharmacyList.get(i);
-            if(!storedFavorites.contains(element)) {
+            if (!storedFavorites.contains(element)) {
                 storedFavorites.add(element);
             }
         }
         return storedFavorites;
     }
 
-    public List<Pharmacy> getmList(){
+    public List<Pharmacy> getmList() {
         return mList;
 
     }
-    public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener,
+
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             ItemTouchHelperViewHolder {
 
         @BindView(R.id.tvName)
@@ -491,9 +524,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
             ivClock.setOnClickListener(this);
 
         }
+
         @Override
         public void onClick(View view) {
-            int id= view.getId();
+            int id = view.getId();
             int position = getAdapterPosition();
             switch (id) {
 
@@ -514,7 +548,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
 
         @Override
         public void onItemSelected() {
-            itemView.setBackgroundColor(ColorUtils.modifyAlpha(ContextCompat.getColor(mContext, R.color.black),0.10f));
+            itemView.setBackgroundColor(ColorUtils.modifyAlpha(ContextCompat.getColor(mContext, R.color.black), 0.10f));
         }
 
         @Override
@@ -523,11 +557,15 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.MyView
         }
     }
 
-    public  interface OnClickCallbacks {
+    public interface OnClickCallbacks {
         void onClickGo(Pharmacy pharmacy);
+
         void onClickPhone(String phone);
+
         void onClickShare(Pharmacy pharmacy);
+
         void onClickOpeningHours(String hour);
+
         void onListEmpty();
     }
 }
