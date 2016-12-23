@@ -22,7 +22,12 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <style name="AppTheme.NoActionBar.Settings">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
 
+
+    </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

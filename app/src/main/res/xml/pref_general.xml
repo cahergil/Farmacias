@@ -2,13 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory >
-        <Preference
-            android:layout="@layout/preference_image"
-            >
-
-        </Preference>
-    </PreferenceCategory>
+  
     <PreferenceCategory android:title="@string/pref_title_first_section">
         <com.chernandezgil.farmacias.customwidget.SeekBarPreference
             android:defaultValue="5"

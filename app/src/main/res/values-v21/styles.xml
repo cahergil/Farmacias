@@ -31,6 +31,14 @@
 
 
     </style>
+    <style name="AppTheme.NoActionBar.Settings">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:colorControlHighlight">@color/colorAccent</item>
+
+
+    </style>
 
 
 

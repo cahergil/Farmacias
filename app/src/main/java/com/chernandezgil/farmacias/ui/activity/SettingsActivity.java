@@ -15,7 +15,7 @@ import com.chernandezgil.farmacias.ui.fragment.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity {
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
-    private ActionBar actionBar;
+ //   private ActionBar actionBar;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -26,18 +26,16 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.logD(LOG_TAG,"onCreate");
-        //comment: no more necessary because I am no longer using Transitions api v21
-        //setContentView(R.layout.activity_settings);
-        //make this trick in so that the enter transitions appears
-        //put inside android.R.id.content identification
 
-    //    setContentView(R.layout.activity_settings);
-        actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.settings_title));
-        actionBar.setDisplayHomeAsUpEnabled(false);
+
+        setContentView(R.layout.activity_settings);
+        // with the addition of an image, toolbar is no longer needed.
+        // actionBar = getSupportActionBar();
+        // actionBar.setTitle(getString(R.string.settings_title));
+        // actionBar.setDisplayHomeAsUpEnabled(false);
 
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content,new SettingsFragment())
+                .replace(R.id.contenido,new SettingsFragment())
                 .commit();
 
     }
