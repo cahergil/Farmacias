@@ -385,7 +385,8 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
             //cancel previous animation
             if (mAnimator != null && mAnimator.isRunning()) {
-                mAnimator.cancel();
+                //mAnimator.cancel();
+                mAnimator.end();
             }
             Paint strokePaint = new Paint();
             strokePaint.setColor(Color.parseColor("#0D47A1"));
