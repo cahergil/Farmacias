@@ -251,7 +251,7 @@ public class GPSTrackerFragment extends Fragment implements LocationListener {
         if (mFirstRun) {
             mFirstRun = false;
             mSharedPreferences.saveLocation(lastLocation);
-            Utils.logD(LOG_TAG, "locationSaved {mFirstRun=true}");
+            Utils.logD(LOG_TAG, "locationSaved {mFirstRun}");
             LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(createBroadcastIntent());
         } else if (mElapsedTime > FRAG_MAP_REFRESH_INTERVAL) {
             Utils.logD(LOG_TAG,"lat:"+lastLocation.getLatitude()+",lon:"+lastLocation.getLongitude());
