@@ -14,7 +14,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +68,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
     FrameLayout mRootView;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout mSwipeContainer;
 
     private Location mLocation;
     private ListTabPresenter mPresenter;
@@ -116,6 +120,7 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         Utils.logD(LOG_TAG, "onCreateView:" + this);
         unbinder = ButterKnife.bind(this, view);
         setUpRecyclerView();
+        setUpSwipeRefreshLayout();
         if (savedInstanceState == null) {
             mPresenter.onGetAddressFromLocation(mLocation);
         } else {
@@ -202,6 +207,17 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    private void setUpSwipeRefreshLayout(){
+        mSwipeContainer.setColorSchemeColors(ContextCompat.getColor(getActivity(),R.color.colorAccent));
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //mSwipeContainer.setRefreshing(true);
+                mAdapter.recalculateIsOpenNow();
+                mSwipeContainer.setRefreshing(false);
+            }
+        });
+    }
     @Override
     public void showResults(List<Pharmacy> pharmacyList) {
         Utils.logD(LOG_TAG, "showResults");
@@ -303,9 +319,8 @@ public class ListTabFragment extends Fragment implements ListTabContract.View,
 
         if (key.equals(mSharedPreferences.getLocationKey())) {
             Utils.logD(LOG_TAG,"onSharedPreferenceChanged");
-            //anado isAdded porque me dio este npe
-            // Process: com.chernandezgil.farmacias, PID: 8683
-            //java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference
+            // isAdded porque me dio este npe
+            // java.lang.NullPointerException: Attempt to invoke virtual method 'android.content.res.TypedArray android.content.Context.obtainStyledAttributes(android.util.AttributeSet, int[], int, int)' on a null object reference
             if (isAdded()) {
                 mSnackBar = new SnackBarWrapper(getActivity());
                 mSnackBar.addCallback(createSnackbarCallback());
