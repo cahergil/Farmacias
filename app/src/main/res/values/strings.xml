@@ -72,7 +72,7 @@
 
     <!-- navigation_drawer_menu.xml-->
     <string name="nd_localizador" translatable="true">Cerca</string>
-    <string name="nd_buscar" translatable="true">Buscar Farmacia</string>
+    <string name="nd_buscar" translatable="true">Buscar farmacia</string>
     <string name="nd_favorites" translatable="true">Favoritos</string>
     <string name="nd_settings" translatable="true">Ajustes</string>
     <string name="nd_ayuda" translatable="true">Ayuda</string>
