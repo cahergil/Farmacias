@@ -714,8 +714,9 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
 
         tvDistance.setText(getString(R.string.format_distance, pharmacy.getDistance() / 1000));
         tvAdress.setText(pharmacy.getAddressFormatted());
-        boolean open = Utils.isPharmacyOpen(pharmacy.getHours());
-        tvHours.setText(open ? getString(R.string.mtf_openinghour_open) : getString(R.string.mtf_openinghour_close));
+//        boolean open = Utils.isPharmacyOpen(pharmacy.getHours());
+//        tvHours.setText(open ? getString(R.string.mtf_openinghour_open) : getString(R.string.mtf_openinghour_close));
+        tvHours.setText(getString(R.string.horario));
         tvPhone.setText(pharmacy.getPhoneFormatted());
         mPresenter.onSetLastMarkerClick(pharmacy);
         mLastMarkerClicked = pharmacy;

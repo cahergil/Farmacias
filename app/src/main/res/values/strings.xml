@@ -14,6 +14,7 @@
     <string name="mtf_fuera_de_extremadura" translatable="true">Fuera de Extremadura</string>
     <string name="mtf_openinghour_open" translatable="true">abierta</string>
     <string name="mtf_openinghour_close" translatable="true">cerrada</string>
+    <string name="horario">Horario</string>
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
     <string name="settings_title" translatable="true">Settings</string>
@@ -149,5 +150,6 @@
     <string name="borrar_historial_mensaje">¿Seguro que quiere borrar el historial de busqueda?</string>
     <string name="borrar_historial_yes_text">si</string>
     <string name="borrar_historial_no_text">cancelar</string>
+
 
 </resources>

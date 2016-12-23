@@ -14,6 +14,7 @@
     <string name="mtf_fuera_de_extremadura" translatable="true">Sie sind nicht in Extremadura</string>
     <string name="mtf_openinghour_open" translatable="true">geöffnet</string>
     <string name="mtf_openinghour_close" translatable="true">geschlossen</string>
+    <string name="horario">Geschäftszeit</string>
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">unbekannte Adresse</string>
     <string name="settings_title" translatable="true">Einstellungen</string>
@@ -146,4 +147,5 @@
     <string name="borrar_historial_mensaje">Sind Sie sicher, dass Sie den gesamten Suchverlauf löschen möchten?</string>
     <string name="borrar_historial_yes_text">ja</string>
     <string name="borrar_historial_no_text">abbrechen</string>
+
 </resources>
