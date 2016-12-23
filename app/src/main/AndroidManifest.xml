@@ -51,7 +51,7 @@
         <activity
             android:name=".ui.activity.SettingsActivity"
             android:label="Settings"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppTheme.NoActionBar.Settings"
             android:parentActivityName=".ui.activity.MainActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
