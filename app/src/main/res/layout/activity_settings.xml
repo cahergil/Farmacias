@@ -12,16 +12,17 @@
         android:gravity="center"
         >
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
-            android:src="@drawable/farmaex_settings" />
+            android:src="@drawable/farmaex_settings_no_bar_no_corners" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/contenido"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:orientation="vertical">
 
     </LinearLayout>

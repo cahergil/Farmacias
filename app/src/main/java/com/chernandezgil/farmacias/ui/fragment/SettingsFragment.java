@@ -86,11 +86,12 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 Preference pref = (Preference) preference;
                 //scale the vector drawable R.drawable.google_play to 24f
                 if (getString(R.string.pref_rate_key).equals(pref.getKey())) {
-                    VectorDrawableCompat drawable = VectorDrawableCompat.create(getActivity().getApplicationContext().getResources(),
-                            R.drawable.google_play, null);
-                    Bitmap bitmap = Utils.createScaledBitMapFromVectorDrawable(getActivity().getApplicationContext(), drawable, 24f);
-                    Drawable rateIcon = new BitmapDrawable(getResources(), bitmap);
-                    pref.setIcon(rateIcon);
+//                    VectorDrawableCompat drawable = VectorDrawableCompat.create(getActivity().getApplicationContext().getResources(),
+//                            R.drawable.google_play, null);
+//                    Bitmap bitmap = Utils.createScaledBitMapFromVectorDrawable(getActivity().getApplicationContext(), drawable, 24f);
+//                    Drawable rateIcon = new BitmapDrawable(getResources(), bitmap);
+//                    pref.setIcon(rateIcon);
+                    pref.setIcon(R.drawable.google_play);
                 }
             }
         }

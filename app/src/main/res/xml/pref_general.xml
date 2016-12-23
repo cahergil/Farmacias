@@ -39,7 +39,7 @@
         </Preference>
 
         <Preference
-            android:icon="@drawable/share"
+            android:icon="@drawable/ic_share_settings"
             android:key="@string/pref_share_app_key"
             android:title="@string/share_app_title">
 
