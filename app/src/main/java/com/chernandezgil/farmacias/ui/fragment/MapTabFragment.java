@@ -788,7 +788,7 @@ public class MapTabFragment extends Fragment implements OnMapReadyCallback,
         Utils.logD(LOG_TAG, "onDestroyView:"+this);
         mCancelThread = true;
         if (mAnimator != null && mAnimator.isRunning()) {
-            mAnimator.cancel();
+            mAnimator.end();
         }
         if (mSnackBar != null) {
             mSnackBar.dismiss();
