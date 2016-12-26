@@ -4,6 +4,13 @@
         <attr name="max" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="TextViewPlus">
+        <attr name="customFont" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="CheckableImageViewv2">
+        <attr name="tin" format="reference|color" />
+    </declare-styleable>
     <declare-styleable name="ExpandableLayout">
         <attr name="ael_duration" format="integer" />
         <attr name="ael_expanded" format="boolean" />

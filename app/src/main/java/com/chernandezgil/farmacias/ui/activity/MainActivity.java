@@ -153,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements
 
         //enableStrictModeForDebug();
         Icepick.restoreInstanceState(this, savedInstanceState);
+        if(savedInstanceState==null) {
+          //  debug
+          //  Stetho.initializeWithDefaults(this);
+        }
 
         if (hasAllPermissions(getDesiredPermissions())) {
             buildGoogleApiClient();

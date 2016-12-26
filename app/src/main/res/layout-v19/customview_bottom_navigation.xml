@@ -26,6 +26,7 @@ Relativelayout must have layout_gravity=center"-->
             <com.chernandezgil.farmacias.customwidget.CheckableImageViewv2
                 android:id="@+id/bnv_around"
                 style="@style/BottomNavigationCheckeableImageView2"
+                app:tin="@color/selector_bottonnavigation_tint_images"
                 app:srcCompat="@drawable/nearby"
 
                 />
@@ -52,6 +53,7 @@ Relativelayout must have layout_gravity=center"-->
             <com.chernandezgil.farmacias.customwidget.CheckableImageViewv2
                 android:id="@+id/bnv_buscar"
                 style="@style/BottomNavigationCheckeableImageView2"
+                app:tin="@color/selector_bottonnavigation_tint_images"
                 app:srcCompat="@drawable/ic_lupa" />
 
             <TextView
@@ -75,6 +77,7 @@ Relativelayout must have layout_gravity=center"-->
             <com.chernandezgil.farmacias.customwidget.CheckableImageViewv2
                 android:id="@+id/bnv_favoritos"
                 style="@style/BottomNavigationCheckeableImageView2"
+                app:tin="@color/selector_bottonnavigation_tint_images"
                 app:srcCompat="@drawable/ic_heart" />
 
             <TextView

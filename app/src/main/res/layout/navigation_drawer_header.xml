@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="250dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="bottom"
+
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:background="@color/colorPrimary">
+    android:background="@drawable/gradient_navigation_drawer_header">
+    <ImageView
+        android:layout_marginTop="40dp"
+        android:layout_width="250dp"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        android:alpha="0.1"
+        android:layout_marginLeft="130dp"
+        android:src="@drawable/extremadura_mapa" />
 
     <ImageView
-        app:layout_widthPercent="100%"
-        app:layout_aspectRatio="@fraction/header_aspectRatio"
+        android:layout_marginTop="66dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:scaleType="fitCenter"
         android:src="@drawable/farmacia_logo" />
 
     <LinearLayout
+        android:layout_marginTop="-20dp"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="100dp"
         android:layout_gravity="left|bottom"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingBottom="8dp"
+
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:textSize="21sp"
+            android:layout_marginBottom="5dp"
+            android:textColor="#ffffff"
+            android:text="Farmaex"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center_vertical"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:maxLines="2"
+            android:shadowRadius="8"
+            android:textSize="18sp"
+
+            android:textColor="@color/red_200"
             android:text="Farmacias de Extremadura"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
 
     </LinearLayout>
 
-</android.support.percent.PercentFrameLayout>
+</FrameLayout>

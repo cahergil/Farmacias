@@ -40,6 +40,16 @@
 
     </style>
 
+    <!--bottom_sheet_middle_box.xml styles
+    @drawable/ripple_bottom_navigation is +21
+    -->
+    <style name="BottomNavigationLinearLayout">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/ripple_bottom_navigation</item>
+        <item name="android:orientation">vertical</item>
+    </style>
 
 
 

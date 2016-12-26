@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
@@ -28,9 +29,10 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
     private static final int CAPACITY = 3;
     private static final int ANIMATION_DURATION = 200;
     private LinearLayout llAround, llBuscar, llFavorites;
-    private CheckableImageView ivAround, ivBuscar, ivFavorites;
+    //private CheckableImageView ivAround, ivBuscar, ivFavorites;
+    private CheckableImageViewv2 ivAround, ivBuscar, ivFavorites;
     private TextView tvAround, tvBuscar, tvFavorites;
-    private SparseArray<CheckableImageView> mHasMapImages;
+    private SparseArray<CheckableImageViewv2> mHasMapImages;
     private SparseArray<TextView> mHasMapText;
     private int lastCheckedId = NONE;
 
@@ -55,9 +57,12 @@ public class BottomNavigation extends LinearLayout implements View.OnClickListen
         llAround = (LinearLayout) findViewById(R.id.llAround);
         llBuscar = (LinearLayout) findViewById(R.id.llBuscar);
         llFavorites = (LinearLayout) findViewById(R.id.llFavorite);
-        ivAround = (CheckableImageView) findViewById(R.id.bnv_around);
-        ivBuscar = (CheckableImageView) findViewById(R.id.bnv_buscar);
-        ivFavorites = (CheckableImageView) findViewById(R.id.bnv_favoritos);
+
+
+        ivAround = (CheckableImageViewv2) findViewById(R.id.bnv_around);
+        ivBuscar = (CheckableImageViewv2) findViewById(R.id.bnv_buscar);
+        ivFavorites = (CheckableImageViewv2) findViewById(R.id.bnv_favoritos);
+
 
         tvAround = (TextView) findViewById(R.id.text_around);
         tvBuscar = (TextView) findViewById(R.id.text_buscar);
