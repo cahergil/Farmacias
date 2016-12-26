@@ -22,14 +22,12 @@ Share to social networks
 
 - [Description](#description)
   - [Screenshots](#screenshots)
-  - [Videos](#videos)
 - [Features](#features)
 - [Libraries used](#libraries-used)
 - [GPS mock](#gps-mock)
 - [Installation and Run](#installation-and-run)
 - [TODO](#todo)
 - [Contribute](#contribute)
-- [Changelog](#changelog)
 - [License](#license)
 
 ## Description
@@ -45,9 +43,6 @@ Share to social networks
    ![Searching](https://github.com/cahergil/Shareablefotos/blob/master/search_string.png)  ![Search results](https://github.com/cahergil/Shareablefotos/blob/master/search_results.png)
  ![Settings](https://github.com/cahergil/Shareablefotos/blob/master/settings.png) 
   
-#### Videos
- 
-
   
 ## Features
 
