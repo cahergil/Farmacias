@@ -9,11 +9,18 @@ retrolambda {
 
 
 android {
-
+    signingConfigs {
+        config {
+            keyAlias 'keyalias'
+            keyPassword 'superpassword'
+            storeFile file('keystore.jks')
+            storePassword 'superpassword'
+        }
+    }
     compileSdkVersion 25
     //buildToolsVersion "24.0.2"
     buildToolsVersion "25.0.0"
-   // buildToolsVersion "24.0.2"
+    // buildToolsVersion "24.0.2"
     defaultConfig {
         applicationId "com.chernandezgil.farmacias"
         minSdkVersion 16
@@ -26,7 +33,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
+            signingConfig signingConfigs.config
         }
     }
     dexOptions {
@@ -50,8 +57,7 @@ repositories {
 }
 dependencies {
     def SUPPORT_LIBRARY_VERSION = "25.0.1"
- //   def SUPPORT_LIBRARY_VERSION = "24.2.1"
-
+    //   def SUPPORT_LIBRARY_VERSION = "24.2.1"
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
@@ -59,13 +65,10 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:design:$SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:support-vector-drawable:$SUPPORT_LIBRARY_VERSION"
-
     compile 'com.google.android.gms:play-services-location:9.8.0'
     compile 'com.google.android.gms:play-services-maps:9.8.0'
     compile 'com.jakewharton:butterknife:8.1.0'
     apt 'com.jakewharton:butterknife-compiler:8.1.0'
-
-
     //Reactive dependencies
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.1.1'
@@ -79,24 +82,18 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.2'
     apt 'com.google.dagger:dagger-compiler:2.0.2'
     provided 'javax.annotation:jsr250-api:1.0'
-
-
     //to convert some web obtained svg(transformed to vector drawable) to bitmap
     //I think I use one method only
     compile 'com.bettervectordrawable:lib:0.8'
-
     //recylerview animations
     //compile 'com.github.gabrielemariotti.recyclerview:recyclerview-animators:0.3.0-SNAPSHOT@aar'
     //compile 'jp.wasabeef:recyclerview-animators:2.2.4'
     //guava for collections
     compile 'com.google.guava:guava:19.0'
-
     //expandable linerlayout
- //   compile 'com.github.aakira:expandable-layout:1.5.1@aar'
-
-     // to implement rxjava with editText
+    //   compile 'com.github.aakira:expandable-layout:1.5.1@aar'
+    // to implement rxjava with editText
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
-
     //icepick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
@@ -104,14 +101,10 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.4+'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.android.support:percent:25.0.0'
-
     //   compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
     //   debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
-
-
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-
 }
 task (depsize) << {
     def size = 0;

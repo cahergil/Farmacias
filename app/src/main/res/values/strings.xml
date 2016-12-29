@@ -1,10 +1,10 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name" translatable="true">Farmacias</string>
     <string name="action_settings" translatable="true">Settings</string>
-    <string name="places_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="maps_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="places_server_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="places_browser_api_key">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
+    <string name="places_api_key" translatable="false">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="maps_api_key" translatable="false">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_server_api_key" translatable="false">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
+    <string name="places_browser_api_key" translatable="false">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
 
     <string name="content_authority" translatable="false">com.chernandezgil.farmacias</string>
     <!-- MapTabFragment-->
