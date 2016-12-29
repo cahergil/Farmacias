@@ -1,12 +1,8 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name" translatable="true">Farmaex</string>
     <string name="action_settings" translatable="true">Settings</string>
-    <string name="places_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="maps_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="places_server_api_key">AIzaSyAtMzGuIRjDOrLl1j1bF3DgLHRFgK5ubps</string>
-    <string name="places_browser_api_key">AIzaSyAs3wpH3kKTdR5FKMBsTjaOERTlscCH_KM</string>
 
-    <string name="content_authority" translatable="false">com.chernandezgil.farmacias</string>
+
 
     <!-- MapTabFragment-->
     <string name="format_distance"><xliff:g id="distance">%1$1.2f</xliff:g> Km</string>
@@ -20,31 +16,23 @@
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Unknown location</string>
     <string name="settings_title" translatable="true">Settings</string>
-    <string name="pref_title_first_section" translatable="false">App</string>
+    <string name="pref_title_first_section" translatable="true">App</string>
     <string name="pref_title_second_section" translatable="true">Others</string>
-    <string name="seek_bar_key" translatable="false">seekbar_key</string>
     <string name="seek_bar_title" translatable="true">Search radio</string>
     <!-- Preferences -->
-    <string name="pref_rate_key" translatable="false">rate</string>
     <string name="rate_app" translatable="true">If you enjoyed the app, please rate it on Play Store</string>
     <string name="rate_app_title" translatable="true">Rate the app</string>
-    <string name="pref_email_key" translatable="false">email</string>
     <string name="email_title" translatable="true">Send an email to developer</string>
 
-    <string name="pref_share_app_key" translatable="false">share app</string>
     <string name="share_app_string" translatable="true">Recommend this app to a friend</string>
     <string name="share_app_title" translatable="true">Share this app with friends</string>
 
-    <string name="pref_version_key" translatable="false">version</string>
     <string name="version_title" translatable="true">Version</string>
 
-    <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
     <string name="subject" translatable="true">Comment about Farmaex app</string>
     <string name="sendchooser_text" translatable="true">send Email...</string>
 
-    <string name="app_play_store_address" translatable="false">https://play.google.com/store/apps/details?id=com.chernandezgil.farmacias</string>
 
-    <string name="pref_delete_history_key" translatable="false">delete</string>
     <string name="pref_delete_history_title" translatable="true">Delete search history</string>
     <string name="pref_delete_history_summary" translatable="true">By clicking you will delete the search history made so far</string>
     <string name="pref_delete_toast_message" translatable="true">Search history deleted</string>
@@ -104,9 +92,6 @@
     <string name="sn_sabado" translatable="true">Saturday:</string>
     <string name="sn_domingo" translatable="true">Sunday:</string>
 
-    <string name="sn_normal_hour" translatable="false">09:00-14:00,16:30-20:30</string>
-    <string name="sn_sabado_hour" translatable="false">09:00-14:00</string>
-    <string name="sn_na_hour" translatable="false">-</string>
     <!-- bottom_sheet_middle_box.java-->
     <string name="bsmb_llamar" translatable="true">CALL</string>
     <string name="bsmb_ir" translatable="true">GO</string>
@@ -118,7 +103,6 @@
     <!-- DialogOpeningHoursPharmacy.java-->
     <string name="dialog_title" translatable="true">Opening hours</string>
     <string name="dialog_mensaje" translatable="true">Timetable</string>
-    <string name="dialog_ok_button" translatable="false">ok</string>
 
     <!-- dialog_opening_hours_24_hours-->
     <string name="doh_24h_open" translatable="true">24 hours open</string>
@@ -141,11 +125,11 @@
     <string name="shared_intent_text_tef" translatable="true">phone:</string>
 
     <!-- SnackBarWrapper.java-->
-    <string name="sbw_nuevas_localizaciones">New location detected</string>
-    <string name="sbw_actualizar">UPDATE</string>
+    <string name="sbw_nuevas_localizaciones" translatable="true">New location detected</string>
+    <string name="sbw_actualizar" translatable="true">UPDATE</string>
     <!-- SettingsFragment -->
-    <string name="borrar_historial_confirmar_accion">Confirm delete</string>
-    <string name="borrar_historial_mensaje">Are you sure you want to delete your search history ?</string>
-    <string name="borrar_historial_yes_text">yes</string>
-    <string name="borrar_historial_no_text">cancel</string>
+    <string name="borrar_historial_confirmar_accion" translatable="true">Confirm delete</string>
+    <string name="borrar_historial_mensaje" translatable="true">Are you sure you want to delete your search history ?</string>
+    <string name="borrar_historial_yes_text" translatable="true">yes</string>
+    <string name="borrar_historial_no_text" translatable="true">cancel</string>
 </resources>

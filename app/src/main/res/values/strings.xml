@@ -18,7 +18,7 @@
     <!-- MainActivityPresenter-->
     <string name="address_not_found" translatable="true">Ubicacion desconocida</string>
     <string name="settings_title" translatable="true">Settings</string>
-    <string name="pref_title_first_section" translatable="false">App</string>
+    <string name="pref_title_first_section" translatable="true">App</string>
     <string name="pref_title_second_section" translatable="true">Otras</string>
     <string name="seek_bar_key" translatable="false">seekbar_key</string>
     <string name="seek_bar_title" translatable="true">Radio de busqueda</string>
@@ -36,7 +36,7 @@
     <string name="pref_version_key" translatable="false">version</string>
     <string name="version_title">Version</string>
 
-    <string name="mailto" translatable="false">farmaciasextremadura@gmail.com</string>
+    <string name="mailto" translatable="false">farmaciasdeextremadura@gmail.com</string>
     <string name="subject" translatable="true">Comentario sobre la aplicacion Farmacias de Extremadura</string>
     <string name="sendchooser_text" translatable="true">Enviar email...</string>
 
@@ -142,14 +142,14 @@
 
 
     <!-- SnackBarWrapper.java-->
-    <string name="sbw_nuevas_localizaciones">Nueva localizacion detectada</string>
-    <string name="sbw_actualizar">ACTUALIZAR</string>
+    <string name="sbw_nuevas_localizaciones" translatable="true">Nueva localizacion detectada</string>
+    <string name="sbw_actualizar" translatable="true">ACTUALIZAR</string>
 
     <!-- SettingsFragment -->
-    <string name="borrar_historial_confirmar_accion">Confirmar borrado</string>
-    <string name="borrar_historial_mensaje">¿Seguro que quiere borrar el historial de busqueda?</string>
-    <string name="borrar_historial_yes_text">si</string>
-    <string name="borrar_historial_no_text">cancelar</string>
+    <string name="borrar_historial_confirmar_accion" translatable="true">Confirmar borrado</string>
+    <string name="borrar_historial_mensaje" translatable="true">¿Seguro que quiere borrar el historial de busqueda?</string>
+    <string name="borrar_historial_yes_text" translatable="true">si</string>
+    <string name="borrar_historial_no_text" translatable="true">cancelar</string>
 
 
 </resources>

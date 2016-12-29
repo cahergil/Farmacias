@@ -9,14 +9,7 @@ retrolambda {
 
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'superalias'
-            keyPassword 'naci1978'
-            storeFile file('C:/Users/Carlos/AndroidStudioProjects/Farmacias/places_keystore.jks')
-            storePassword 'naci1978'
-        }
-    }
+
     compileSdkVersion 25
     //buildToolsVersion "24.0.2"
     buildToolsVersion "25.0.0"
@@ -33,7 +26,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+
         }
     }
     dexOptions {
@@ -101,25 +94,23 @@ dependencies {
     //expandable linerlayout
  //   compile 'com.github.aakira:expandable-layout:1.5.1@aar'
 
- //   compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
-    // to implement rxjava with editText
+     // to implement rxjava with editText
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 
     //icepick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
-
     compile 'com.github.andrewlord1990:snackbarbuilder:0.6.0'
-
     compile 'com.google.maps.android:android-maps-utils:0.4+'
-
     compile 'com.google.code.gson:gson:2.3.1'
-
-
     compile 'com.android.support:percent:25.0.0'
 
+    //   compile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
+    //   debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
 
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
 }
 task (depsize) << {
