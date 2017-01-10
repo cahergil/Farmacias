@@ -25,11 +25,12 @@ import java.util.List;
 public class CsvReader {
 
     private static final String LOG_TAG=CsvReader.class.getSimpleName();
-    //   https://www.dropbox.com/s/lo5nrm1inmgh27o/farmacias_extremadura.txt?dl=0
-//https://dl.dropboxusercontent.com/u/19281611/Farmacias/farmacias_extremadura.txt
+    //https://www.dropbox.com/s/lo5nrm1inmgh27o/farmacias_extremadura.txt?dl=0
+    //https://dl.dropboxusercontent.com/u/19281611/Farmacias/farmacias_extremadura.txt
     //private static String endpoint="https://dl.dropboxusercontent.com/s/lo5nrm1inmgh27o/farmacias_extremadura.txt";
     //https://dl.dropboxusercontent.com/u/19281611/Farmacias/farmacias_extremadura.txt
-    private static String endpoint = "https://dl.dropboxusercontent.com/u/19281611/Farmacias/farmacias_extremadura.txt";
+    //private static String endpoint = "https://dl.dropboxusercontent.com/u/19281611/Farmacias/farmacias_extremadura.txt";
+    private static String endpoint = "https://www.dropbox.com/s/jplexzcdkmgkfof/farmacias_extremadura.txt?dl=0";
 
     private static CellProcessor[] getProcessors() {
         final CellProcessor[] processors = new CellProcessor[]{
