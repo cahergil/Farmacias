@@ -6,7 +6,7 @@
  [![targetSdk](https://img.shields.io/badge/targetSDK-25-orange.svg?style=flat)](http://source.android.com/source/build-numbers.html)
 
 
-![Pharmaex logo](https://github.com/cahergil/Shareablefotos/blob/master/farmaex_logo_87x87.png)
+![Pharmaex logo](https://github.com/cahergil/shareablefotos/blob/master/farmaex/farmaex_logo_87x87.png)
 
 This repository contains Farmaex, a pharmacy discovering app I developed for the region of Extremadura(Spain). The intention of the project 
 is to build new features over the time, constantly enhancing thus its functionality.
@@ -38,9 +38,10 @@ Share to social networks
   
  
  
-  ![Nearby list](https://github.com/cahergil/Shareablefotos/blob/master/list_map_options_open.png)  ![Nearby map](https://github.com/cahergil/Shareablefotos/blob/master/map_normal.png)
-    ![bottom sheet extended](https://github.com/cahergil/Shareablefotos/blob/master/map_bottom_sheet_extended.png)  ![Favorites](https://github.com/cahergil/Shareablefotos/blob/master/favoritos.png)
-   ![Searching](https://github.com/cahergil/Shareablefotos/blob/master/search_string.png)  ![Search results](https://github.com/cahergil/Shareablefotos/blob/master/search_results.png)
+  ![Nearby list](https://github.com/cahergil/shareablefotos/blob/master/farmaex/list.png)  ![Nearby map](https://github.com/cahergil/Shareablefotos/blob/master/map_normal.png)
+    ![bottom sheet extended](https://github.com/cahergil/shareablefotos/blob/master/farmaex/map.png)  ![Favorites](https://github.com/cahergil/shareablefotos/blob/master/farmaex/favoritos.png)
+   ![Searching](https://github.com/cahergil/shareablefotos/blob/master/farmaex/search.png) 
+   ![Search results](https://github.com/cahergil/shareablefotos/blob/master/farmaex/search_results.png) 
  ![Settings](https://github.com/cahergil/Shareablefotos/blob/master/settings.png) 
   
   
