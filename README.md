@@ -38,11 +38,6 @@ Share to social networks
   
  
  
-  ![Nearby list](https://github.com/cahergil/shareablefotos/blob/master/farmaex/list.png)  ![Nearby map](https://github.com/cahergil/Shareablefotos/blob/master/map_normal.png)
-    ![bottom sheet extended](https://github.com/cahergil/shareablefotos/blob/master/farmaex/map.png)  ![Favorites](https://github.com/cahergil/shareablefotos/blob/master/farmaex/favoritos.png)
-   ![Searching](https://github.com/cahergil/shareablefotos/blob/master/farmaex/search.png) 
-   ![Search results](https://github.com/cahergil/shareablefotos/blob/master/farmaex/search_results.png) 
- ![Settings](https://github.com/cahergil/Shareablefotos/blob/master/settings.png) 
   
   
 ## Features
