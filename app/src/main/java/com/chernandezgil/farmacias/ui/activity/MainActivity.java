@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements
         Icepick.restoreInstanceState(this, savedInstanceState);
         if(savedInstanceState==null) {
           //  debug
-          //  Stetho.initializeWithDefaults(this);
+            Stetho.initializeWithDefaults(this);
         }
 
         if (hasAllPermissions(getDesiredPermissions())) {
@@ -466,9 +466,6 @@ public class MainActivity extends AppCompatActivity implements
                         option = 3;
                         break;
 
-                    case R.id.item_navigation_help:
-                        option = 4;
-                        break;
                     case R.id.item_navigation_feedback:
                         option = 5;
                         sendFeedback();

@@ -24,10 +24,7 @@
                 android:id="@+id/item_navigation_drawer_settings"
                 android:icon="@drawable/ic_settings"
                 android:title="@string/nd_settings" />
-            <item
-                android:id="@+id/item_navigation_help"
-                android:icon="@drawable/ic_help_circle"
-                android:title="@string/nd_ayuda" />
+
             <item
                 android:id="@+id/item_navigation_feedback"
                 android:icon="@drawable/ic_comment_alert"
