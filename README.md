@@ -1,5 +1,6 @@
 ## Farmaex
 
+Deprecated!!
 
 [![GPL license](https://img.shields.io/badge/license-GPL v3-blue.svg?style=flat)](https://raw.githubusercontent.com/cahegi/Farmacias/master/LICENSE.md)
  [![minSdk](https://img.shields.io/badge/minSDK-16%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=16#)
